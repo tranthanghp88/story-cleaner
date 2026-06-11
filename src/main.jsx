@@ -1512,7 +1512,7 @@ function App() {
                   <button className="bookTitleBtn" onClick={() => toggleBookCollapsed(bIdx)} title={book.title || `Truyện ${bIdx + 1}`} style={{ fontWeight: 'bold', width: '100%', textAlign: 'left', padding: '4px 6px' }}>
                     <span className="bookTitleText">{book.title || `Truyện ${bIdx + 1}`} ({chs.length} chương)</span>
                   </button>
-                  <div className="bookNodeActions" style={{ display: 'flex', gap: '6px', marginTop: '4px', alignItems: 'center', justifyContent: 'flex-start' }}>
+                  <div className="bookNodeActions" style={{ display: 'none' }}>
                     <button 
                       onClick={addChapter} 
                       style={{ 
@@ -1573,7 +1573,7 @@ function App() {
                   </div>
                 </div>
 
-                <div className="chapterList treeChapters" style={{ marginTop: '8px' }}>
+                <div className="chapterList treeChapters" style={{ marginTop: '8px' }}><div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '24px', marginLeft: '-15px' }}><div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} /><button onClick={addChapter} className="softPrimary" style={{ padding: '2px 8px', fontSize: '11px', whiteSpace: 'nowrap', borderRadius: '6px', height: '22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: 'bold', margin: 0, border: '1px solid #bfdbfe' }}>+ Chương tiếp</button><label style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer', height: '22px', userSelect: 'none' }}><input type="checkbox" style={{ width: '13px', height: '13px', margin: 0, flexShrink: 0, cursor: 'pointer' }} checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} onChange={() => { const allSelected = chs.every(c => c.selectedForExport === true); setBooks(prev => prev.map((x, bookI) => { if (bookI === bIdx) { return { ...x, chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected })) }; } return x; })); }} /><span style={{ fontSize: '11px', fontWeight: 'bold', color: '#172033', lineHeight: '1', whiteSpace: 'nowrap' }}>All</span></label></div>
                   {chs.map((ch, i) => {
                     const isActive = bIdx === bookIndex && i === selected;
                     return (
