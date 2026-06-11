@@ -484,6 +484,36 @@ function App() {
   const projectInputRef=useRef(null);
   const cancelRef = useRef(false);
   const [cancelRequested, setCancelRequested] = useState(false);
+
+  // States for DOCX dropdown and batch export modal
+  const [showDocxDropdown, setShowDocxDropdown] = useState(false);
+  const [showBatchExportModal, setShowBatchExportModal] = useState(false);
+  const [exportStartCh, setExportStartCh] = useState(1);
+  const [exportEndCh, setExportEndCh] = useState(10);
+  const [exportFilename, setExportFilename] = useState('Tập 01');
+  const [exportIsSiri, setExportIsSiri] = useState(false);
+
+  // States for split buttons
+  const [batchAiSelection, setBatchAiSelection] = useState('3');
+  const [batchAiValue, setBatchAiValue] = useState(3);
+  const [batchFetchSelection, setBatchFetchSelection] = useState('all');
+  const [batchFetchValue, setBatchFetchValue] = useState('all');
+  const [showFetchDropdown, setShowFetchDropdown] = useState(false);
+  const [isEnteringFetchCustom, setIsEnteringFetchCustom] = useState(false);
+  const [tempFetchCustomValue, setTempFetchCustomValue] = useState(10);
+  const [showBatchAiDropdown, setShowBatchAiDropdown] = useState(false);
+  const [isEnteringAiCustom, setIsEnteringAiCustom] = useState(false);
+  const [tempAiCustomValue, setTempAiCustomValue] = useState(5);
+  const [showOptionsPopup, setShowOptionsPopup] = useState(false);
+
+  const updateDefaultFilename = (start, end) => {
+    const s = parseInt(start) || 1;
+    const e = parseInt(end) || 10;
+    const diff = Math.max(1, e - s + 1);
+    const tapNum = Math.max(1, Math.ceil(s / diff));
+    const padNum = String(tapNum).padStart(2, '0');
+    setExportFilename(`Tập ${padNum}`);
+  };
   const handleStop = () => {
     cancelRef.current = true;
     setCancelRequested(true);
@@ -619,6 +649,11 @@ function App() {
     }, 900);
     return ()=>clearTimeout(timer);
   },[books,bookIndex,bookTitle,author,chapters,filters,options,apiSettings,apiPool,promptSettings,collapsedBooks]);  const current=chapters[selected]||chapters[0];
+  const formatCharCount = (ch) => {
+    if (!ch) return '0';
+    const text = ch.raw || ch.cleaned || '';
+    return text.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
   const [createCount, setCreateCount] = useState(1);
   const [batchSizeInput, setBatchSizeInput] = useState(10);
   const [copiedClean, setCopiedClean] = useState(false);
@@ -673,64 +708,33 @@ function App() {
     return t;
   }
 
-  const continueChapter = async (bIdx) => {
+  const continueChapter = (bIdx) => {
     const targetBookIndex = bIdx !== undefined ? bIdx : bookIndex;
     const book = books[targetBookIndex];
     if (!book) return;
     const chs = book.chapters || [];
-    if (!chs.length) {
-      alert('Không có chương nào để tiếp tục.');
-      return;
-    }
-    const lastCh = chs[chs.length - 1];
-    if (!lastCh.url) {
-      setStatus({type:'warn',message:'Chương cuối không có URL để làm căn cứ tìm chương tiếp.'});
-      return;
-    }
-    const nextUrl = getNextChapterUrl(lastCh.url);
-    if (!nextUrl) {
-      setStatus({type:'warn',message:'Không nhận diện được số chương trong URL của chương cuối.'});
-      return;
-    }
-    if (!window.storyAPI?.fetchChapter) {
-      setStatus({type:'warn',message:'Tính năng lấy link chỉ chạy trong app desktop Electron.'});
-      return;
-    }
-
-    setFetching(true);
-    setStatus({type:'',message:'Đang lấy nội dung chương tiếp theo...'});
-    try {
-      const res = await window.storyAPI.fetchChapter(nextUrl);
-      setFetching(false);
-      if (!res.ok) {
-        setStatus({type:'error',message: res.error || 'Không lấy được chương tiếp theo.'});
-        return;
+    const newChNum = chs.length + 1;
+    const newCh = {
+      title: `Chương ${newChNum}`,
+      url: '',
+      raw: '',
+      cleaned: '',
+      selectedForExport: false
+    };
+    setBooks(prev => prev.map((x, i) => {
+      if (i === targetBookIndex) {
+        return {
+          ...x,
+          chapters: [...(x.chapters || []), newCh],
+          updatedAt: new Date().toISOString()
+        };
       }
-      const newCh = {
-        title: normalizeChapterTitle(res.title || `Chương ${chs.length + 1}`, book.title),
-        url: nextUrl,
-        raw: res.text || '',
-        cleaned: cleanStoryText(res.text || '', options, filters),
-        selectedForExport: false
-      };
-      setBooks(prev => prev.map((x, i) => {
-        if (i === targetBookIndex) {
-          return {
-            ...x,
-            chapters: [...(x.chapters || []), newCh],
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return x;
-      }));
-      if (targetBookIndex === bookIndex) {
-        setSelected(chs.length);
-      }
-      setStatus({type:'ok',message:`Đã thêm và lấy xong ${newCh.title}.`});
-    } catch (err) {
-      setFetching(false);
-      setStatus({type:'error',message: err.message || 'Lỗi khi tiếp tục chương.'});
+      return x;
+    }));
+    if (targetBookIndex === bookIndex) {
+      setSelected(chs.length);
     }
+    setStatus({type:'ok',message:`Đã tạo chương mới: Chương ${newChNum}`});
   };
 
   const loadChapterList = async () => {
@@ -843,6 +847,85 @@ function App() {
     }
   };
 
+  const fetchBatchChapters = async (option) => {
+    if (fetching || aiRunning) return;
+    let targets = [];
+    if (option === 'all') {
+      targets = chapters.map((ch, idx) => ({ ch, idx })).filter(({ ch }) => ch.url);
+    } else {
+      const count = parseInt(option) || 1;
+      const startIndex = selected;
+      const endIndex = Math.min(chapters.length, startIndex + count);
+      for (let idx = startIndex; idx < endIndex; idx++) {
+        if (chapters[idx].url) {
+          targets.push({ ch: chapters[idx], idx });
+        }
+      }
+    }
+
+    if (!targets.length) {
+      return setStatus({type: 'warn', message: 'Không tìm thấy chương nào có Link để lấy nội dung.'});
+    }
+    if (!window.storyAPI?.fetchChapter) {
+      return setStatus({type: 'warn', message: 'Lấy nội dung chỉ chạy trong app Electron.'});
+    }
+
+    setFetching(true);
+    let successCount = 0;
+    let failCount = 0;
+    try {
+      for (let i = 0; i < targets.length; i++) {
+        if (cancelRef.current) break;
+        const { ch, idx } = targets[i];
+        setStatus({type: '', message: `Đang lấy nội dung chương ${idx + 1}/${chapters.length}...`});
+        setSelected(idx);
+        const res = await window.storyAPI.fetchChapter(ch.url);
+        if (res.ok) {
+          successCount++;
+          updateChapter(idx, {
+            title: normalizeChapterTitle(res.title || ch.title, bookTitle),
+            raw: res.text || '',
+            cleaned: cleanStoryText(res.text || '', options, filters)
+          });
+        } else {
+          failCount++;
+        }
+        await sleep(1000);
+      }
+      setStatus({type: 'ok', message: `Đã lấy xong hàng loạt: ${successCount} thành công, ${failCount} thất bại.`});
+    } catch (err) {
+      setStatus({type: 'error', message: err.message || 'Lỗi lấy nội dung hàng loạt.'});
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const exportBatchDocx = async (start, end, filename, isSiri) => {
+    const s = Math.max(1, parseInt(start) || 1) - 1;
+    const e = Math.min(chapters.length, parseInt(end) || chapters.length) - 1;
+    if (s > e) {
+      alert('Chương bắt đầu phải nhỏ hơn hoặc bằng chương kết thúc.');
+      return;
+    }
+    const ready = chapters.slice(s, e + 1).filter(ch => (ch.cleaned || ch.raw || '').trim());
+    if (!ready.length) {
+      alert('Không có nội dung chương trong khoảng đã chọn.');
+      return;
+    }
+    try {
+      const blob = await buildDocx({ title: filename, author, chapters: ready, isSiri });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${filename || slugify(bookTitle)}.docx`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus({ type: 'ok', message: `Đã xuất ${filename}.docx (${ready.length} chương).` });
+      setShowBatchExportModal(false);
+    } catch (err) {
+      setStatus({ type: 'error', message: err?.message || 'Xuất DOCX thất bại.' });
+    }
+  };
+
   const humanizeSelectedChapters = async () => {
     if (aiRunning || fetching) return;
     const targets = chapters.map((ch, idx) => ({ ch, idx })).filter(({ ch }) => ch.selectedForExport === true);
@@ -880,7 +963,6 @@ function App() {
     cancelRef.current = false;
     setCancelRequested(false);
     setAiRunning(true);
-    setTab('ai');
     let successCount = 0;
     let failCount = 0;
     try {
@@ -1090,7 +1172,6 @@ function App() {
     
     if (!isBatch) {
       setAiRunning(true);
-      setTab('ai');
     }
     setAiProgress({done:0,total:chunks.length,message:`Bắt đầu AI humanize chương ${i+1}...`});
     setStatus({type:'warn',message:`Đang AI xử lý Natural VN ${chunks.length} chunk. App sẽ tự xoay key và nghỉ giữa request.`});
@@ -1139,7 +1220,6 @@ function App() {
     if(!keys.length) return setStatus({type:'warn',message:'Bạn cần nhập ít nhất 1 Gemini API key để lấy danh sách model.'});
     if(!window.storyAPI?.geminiListModels) return setStatus({type:'warn',message:'Lấy model chỉ chạy trong app desktop Electron. Hãy chạy start-dev.bat.'});
     setAiRunning(true);
-    setTab('ai');
     setAiProgress({done:0,total:1,message:'Đang lấy danh sách model từ key đầu...'});
     try {
       const res = await window.storyAPI.geminiListModels({apiKey: keys[0]});
@@ -1176,7 +1256,6 @@ function App() {
     cancelRef.current = false;
     setCancelRequested(false);
     setAiRunning(true);
-    setTab('ai');
     let ok=0, fail=0;
     try{
       for(let i=0;i<keys.length;i++){
@@ -1322,7 +1401,7 @@ function App() {
         output += `(Chưa có chương nào)\n`;
       } else {
         data.successList.forEach((item) => {
-          output += `- Chương ${item.idx + 1}: ${item.title} (Thời gian AI: ${item.aiNaturalAt || '-'}, Ký tự gốc: ${item.rawLen}, Ký tự sau AI: ${item.aiLen})\n`;
+          output += `- Chương ${item.idx + 1}: ${item.title} (${item.aiNaturalAt || '-'}) - ${item.rawLen} -> ${item.aiLen} ký tự\n`;
         });
       }
       output += `\nDANH SÁCH CHƯƠNG LỖI AI:\n`;
@@ -1330,7 +1409,7 @@ function App() {
         output += `(Không có chương nào bị lỗi)\n`;
       } else {
         data.errorList.forEach((item) => {
-          output += `- Chương ${item.idx + 1}: ${item.title} (Thời gian lỗi: ${item.errorAt || '-'}, Loại lỗi: ${item.errorType}, Chi tiết lỗi: ${item.error})\n`;
+          output += `- Chương ${item.idx + 1}: ${item.title} (${item.errorAt || '-'}) - ${item.errorType}: ${item.error}\n`;
         });
       }
     }
@@ -1349,6 +1428,7 @@ function App() {
     if(Array.isArray(data.apiPool)) setApiPool(data.apiPool);
     setStatus({type:'ok',message:'Đã import project/cache để làm tiếp.'});
   };
+
   const importEpub=async(file)=>{
     if(!file) return;
     try{
@@ -1428,28 +1508,68 @@ function App() {
 
             return (
               <div key={book.id || bIdx} className={`bookNode open ${bIdx === bookIndex ? 'activeBook' : ''}`}>
-                <div className="bookNodeHeader">
-                  <button className="bookTitleBtn" onClick={() => toggleBookCollapsed(bIdx)} title={book.title || `Truyện ${bIdx + 1}`} style={{ fontWeight: 'bold', width: '100%', textAlign: 'left' }}>
+                <div className="bookNodeHeader" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                  <button className="bookTitleBtn" onClick={() => toggleBookCollapsed(bIdx)} title={book.title || `Truyện ${bIdx + 1}`} style={{ fontWeight: 'bold', width: '100%', textAlign: 'left', padding: '4px 6px' }}>
                     <span className="bookTitleText">{book.title || `Truyện ${bIdx + 1}`} ({chs.length} chương)</span>
                   </button>
-                  <div className="bookNodeActions" style={{ display: 'flex', gap: '8px', marginTop: '6px', width: '100%' }}>
-                    <button className="miniAddChapter" onClick={() => continueChapter(bIdx)} title="Tìm và lấy nội dung chương tiếp theo" style={{ flex: 1, justifyContent: 'center' }}>
-                      {fetching ? <RefreshCcw className="spin" size={14} /> : null} + Chương tiếp
+                  <div className="bookNodeActions" style={{ display: 'flex', gap: '6px', marginTop: '4px', alignItems: 'center', justifyContent: 'flex-start' }}>
+                    <button 
+                      onClick={addChapter} 
+                      style={{ 
+                        padding: '4px 8px', 
+                        fontSize: '11.5px', 
+                        whiteSpace: 'nowrap', 
+                        borderRadius: '6px', 
+                        height: '28px', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        border: '1px solid #cbd5e1', 
+                        backgroundColor: '#ffffff',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        margin: 0
+                      }}
+                    >
+                      + Chương tiếp
                     </button>
-                    <button className="miniAddChapter" onClick={() => {
-                      const allSelected = chs.every(c => c.selectedForExport === true);
-                      setBooks(prev => prev.map((x, bookI) => {
-                        if (bookI === bIdx) {
-                          return {
-                            ...x,
-                            chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected }))
-                          };
-                        }
-                        return x;
-                      }));
-                    }} style={{ padding: '4px 8px' }}>
-                      ✓ All
-                    </button>
+                    <label style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '4px', 
+                      cursor: 'pointer', 
+                      fontSize: '11.5px', 
+                      userSelect: 'none', 
+                      border: '1px solid #cbd5e1', 
+                      borderRadius: '6px', 
+                      padding: '4px 6px', 
+                      backgroundColor: '#f8fafc', 
+                      fontWeight: 'bold', 
+                      margin: 0, 
+                      whiteSpace: 'nowrap', 
+                      flexShrink: 0, 
+                      height: '28px',
+                      flexWrap: 'nowrap'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, display: 'inline-block', cursor: 'pointer' }} 
+                        checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} 
+                        onChange={() => {
+                          const allSelected = chs.every(c => c.selectedForExport === true);
+                          setBooks(prev => prev.map((x, bookI) => {
+                            if (bookI === bIdx) {
+                              return {
+                                ...x,
+                                chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected }))
+                              };
+                            }
+                            return x;
+                          }));
+                        }} 
+                      />
+                      <span style={{ fontSize: '11.5px', fontWeight: 'bold' }}>All</span>
+                    </label>
                   </div>
                 </div>
 
@@ -1461,19 +1581,30 @@ function App() {
                         selectBook(bIdx);
                         setSelected(i);
                       }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', border: '1px solid #dbeafe', textAlign: 'left' }}>
-                        <input type="checkbox" checked={ch.selectedForExport === true} onClick={e => e.stopPropagation()} onChange={e => {
-                          setBooks(prev => prev.map((x, bookI) => {
-                            if (bookI === bIdx) {
-                              return {
-                                ...x,
-                                chapters: x.chapters.map((c, chI) => chI === i ? { ...c, selectedForExport: e.target.checked } : c)
-                              };
-                            }
-                            return x;
-                          }));
-                        }} style={{ width: 'auto', margin: 0, cursor: 'pointer' }} />
+                        <input 
+                          type="checkbox" 
+                          checked={ch.selectedForExport === true} 
+                          onClick={e => e.stopPropagation()} 
+                          onChange={e => {
+                            setBooks(prev => prev.map((x, bookI) => {
+                              if (bookI === bIdx) {
+                                return {
+                                  ...x,
+                                  chapters: x.chapters.map((c, chI) => chI === i ? { ...c, selectedForExport: e.target.checked } : c)
+                                };
+                              }
+                              return x;
+                            }));
+                          }} 
+                          style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, cursor: 'pointer' }} 
+                        />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ display: 'block', fontWeight: 800 }}>Chương {i + 1}</span>
+                          <span style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px', fontWeight: 800, fontSize: '13px' }}>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxHeight: '20px' }}>{ch.title || `Chương ${i + 1}`}</span>
+                            <span style={{ color: '#94a3b8', fontSize: '10.5px', fontWeight: 'normal', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                              ({formatCharCount(ch)} ký tự)
+                            </span>
+                          </span>
                         </div>
                       </button>
                     );
@@ -1486,121 +1617,372 @@ function App() {
       </aside>
 
       <main className="main">
-        <section className="topbar">
-          <div><h1>Story Cleaner</h1></div>
-          <div className="actions">
+        <section className="topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div className="tabs" style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: 0 }}>
+            <button className={tab === 'editor' ? 'on' : ''} onClick={() => setTab('editor')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>Biên tập</button>
+            <button className={tab === 'filters' ? 'on' : ''} onClick={() => setTab('filters')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><ShieldCheck size={14} /> Bộ lọc từ</button>
+            <button className={tab === 'ai' ? 'on' : ''} onClick={() => setTab('ai')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><Sparkles size={14} /> Gemini AI</button>
+            <button className="reportTabBtn" onClick={() => setShowAiReport(true)} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}><FileText size={14} /> Báo cáo AI</button>
+          </div>
+          <div className="actions" style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: 0 }}>
             <input ref={projectInputRef} type="file" accept=".json" hidden onChange={e => importProject(e.target.files?.[0])} />
-            <button onClick={() => projectInputRef.current?.click()}><Upload size={17} /> Import cache</button>
-            <button onClick={saveProject}><Save size={17} /> Export backup</button>
-            {lastAutoSaved && <span className="autosave"><Database size={14} /> Auto saved {lastAutoSaved}</span>}
-            <button className="primary" onClick={() => exportDocx(false)}><Download size={17} /> DOCX</button>
-            <button className="softPrimary" onClick={() => exportDocx(true)}><Download size={17} /> Xuất DOCX Siri</button>
+            <button onClick={() => projectInputRef.current?.click()} style={{ height: '34px', padding: '6px 10px', borderRadius: '8px', fontSize: '13px' }}><Upload size={14} /> Import cache</button>
+            <button onClick={saveProject} style={{ height: '34px', padding: '6px 10px', borderRadius: '8px', fontSize: '13px' }}><Save size={14} /> Export backup</button>
+            {lastAutoSaved && <span className="autosave" style={{ height: '34px', display: 'inline-flex', alignItems: 'center', margin: 0, padding: '0 8px', borderRadius: '8px', fontSize: '12px' }}><Database size={12} /> Auto saved {lastAutoSaved}</span>}
+            
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <button className="primary" onClick={() => setShowDocxDropdown(!showDocxDropdown)} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>
+                DOCX <span style={{ fontSize: '10px' }}>▼</span>
+              </button>
+              {showDocxDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '4px',
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                  zIndex: 1000,
+                  minWidth: '180px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '6px 0'
+                }}>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%' }} onClick={() => { setShowDocxDropdown(false); exportDocx(false); }}>DOCX Thường</button>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%' }} onClick={() => { setShowDocxDropdown(false); exportDocx(true); }}>DOCX Siri</button>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%' }} onClick={() => { setShowDocxDropdown(false); setExportIsSiri(false); setExportStartCh(1); setExportEndCh(Math.min(10, chapters.length)); updateDefaultFilename(1, Math.min(10, chapters.length)); setShowBatchExportModal(true); }}>DOCX Theo Tập</button>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%' }} onClick={() => { setShowDocxDropdown(false); setExportIsSiri(true); setExportStartCh(1); setExportEndCh(Math.min(10, chapters.length)); updateDefaultFilename(1, Math.min(10, chapters.length)); setShowBatchExportModal(true); }}>DOCX Theo Tập Siri</button>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
         {status.message && (
-          <div className={`status ${status.type}`}>
-            {status.type === 'ok' ? <CheckCircle2 /> : status.type === 'error' ? <AlertTriangle /> : <RefreshCcw className={(aiRunning || fetching) ? 'spin' : ''} />}
+          <div className={`status ${status.type}`} style={{ padding: '8px 12px', minHeight: '34px', borderRadius: '10px', fontSize: '13px', margin: '4px 0' }}>
+            {status.type === 'ok' ? <CheckCircle2 size={16} /> : status.type === 'error' ? <AlertTriangle size={16} /> : <RefreshCcw size={16} className={(aiRunning || fetching) ? 'spin' : ''} />}
             <div style={{ flex: 1 }}>{status.message}</div>
           </div>
         )}
 
         {(aiRunning || fetching) && (
-          <div className="progressBox">
-            <div className="progressHeader">
+          <div className="progressBox" style={{ padding: '8px 12px', borderRadius: '10px', margin: '4px 0' }}>
+            <div className="progressHeader" style={{ fontSize: '13px' }}>
               <b>{aiProgress.message}</b>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span>{aiProgress.done}/{aiProgress.total}</span>
-                <button onClick={handleStop} className="dangerSoft stopBtn" style={{ padding: '5px 10px', fontSize: '12px', color: '#b91c1c', backgroundColor: '#fef2f2', borderColor: '#fecaca', borderRadius: '8px', cursor: 'pointer', height: 'auto', minHeight: '0', display: 'inline-flex', alignItems: 'center', fontWeight: 'bold' }} disabled={cancelRequested}>{cancelRequested ? 'Đang dừng...' : 'Dừng'}</button>
+                <button onClick={handleStop} className="dangerSoft stopBtn" style={{ padding: '4px 8px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fef2f2', borderColor: '#fecaca', borderRadius: '6px', cursor: 'pointer', height: 'auto', minHeight: '0', display: 'inline-flex', alignItems: 'center', fontWeight: 'bold' }} disabled={cancelRequested}>{cancelRequested ? 'Đang dừng...' : 'Dừng'}</button>
               </div>
             </div>
-            <div className="progressTrack">
+            <div className="progressTrack" style={{ height: '6px', marginTop: '6px' }}>
               <div style={{ width: aiProgress.total ? `${Math.round(aiProgress.done / aiProgress.total * 100)}%` : '8%' }} />
             </div>
           </div>
         )}
 
-        <section className="tabs">
-          <button className={tab === 'editor' ? 'on' : ''} onClick={() => setTab('editor')}>Biên tập</button>
-          <button className={tab === 'filters' ? 'on' : ''} onClick={() => setTab('filters')}><ShieldCheck size={16} /> Bộ lọc từ</button>
-          <button className={tab === 'ai' ? 'on' : ''} onClick={() => setTab('ai')}><Sparkles size={16} /> Gemini AI</button>
-          <button className="reportTabBtn" onClick={() => setShowAiReport(true)} style={{ marginLeft: 'auto', background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}><FileText size={16} /> Báo cáo AI</button>
-        </section>
-
         {tab === 'editor' && (
-          <div className="chapterTools compactTools" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', padding: '12px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px' }}>
-            <button onClick={fetchSelectedChapters} disabled={fetching || aiRunning}>
-              {fetching ? <RefreshCcw className="spin" size={15} /> : null} Lấy nội dung hàng loạt
-            </button>
-            <button onClick={humanizeSelectedChapters} disabled={aiRunning || fetching} className="softPrimary">
-              {aiRunning ? <RefreshCcw className="spin" size={15} /> : <Sparkles size={16} />} AI chương đã chọn
-            </button>
-            <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>AI hàng loạt:</span>
-            <button onClick={() => humanizeBatch(3)} disabled={aiRunning || fetching}>3 chương</button>
-            <button onClick={() => humanizeBatch(5)} disabled={aiRunning || fetching}>5 chương</button>
-            <button onClick={() => humanizeBatch(10)} disabled={aiRunning || fetching}>10 chương</button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <input type="number" min="1" placeholder="Số lượng" value={batchSizeInput} onChange={e => setBatchSizeInput(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '70px', padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '8px' }} />
-              <button onClick={() => humanizeBatch(batchSizeInput)} disabled={aiRunning || fetching} className="softPrimary">Chạy</button>
+          <div className="chapterTools compactTools" style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'nowrap', padding: '6px 10px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflowX: 'auto', margin: '4px 0' }}>
+            
+            {/* Lấy nội dung hàng loạt */}
+            <div style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '8px', border: '1px solid #bfdbfe', overflow: 'visible', height: '34px', position: 'relative', flexShrink: 0 }}>
+              <button 
+                onClick={() => {
+                  if (batchFetchSelection === 'all') {
+                    fetchBatchChapters('all');
+                  } else {
+                    fetchBatchChapters(batchFetchValue);
+                  }
+                }} 
+                disabled={fetching || aiRunning} 
+                className="softPrimary" 
+                style={{ 
+                  border: 0, 
+                  borderRight: '1px solid #bfdbfe', 
+                  borderRadius: '8px 0 0 8px', 
+                  height: '100%', 
+                  fontSize: '12px', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '4px', 
+                  padding: '0 10px', 
+                  margin: 0,
+                  boxShadow: 'none',
+                  transform: 'none',
+                  fontWeight: 'bold'
+                }}
+              >
+                {fetching ? <RefreshCcw className="spin" size={14} /> : <LinkIcon size={14} />} 
+                Lấy nội dung hàng loạt {batchFetchSelection === 'all' ? '(Tất cả)' : `(${batchFetchValue} ch)`}
+              </button>
+              <button 
+                onClick={() => {
+                  setShowFetchDropdown(!showFetchDropdown);
+                  setIsEnteringFetchCustom(false);
+                }} 
+                disabled={fetching || aiRunning} 
+                className="softPrimary" 
+                style={{ 
+                  border: 0, 
+                  borderRadius: '0 8px 8px 0', 
+                  height: '100%', 
+                  fontSize: '9px', 
+                  padding: '0 8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: 0,
+                  boxShadow: 'none',
+                  transform: 'none',
+                  fontWeight: 'bold'
+                }}
+              >
+                ▼
+              </button>
+              {showFetchDropdown && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  left: 0, 
+                  marginTop: '4px', 
+                  background: '#ffffff', 
+                  border: '1px solid #cbd5e1', 
+                  borderRadius: '8px', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                  zIndex: 100, 
+                  padding: '4px 0', 
+                  minWidth: '160px' 
+                }}>
+                  {!isEnteringFetchCustom ? (
+                    <>
+                      <button 
+                        style={{ display: 'block', width: '100%', padding: '8px 12px', border: 0, background: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '13px', borderRadius: 0, fontWeight: 'normal', color: '#172033' }} 
+                        onClick={() => { setBatchFetchSelection('all'); setBatchFetchValue('all'); setShowFetchDropdown(false); }}
+                      >
+                        Tất cả
+                      </button>
+                      <button 
+                        style={{ display: 'block', width: '100%', padding: '8px 12px', border: 0, background: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '13px', borderRadius: 0, fontWeight: 'normal', color: '#172033' }} 
+                        onClick={() => { setIsEnteringFetchCustom(true); setTempFetchCustomValue(typeof batchFetchValue === 'number' ? batchFetchValue : 10); }}
+                      >
+                        Nhập số chương...
+                      </button>
+                    </>
+                  ) : (
+                    <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>Số chương:</span>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <input 
+                          type="number" 
+                          min="1" 
+                          value={tempFetchCustomValue} 
+                          onChange={e => setTempFetchCustomValue(Math.max(1, parseInt(e.target.value) || 1))} 
+                          style={{ width: '60px', padding: '4px', height: '28px', borderRadius: '4px', fontSize: '12.5px', border: '1px solid #cbd5e1' }} 
+                        />
+                        <button 
+                          className="primary" 
+                          style={{ padding: '0 8px', border: 0, borderRadius: '4px', fontSize: '12px', cursor: 'pointer', height: '28px', display: 'inline-flex', alignItems: 'center' }} 
+                          onClick={() => {
+                            setBatchFetchSelection('custom');
+                            setBatchFetchValue(tempFetchCustomValue);
+                            setIsEnteringFetchCustom(false);
+                            setShowFetchDropdown(false);
+                          }}
+                        >
+                          OK
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* AI hàng loạt */}
+            <div style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '8px', border: '1px solid #2563eb', overflow: 'visible', height: '34px', position: 'relative', flexShrink: 0 }}>
+              <button 
+                onClick={() => humanizeBatch(batchAiValue)} 
+                disabled={aiRunning || fetching} 
+                className="primary" 
+                style={{ 
+                  border: 0, 
+                  borderRight: '1px solid #1d4ed8', 
+                  borderRadius: '8px 0 0 8px', 
+                  height: '100%', 
+                  fontSize: '12px', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '4px', 
+                  padding: '0 10px', 
+                  margin: 0,
+                  boxShadow: 'none',
+                  transform: 'none',
+                  background: '#2563eb',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}
+              >
+                {aiRunning ? <RefreshCcw className="spin" size={14} /> : <Sparkles size={14} />} 
+                AI hàng loạt ({batchAiSelection === 'custom' ? `${batchAiValue} ch` : `${batchAiSelection} ch`})
+              </button>
+              <button 
+                onClick={() => {
+                  setShowBatchAiDropdown(!showBatchAiDropdown);
+                  setIsEnteringAiCustom(false);
+                }} 
+                disabled={aiRunning || fetching} 
+                className="primary" 
+                style={{ 
+                  border: 0, 
+                  borderRadius: '0 8px 8px 0', 
+                  height: '100%', 
+                  fontSize: '9px', 
+                  padding: '0 8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: 0,
+                  boxShadow: 'none',
+                  transform: 'none',
+                  background: '#2563eb',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}
+              >
+                ▼
+              </button>
+              {showBatchAiDropdown && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  left: 0, 
+                  marginTop: '4px', 
+                  background: '#ffffff', 
+                  border: '1px solid #cbd5e1', 
+                  borderRadius: '8px', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                  zIndex: 100, 
+                  padding: '4px 0', 
+                  minWidth: '160px' 
+                }}>
+                  {!isEnteringAiCustom ? (
+                    <>
+                      {[3, 5, 10].map(num => (
+                        <button 
+                          key={num} 
+                          style={{ display: 'block', width: '100%', padding: '8px 12px', border: 0, background: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '13px', borderRadius: 0, fontWeight: 'normal', color: '#172033' }} 
+                          onClick={() => { setBatchAiSelection(String(num)); setBatchAiValue(num); setShowBatchAiDropdown(false); }}
+                        >
+                          {num} chương
+                        </button>
+                      ))}
+                      <button 
+                        style={{ display: 'block', width: '100%', padding: '8px 12px', border: 0, background: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '13px', borderRadius: 0, fontWeight: 'normal', color: '#172033' }} 
+                        onClick={() => { setIsEnteringAiCustom(true); setTempAiCustomValue(batchAiValue); }}
+                      >
+                        Nhập số chương...
+                      </button>
+                    </>
+                  ) : (
+                    <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>Số chương:</span>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <input 
+                          type="number" 
+                          min="1" 
+                          value={tempAiCustomValue} 
+                          onChange={e => setTempAiCustomValue(Math.max(1, parseInt(e.target.value) || 1))} 
+                          style={{ width: '60px', padding: '4px', height: '28px', borderRadius: '4px', fontSize: '12.5px', border: '1px solid #cbd5e1' }} 
+                        />
+                        <button 
+                          className="primary" 
+                          style={{ padding: '0 8px', border: 0, borderRadius: '4px', fontSize: '12px', cursor: 'pointer', height: '28px', display: 'inline-flex', alignItems: 'center' }} 
+                          onClick={() => {
+                            setBatchAiSelection('custom');
+                            setBatchAiValue(tempAiCustomValue);
+                            setIsEnteringAiCustom(false);
+                            setShowBatchAiDropdown(false);
+                          }}
+                        >
+                          OK
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* AI chương đã chọn */}
+            <button onClick={humanizeSelectedChapters} disabled={aiRunning || fetching} className="softPrimary" style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1' }}>
+              {aiRunning ? <RefreshCcw className="spin" size={13} /> : <Sparkles size={13} />} AI đã chọn
+            </button>
+
+            {/* AI chương hiện tại */}
+            <button onClick={() => humanizeChapter(selected, false, false)} className="softPrimary" disabled={aiRunning || fetching} style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1' }}>
+              {aiRunning ? <RefreshCcw className="spin" size={13} /> : <Sparkles size={13} />} AI hiện tại
+            </button>
+
+            {/* Re-AI chương */}
+            {current && current.cleaned && (
+              <button onClick={() => humanizeChapter(selected, false, true)} className="dangerSoft" disabled={aiRunning || fetching} style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1' }}>
+                <RefreshCcw size={13} /> Re-AI chương
+              </button>
+            )}
+
           </div>
         )}
 
-        <div className="scrollContent">
-          <section className="bookInfo card" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: '200px' }}>
-              <label style={{ margin: 0 }}>Tên truyện</label>
-              <input value={bookTitle} onChange={e => setBookTitle(e.target.value)} />
+        {/* Fix cứng Block Tên truyện (fixed/non-scrollable) */}
+        <section className="bookInfo card" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <label style={{ margin: 0 }}>Tên truyện</label>
+            <input value={bookTitle} onChange={e => setBookTitle(e.target.value)} />
+          </div>
+          <div style={{ flex: 1, minWidth: '150px' }}>
+            <label style={{ margin: 0 }}>Tác giả</label>
+            <input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Không bắt buộc" />
+          </div>
+          <div style={{ flex: 2, minWidth: '250px' }}>
+            <label style={{ margin: 0 }}>Link tổng (Table of Contents)</label>
+            <div className="urlRow">
+              <input value={currentBook.url || ''} onChange={e => updateBook({ url: e.target.value })} placeholder="https://..." />
+              <button onClick={loadChapterList} disabled={fetching} className="softPrimary">
+                {fetching ? <RefreshCcw className="spin" size={15} /> : null} Load List
+              </button>
             </div>
-            <div style={{ flex: 1, minWidth: '150px' }}>
-              <label style={{ margin: 0 }}>Tác giả</label>
-              <input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Không bắt buộc" />
-            </div>
-            <div style={{ flex: 2, minWidth: '250px' }}>
-              <label style={{ margin: 0 }}>Link tổng (Table of Contents)</label>
-              <div className="urlRow">
-                <input value={currentBook.url || ''} onChange={e => updateBook({ url: e.target.value })} placeholder="https://..." />
-                <button onClick={loadChapterList} disabled={fetching} className="softPrimary">
-                  {fetching ? <RefreshCcw className="spin" size={15} /> : null} Load List
-                </button>
-              </div>
-            </div>
-            <button className="dangerSoft equalBtn" onClick={() => deleteBook(bookIndex)} style={{ height: '42px', alignSelf: 'flex-end' }}><Trash2 size={16} /> Xóa truyện</button>
-          </section>
+          </div>
+          <button className="dangerSoft equalBtn" onClick={() => deleteBook(bookIndex)} style={{ height: '42px', alignSelf: 'flex-end' }}><Trash2 size={16} /> Xóa truyện</button>
+        </section>
 
+        <div className="scrollContent" style={{ overflowY: tab === 'editor' ? 'hidden' : 'auto', flex: 1, display: 'flex', flexDirection: 'column' }}>
           {tab === 'editor' && (
-            <>
-              <section className="chapterWorkspace card">
-                <div className="chapterWorkspaceHead" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '10px', marginBottom: '12px' }}>
-                  <h2 style={{ fontSize: '18px' }}>Chương đang sửa (Chương {selected + 1})</h2>
-                </div>
-
-                <div className="chapterNavigation" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: '#f8fafc', padding: '10px 14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <section className="chapterWorkspace card" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '14px', gap: '6px' }}>
+              {/* Fix cứng Header Chương đang sửa */}
+              <div className="chapterWorkspaceHead" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '6px', marginBottom: '4px', gap: '12px', flexWrap: 'nowrap' }}>
+                <h2 style={{ fontSize: '18px', margin: 0, whiteSpace: 'nowrap' }}>Chương đang sửa (Chương {selected + 1})</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
                   <button onClick={() => moveChapter(selected, -1)} title="Lên">↑</button>
                   <button onClick={() => moveChapter(selected, 1)} title="Xuống">↓</button>
                   <button onClick={() => setSelected(0)} disabled={selected === 0}>Chương 1</button>
                   <button onClick={() => setSelected(chapters.length - 1)} disabled={selected === chapters.length - 1}>Chương cuối</button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <input type="number" min="1" max={chapters.length} value={selected + 1} onChange={e => {
-                      const val = parseInt(e.target.value) - 1;
-                      if (val >= 0 && val < chapters.length) {
-                        setSelected(val);
-                      }
-                    }} style={{ width: '70px', padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '8px' }} />
-                  </div>
-                  <button className="dangerSoft" onClick={() => removeChapter(selected)} style={{ marginLeft: 'auto' }}><Trash2 size={16} /> Xóa</button>
+                  <input type="number" min="1" max={chapters.length} value={selected + 1} onChange={e => {
+                    const val = parseInt(e.target.value) - 1;
+                    if (val >= 0 && val < chapters.length) {
+                      setSelected(val);
+                    }
+                  }} style={{ width: '70px', padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '8px' }} />
+                  <button className="dangerSoft" onClick={() => removeChapter(selected)} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Trash2 size={16} /> Xóa</button>
                 </div>
+              </div>
 
-                <div className="manualAddArea" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '10px 14px', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '13px' }}>Tạo thêm:</span>
-                  <input type="number" min="1" value={createCount} onChange={e => setCreateCount(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '75px', padding: '6px 8px', border: '1px solid #cbd5e1', borderRadius: '8px' }} />
-                  <span style={{ fontSize: '13px' }}>chương rỗng</span>
-                  <button onClick={createNChapters} className="softPrimary" style={{ padding: '6px 12px' }}>Tạo</button>
-                </div>
-
-                <div className="chapterMeta">
-                  <label>Tiêu đề chương<input value={current.title} onChange={e => updateChapter(selected, { title: e.target.value })} /></label>
-                  <label>Link chương
+              {/* Chỉ cuộn phần nội dung chương từ Tiêu đề/Link chương trở xuống */}
+              <div className="chapterWorkspaceBody" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
+                {/* Đưa 2 dòng Tiêu đề chương và Link chương lên cùng 1 hàng */}
+                <div className="chapterMeta" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px', alignItems: 'end' }}>
+                  <label style={{ margin: 0 }}>Tiêu đề chương<input value={current.title} onChange={e => updateChapter(selected, { title: e.target.value })} /></label>
+                  <label style={{ margin: 0 }}>Link chương
                     <div className="urlRow">
                       <input value={current.url} onChange={e => updateChapter(selected, { url: e.target.value })} placeholder="https://..." />
                       <button onClick={fetchCurrentUrl} disabled={fetching}>
@@ -1615,33 +1997,65 @@ function App() {
                   <button onClick={() => cleanOne(selected)}><Wand2 size={17} /> Dọn + chia đoạn</button>
                   <button onClick={() => layoutOne(selected)}><AlignLeft size={17} /> Chỉ chia bố cục</button>
                   <button onClick={cleanAll}><Wand2 size={17} /> Dọn tất cả</button>
-                  <button onClick={() => humanizeChapter(selected, false, false)} className="softPrimary" disabled={aiRunning}><Sparkles size={17} /> AI Natural VN chương</button>
-                  {current.cleaned && (
-                    <button onClick={() => humanizeChapter(selected, false, true)} className="dangerSoft" disabled={aiRunning}><RefreshCcw size={17} /> Re-AI</button>
-                  )}
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <button onClick={() => setShowOptionsPopup(!showOptionsPopup)} className="softPrimary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Sliders size={17} /> Tùy chọn dọn text <span style={{ fontSize: '10px' }}>▼</span>
+                    </button>
+                    {showOptionsPopup && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '100%',
+                        left: 0,
+                        marginBottom: '4px',
+                        background: '#ffffff',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '12px',
+                        boxShadow: '0 -4px 16px rgba(0,0,0,0.12), 0 10px 25px rgba(0,0,0,0.15)',
+                        zIndex: 1000,
+                        minWidth: '280px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', color: '#172033' }}>
+                          Tùy chọn dọn text
+                        </div>
+                        {[
+                          ['normalizeSpaces', 'Xóa khoảng trắng/dòng trống thừa'],
+                          ['mergeBrokenLines', 'Gộp dòng bị ngắt sai'],
+                          ['reflowLayout', 'Chia lại bố cục đoạn văn'],
+                          ['removeWatermark', 'Xóa watermark/câu rác'],
+                          ['restoreFilteredWords', 'Khôi phục từ bị lọc'],
+                          ['autoReplace', 'Thay từ convert theo bộ lọc']
+                        ].map(([k, t]) => (
+                          <label key={k} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12.5px', fontWeight: 'normal', margin: 0, userSelect: 'none', flexDirection: 'row', width: '100%', color: '#172033' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={options[k]} 
+                              onChange={e => setOptions({ ...options, [k]: e.target.checked })} 
+                              style={{ width: '15px', height: '15px', margin: 0, flexShrink: 0 }}
+                            />
+                            <span>{t}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="compareGrid">
-                  <label>Nội dung gốc<textarea ref={rawTextRef} value={current.raw} onScroll={() => handleCompareScroll('raw')} onChange={e => updateChapter(selected, { raw: e.target.value })} placeholder="Dán truyện convert / bản dịch thô / text lỗi vào đây..." /></label>
+                  <label>Nội dung gốc<textarea ref={rawTextRef} value={current.raw} onScroll={() => handleCompareScroll('raw')} onChange={e => updateChapter(selected, { raw: e.target.value })} placeholder="Dán truyện convert / bản dịch thô / text lỗi vào đây..." style={{ height: 'calc(100vh - 350px)', minHeight: '260px', resize: 'none' }} /></label>
                   <label>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span>Bản đã clean</span>
                       <button onClick={copyCleanText} className="softPrimary" style={{ padding: '3px 8px', fontSize: '12px', minHeight: 0, height: 'auto', borderRadius: '6px' }}>{copiedClean ? 'Đã Copy' : 'Copy'}</button>
                     </div>
-                    <textarea ref={cleanTextRef} value={current.cleaned} onScroll={() => handleCompareScroll('clean')} onChange={e => updateChapter(selected, { cleaned: e.target.value })} placeholder="Kết quả sau khi dọn / bản AI sửa sẽ đặt ở đây." />
+                    <textarea ref={cleanTextRef} value={current.cleaned} onScroll={() => handleCompareScroll('clean')} onChange={e => updateChapter(selected, { cleaned: e.target.value })} placeholder="Kết quả sau khi dọn / bản AI sửa sẽ đặt ở đây." style={{ height: 'calc(100vh - 350px)', minHeight: '260px', resize: 'none' }} />
                   </label>
                 </div>
-              </section>
-
-              <section className="settings card">
-                <h2>Tùy chọn dọn text</h2>
-                {[['normalizeSpaces', 'Xóa khoảng trắng/dòng trống thừa'], ['mergeBrokenLines', 'Gộp dòng bị ngắt sai'], ['reflowLayout', 'Chia lại bố cục đoạn văn'], ['removeWatermark', 'Xóa watermark/câu rác'], ['restoreFilteredWords', 'Khôi phục từ bị lọc'], ['autoReplace', 'Thay từ convert theo bộ lọc']].map(([k, t]) => (
-                  <label key={k} className="check">
-                    <input type="checkbox" checked={options[k]} onChange={e => setOptions({ ...options, [k]: e.target.checked })} /> {t}
-                  </label>
-                ))}
-              </section>
-            </>
+              </div>
+            </section>
           )}
 
           {tab === 'filters' && (
@@ -1686,18 +2100,24 @@ function App() {
                   </div>
                 </div>
                 <div className="keyTablePanel">
-                  <div className="tableToolbar">
-                    <div className="searchBox">
+                  <div className="tableToolbar" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div className="searchBox" style={{ width: '130px', flex: 'none' }}>
                       <Search size={15} />
-                      <input value={keySearch} onChange={e => setKeySearch(e.target.value)} placeholder="Tìm label/status..." />
+                      <input value={keySearch} onChange={e => setKeySearch(e.target.value)} placeholder="Tìm..." />
                     </div>
-                    <select value={keyStatusFilter} onChange={e => setKeyStatusFilter(e.target.value)}>
+                    <select value={keyStatusFilter} style={{ width: '110px' }} onChange={e => setKeyStatusFilter(e.target.value)}>
                       <option value="all">Tất cả</option>
                       <option value="enabled">Đang bật</option>
                       <option value="active">Active</option>
                       <option value="limited">Limited</option>
                       <option value="error">Error</option>
                       <option value="unknown">Unknown</option>
+                    </select>
+                    <select value={keysPerPage} style={{ width: '110px' }} onChange={e => { setKeysPerPage(e.target.value); setKeyPage(1); }}>
+                      <option value="10">10 Key/trang</option>
+                      <option value="20">20 / trang</option>
+                      <option value="50">50 / trang</option>
+                      <option value="all">Tất cả</option>
                     </select>
                     <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: true })))}><ToggleRight size={15} /> Bật all</button>
                     <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: false })))}><ToggleLeft size={15} /> Tắt all</button>
@@ -1730,17 +2150,11 @@ function App() {
                     )) : <p className="note emptyKey">Chưa có key hoặc không có key khớp bộ lọc.</p>}
                   </div>
                   {visibleKeys.length > 0 && (
-                    <div className="pagination">
+                    <div className="pagination" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
                       <button onClick={() => setKeyPage(p => Math.max(1, p - 1))} disabled={keyPage <= 1}>Trang trước</button>
                       <span>Trang {keyPage} / {totalPages}</span>
                       <button onClick={() => setKeyPage(p => Math.min(totalPages, p + 1))} disabled={keyPage >= totalPages}>Trang sau</button>
-                      <select value={keysPerPage} onChange={e => { setKeysPerPage(e.target.value); setKeyPage(1); }}>
-                        <option value="10">10 / trang</option>
-                        <option value="20">20 / trang</option>
-                        <option value="50">50 / trang</option>
-                        <option value="all">Tất cả</option>
-                      </select>
-                      <span className="totalKeys">Tổng số key: {visibleKeys.length}</span>
+                      <span className="totalKeys" style={{ marginLeft: 'auto' }}>Tổng số key: {visibleKeys.length}</span>
                     </div>
                   )}
                 </div>
@@ -1873,6 +2287,42 @@ function App() {
                 setStatus({ type: 'ok', message: 'Đã copy báo cáo dạng Markdown.' });
               }}><Copy size={16} /> Copy MD</button>
               <button onClick={() => setShowAiReport(false)}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showBatchExportModal && (
+        <div className="modalOverlay" onClick={() => setShowBatchExportModal(false)}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <div className="modalHeader">
+              <h3><Download size={20} /> {exportIsSiri ? 'Xuất DOCX Theo Tập Siri' : 'Xuất DOCX Theo Tập'}</h3>
+              <button className="closeBtn" onClick={() => setShowBatchExportModal(false)}>×</button>
+            </div>
+            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <label style={{ flex: 1, gap: '6px' }}>Từ chương
+                  <input type="number" min="1" max={chapters.length} value={exportStartCh} onChange={e => {
+                    const start = Math.max(1, parseInt(e.target.value) || 1);
+                    setExportStartCh(start);
+                    updateDefaultFilename(start, exportEndCh);
+                  }} />
+                </label>
+                <label style={{ flex: 1, gap: '6px' }}>Đến chương
+                  <input type="number" min="1" max={chapters.length} value={exportEndCh} onChange={e => {
+                    const end = Math.max(1, parseInt(e.target.value) || 1);
+                    setExportEndCh(end);
+                    updateDefaultFilename(exportStartCh, end);
+                  }} />
+                </label>
+              </div>
+              <label style={{ gap: '6px' }}>Tên file mặc định
+                <input type="text" value={exportFilename} onChange={e => setExportFilename(e.target.value)} />
+              </label>
+            </div>
+            <div className="modalFooter">
+              <button className="softPrimary" onClick={() => setShowBatchExportModal(false)}>Hủy</button>
+              <button className="primary" onClick={() => exportBatchDocx(exportStartCh, exportEndCh, exportFilename, exportIsSiri)}>Xuất file</button>
             </div>
           </div>
         </div>
