@@ -238,38 +238,3 @@ button {
   font-weight: 800;
   letter-spacing: -.02em;
 }
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.spin {
-  animation: spin 1s linear infinite !important;
-}
-.scrollContent {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-right: 4px;
-}
-.bookNodeHeader {
-  position: sticky !important;
-  top: 0;
-  background: #ffffff !important;
-  z-index: 10;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #dbeafe;
-}
-.sidebar {
-  height: 100vh !important;
-  position: sticky !important;
-  top: 0;
-  overflow: hidden !important;
-}
-.main {
-  height: 100vh !important;
-  overflow: hidden !important;
-}

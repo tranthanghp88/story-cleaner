@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+release/
+out/
+build-temp/
+
+# Electron Builder
+*.blockmap
+latest.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.cache/
+.vite/
+temp/
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Runtime data
+story-cache/
+session-cache/
+exports/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Generated docs
+*.docx
+*.pdf
+*.epub
+
+# User data
+userdata/
+backup/
+
+# Electron
+resources/app-update.yml
+
+# Gemini Keys
+keys.json
+api-keys.json
+
+# Optional
+*.bak
+*.old
+*.tmp

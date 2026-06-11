@@ -1,0 +1,69 @@
+{
+  "name": "story-cleaner-epub-builder",
+  "version": "0.9.0",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Thang Tran",
+  "description": "Story Cleaner desktop app for cleaning and natural Vietnamese audio-friendly novel text.",
+  "productName": "Story Cleaner",
+  "scripts": {
+    "dev:web": "vite --host 0.0.0.0 --port 5188",
+    "dev": "concurrently \"npm run dev:web\" \"wait-on http://localhost:5188 && electron .\"",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 5188",
+    "electron": "electron .",
+    "dist:portable": "npm run build && electron-builder --win portable",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:dir": "npm run build && electron-builder --win --dir"
+  },
+  "dependencies": {
+    "@mozilla/readability": "latest",
+    "axios": "latest",
+    "cheerio": "latest",
+    "jsdom": "latest",
+    "jszip": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "docx": "latest"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.8.1",
+    "electron": "^37.0.0",
+    "@vitejs/plugin-react": "latest",
+    "concurrently": "latest",
+    "vite": "latest",
+    "wait-on": "latest"
+  },
+  "build": {
+    "appId": "com.easy.storycleaner",
+    "productName": "Story Cleaner",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "build/icon.ico",
+      "build/icon.png"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "Story-Cleaner-Portable-${version}.${ext}"
+    }
+  }
+}

@@ -2,6 +2,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('storyAPI', {
   fetchChapter: (url) => ipcRenderer.invoke('story:fetch-chapter', url),
+  fetchHtml: (url) => ipcRenderer.invoke('story:fetch-html', url),
   geminiGenerate: (payload) => ipcRenderer.invoke('story:gemini-generate', payload),
-  geminiListModels: (payload) => ipcRenderer.invoke('story:gemini-list-models', payload)
+  geminiListModels: (payload) => ipcRenderer.invoke('story:gemini-list-models', payload),
+  logError: (msg) => ipcRenderer.invoke('story:log-error', msg),
+  saveChapterContent: (payload) => ipcRenderer.invoke('story:save-chapter-content', payload),
+  loadChapterContent: (payload) => ipcRenderer.invoke('story:load-chapter-content', payload),
+  deleteBookChapters: (payload) => ipcRenderer.invoke('story:delete-book-chapters', payload)
 });

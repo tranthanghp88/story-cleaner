@@ -188,27 +188,6 @@ ipcMain.handle('story:fetch-chapter', async (_, url) => {
   }
 });
 
-ipcMain.handle('story:fetch-html', async (_, url) => {
-  if (!url || !/^https?:\/\//i.test(url)) {
-    return { ok: false, error: 'Link không hợp lệ. Link cần bắt đầu bằng http:// hoặc https://.' };
-  }
-  try {
-    const res = await axios.get(url, {
-      timeout: 25000,
-      maxRedirects: 5,
-      responseType: 'text',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8'
-      }
-    });
-    return { ok: true, html: String(res.data || '') };
-  } catch (err) {
-    return { ok: false, error: err?.message || 'Không lấy được HTML từ link.' };
-  }
-});
-
 
 function extractGeminiText(data) {
   const parts = data?.candidates?.[0]?.content?.parts || [];
@@ -304,61 +283,6 @@ ipcMain.handle('story:gemini-generate', async (_, payload = {}) => {
     return { ok: true, text };
   } catch (err) {
     return { ok: false, status: 500, error: err?.message || 'Không gọi được Gemini API.' };
-  }
-});
-
-ipcMain.handle('story:log-error', async (_, msg) => {
-  try {
-    fs.appendFileSync(path.join(__dirname, '..', 'runtime-error.txt'), msg);
-  } catch {}
-  return { ok: true };
-});
-
-ipcMain.handle('story:save-chapter-content', async (_, payload = {}) => {
-  const { bookId, chapterIndex, raw, cleaned } = payload;
-  if (!bookId) return { ok: false, error: 'Thiếu bookId' };
-  try {
-    const userDataPath = app.getPath('userData');
-    const bookDir = path.join(userDataPath, 'chapters', String(bookId));
-    if (!fs.existsSync(bookDir)) {
-      fs.mkdirSync(bookDir, { recursive: true });
-    }
-    const filePath = path.join(bookDir, `chapter_${chapterIndex}.json`);
-    fs.writeFileSync(filePath, JSON.stringify({ raw: raw || '', cleaned: cleaned || '' }, null, 2), 'utf8');
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: err.message };
-  }
-});
-
-ipcMain.handle('story:load-chapter-content', async (_, payload = {}) => {
-  const { bookId, chapterIndex } = payload;
-  if (!bookId) return { ok: false, error: 'Thiếu bookId' };
-  try {
-    const userDataPath = app.getPath('userData');
-    const filePath = path.join(userDataPath, 'chapters', String(bookId), `chapter_${chapterIndex}.json`);
-    if (fs.existsSync(filePath)) {
-      const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      return { ok: true, raw: content.raw || '', cleaned: content.cleaned || '' };
-    }
-    return { ok: true, raw: '', cleaned: '' };
-  } catch (err) {
-    return { ok: true, raw: '', cleaned: '' };
-  }
-});
-
-ipcMain.handle('story:delete-book-chapters', async (_, payload = {}) => {
-  const { bookId } = payload;
-  if (!bookId) return { ok: false, error: 'Thiếu bookId' };
-  try {
-    const userDataPath = app.getPath('userData');
-    const bookDir = path.join(userDataPath, 'chapters', String(bookId));
-    if (fs.existsSync(bookDir)) {
-      fs.rmSync(bookDir, { recursive: true, force: true });
-    }
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: err.message };
   }
 });
 

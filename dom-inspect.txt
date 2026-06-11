@@ -1,0 +1,8 @@
+{
+  "innerText": "Số chương:\n1218",
+  "spanColor": "rgb(71, 85, 105)",
+  "bColor": "rgb(29, 78, 216)",
+  "spanDisplay": "block",
+  "bDisplay": "block",
+  "html": "<div class=\"stat chapterStat\"><span>Số chương:</span><b>1218</b></div>"
+}
