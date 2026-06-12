@@ -476,3 +476,40 @@ button {
 .compareGrid {
   flex: 0 0 auto;
 }
+
+.tree-all-simple {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  line-height: 24px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tree-all-simple input {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.tree-all-simple span {
+  font-size: 12px;
+  color: #111827;
+  line-height: 1;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.tree-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.tree-continue-btn {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}

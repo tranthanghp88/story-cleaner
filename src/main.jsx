@@ -1573,40 +1573,86 @@ function App() {
                   </div>
                 </div>
 
-                <div className="chapterList treeChapters" style={{ marginTop: '8px' }}><div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '24px', marginLeft: '-15px' }}><div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} /><button onClick={addChapter} className="softPrimary" style={{ padding: '2px 8px', fontSize: '11px', whiteSpace: 'nowrap', borderRadius: '6px', height: '22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontWeight: 'bold', margin: 0, border: '1px solid #bfdbfe' }}>+ Chương tiếp</button><label style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer', height: '22px', userSelect: 'none' }}><input type="checkbox" style={{ width: '13px', height: '13px', margin: 0, flexShrink: 0, cursor: 'pointer' }} checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} onChange={() => { const allSelected = chs.every(c => c.selectedForExport === true); setBooks(prev => prev.map((x, bookI) => { if (bookI === bIdx) { return { ...x, chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected })) }; } return x; })); }} /><span style={{ fontSize: '11px', fontWeight: 'bold', color: '#172033', lineHeight: '1', whiteSpace: 'nowrap' }}>All</span></label></div>
-                  {chs.map((ch, i) => {
-                    const isActive = bIdx === bookIndex && i === selected;
-                    return (
-                      <button key={i} className={isActive ? 'chapter active' : 'chapter'} onClick={() => {
-                        selectBook(bIdx);
-                        setSelected(i);
-                      }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', border: '1px solid #dbeafe', textAlign: 'left' }}>
+                <div className="chapterList treeChapters" style={{ marginTop: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', height: '24px', marginLeft: '-15px', width: 'calc(100% + 15px)' }}>
+                    <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
+                    <div className="tree-action-row">
+                      <button 
+                        onClick={addChapter} 
+                        className="softPrimary tree-continue-btn"
+                        style={{ 
+                          padding: '2px 8px', 
+                          fontSize: '11px', 
+                          borderRadius: '6px', 
+                          height: '22px', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          margin: 0,
+                          border: '1px solid #bfdbfe'
+                        }}
+                      >
+                        + Chương tiếp
+                      </button>
+                      <div className="tree-all-simple">
                         <input 
                           type="checkbox" 
-                          checked={ch.selectedForExport === true} 
-                          onClick={e => e.stopPropagation()} 
-                          onChange={e => {
+                          checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} 
+                          onChange={() => {
+                            const allSelected = chs.every(c => c.selectedForExport === true);
                             setBooks(prev => prev.map((x, bookI) => {
                               if (bookI === bIdx) {
                                 return {
                                   ...x,
-                                  chapters: x.chapters.map((c, chI) => chI === i ? { ...c, selectedForExport: e.target.checked } : c)
+                                  chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected }))
                                 };
                               }
                               return x;
                             }));
                           }} 
-                          style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, cursor: 'pointer' }} 
                         />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px', fontWeight: 800, fontSize: '13px' }}>
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxHeight: '20px' }}>{ch.title || `Chương ${i + 1}`}</span>
-                            <span style={{ color: '#94a3b8', fontSize: '10.5px', fontWeight: 'normal', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                              ({formatCharCount(ch)} ký tự)
+                        <span>All</span>
+                      </div>
+                    </div>
+                  </div>
+                  {chs.map((ch, i) => {
+                    const isActive = bIdx === bookIndex && i === selected;
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '36px', marginLeft: '-15px' }}>
+                        <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
+                        <button className={isActive ? 'chapter active' : 'chapter'} onClick={() => {
+                          selectBook(bIdx);
+                          setSelected(i);
+                        }} style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 auto', border: '1px solid #dbeafe', textAlign: 'left', padding: '6px 10px', height: '32px', minWidth: 0, overflow: 'hidden' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={ch.selectedForExport === true} 
+                            onClick={e => e.stopPropagation()} 
+                            onChange={e => {
+                              setBooks(prev => prev.map((x, bookI) => {
+                                if (bookI === bIdx) {
+                                  return {
+                                    ...x,
+                                    chapters: x.chapters.map((c, chI) => chI === i ? { ...c, selectedForExport: e.target.checked } : c)
+                                  };
+                                }
+                                return x;
+                              }));
+                            }} 
+                            style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, cursor: 'pointer' }} 
+                          />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '13px', whiteSpace: 'nowrap' }}>
+                              <span>Chương {i + 1}</span>
+                              <span style={{ color: '#94a3b8', fontSize: '10.5px', fontWeight: 'normal', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                ({formatCharCount(ch)} ký tự)
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                      </button>
+                          </div>
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -1683,7 +1729,7 @@ function App() {
         )}
 
         {tab === 'editor' && (
-          <div className="chapterTools compactTools" style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'nowrap', padding: '6px 10px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflowX: 'auto', margin: '4px 0' }}>
+          <div className="chapterTools compactTools" style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', padding: '6px 10px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'visible', margin: '4px 0' }}>
             
             {/* Lấy nội dung hàng loạt */}
             <div style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '8px', border: '1px solid #bfdbfe', overflow: 'visible', height: '34px', position: 'relative', flexShrink: 0 }}>
