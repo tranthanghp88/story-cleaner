@@ -8,5 +8,7 @@ contextBridge.exposeInMainWorld('storyAPI', {
   logError: (msg) => ipcRenderer.invoke('story:log-error', msg),
   saveChapterContent: (payload) => ipcRenderer.invoke('story:save-chapter-content', payload),
   loadChapterContent: (payload) => ipcRenderer.invoke('story:load-chapter-content', payload),
-  deleteBookChapters: (payload) => ipcRenderer.invoke('story:delete-book-chapters', payload)
+  deleteBookChapters: (payload) => ipcRenderer.invoke('story:delete-book-chapters', payload),
+  saveSettings: (data) => ipcRenderer.invoke('story:save-settings', data),
+  loadSettings: () => ipcRenderer.invoke('story:load-settings')
 });

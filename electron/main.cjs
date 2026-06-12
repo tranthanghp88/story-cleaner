@@ -362,6 +362,43 @@ ipcMain.handle('story:delete-book-chapters', async (_, payload = {}) => {
   }
 });
 
+ipcMain.handle('story:save-settings', async (_, data) => {
+  try {
+    const filePath = path.join(process.cwd(), 'settings.json');
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    return { ok: true };
+  } catch (err) {
+    try {
+      const userDataPath = app.getPath('userData');
+      const filePathFallback = path.join(userDataPath, 'settings.json');
+      fs.writeFileSync(filePathFallback, JSON.stringify(data, null, 2), 'utf8');
+      return { ok: true, fallback: true };
+    } catch (errFallback) {
+      return { ok: false, error: errFallback.message };
+    }
+  }
+});
+
+ipcMain.handle('story:load-settings', async () => {
+  try {
+    const filePath = path.join(process.cwd(), 'settings.json');
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      return { ok: true, data };
+    }
+    const userDataPath = app.getPath('userData');
+    const filePathFallback = path.join(userDataPath, 'settings.json');
+    if (fs.existsSync(filePathFallback)) {
+      const data = JSON.parse(fs.readFileSync(filePathFallback, 'utf8'));
+      return { ok: true, data };
+    }
+    return { ok: true, data: null };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
+
 app.whenReady().then(() => {
   if (process.platform === 'darwin' && fs.existsSync(iconPath)) {
     app.dock.setIcon(iconPath);
