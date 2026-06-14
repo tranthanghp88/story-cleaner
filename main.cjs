@@ -114,6 +114,9 @@ function extractWithCheerio(html, url) {
     $('title').first().text().trim() ||
     'Chương mới';
 
+  // Clean title, headings, breadcrumbs, metadata, and navigation elements from the DOM tree before extracting content text
+  $('h1, h2, h3, h4, h5, h6, .chapter-title, .chapter-name, .title-chapter, .chapter_title, .chap-title, .book-title, .novel-title, .title-book, .title-novel, .breadcrumb, .breadcrumbs, .crumb, .breadcrumbs-list, .metadata, .meta, .chapter-meta, .post-meta, .author, .post-author, .time, .post-time, .navigation, .nav, .next-prev, .chapter-nav, .btn-navigation, .chapter-control, .chapter-controls, .control-btn, #next_chap, #prev_chap, .chapter-nav-top, .chapter-nav-bottom, .navigation-btn, .nav-buttons').remove();
+
   const selectors = [
     '#chapter-content', '.chapter-content', '.chapter-c', '.chapter-cnt', '.chapter-text', '.chapter-body', '.chapter-detail',
     '#content_chap', '#content-chap', '#content', '.content', '.entry-content', '.post-content', '.reading-content',
@@ -144,13 +147,24 @@ function extractWithCheerio(html, url) {
 }
 
 async function extractWithReadability(html, url) {
-  const dom = new JSDOM(html, { url });
-  const reader = new Readability(dom.window.document);
-  const article = reader.parse();
-  if (!article) return null;
+  const domForTitle = new JSDOM(html, { url });
+  const readerForTitle = new Readability(domForTitle.window.document);
+  const articleForTitle = readerForTitle.parse();
+  const title = articleForTitle ? articleForTitle.title : 'Chương mới';
+
+  const domForContent = new JSDOM(html, { url });
+  const doc = domForContent.window.document;
+  
+  const unwanted = doc.querySelectorAll('h1, h2, h3, h4, h5, h6, .chapter-title, .chapter-name, .title-chapter, .chapter_title, .chap-title, .book-title, .novel-title, .title-book, .title-novel, .breadcrumb, .breadcrumbs, .crumb, .breadcrumbs-list, .metadata, .meta, .chapter-meta, .post-meta, .author, .post-author, .time, .post-time, .navigation, .nav, .next-prev, .chapter-nav, .btn-navigation, .chapter-control, .chapter-controls, .control-btn, #next_chap, #prev_chap, .chapter-nav-top, .chapter-nav-bottom, .navigation-btn, .nav-buttons');
+  unwanted.forEach(el => el.remove());
+
+  const readerForContent = new Readability(doc);
+  const articleForContent = readerForContent.parse();
+  if (!articleForContent) return null;
+
   return {
-    title: article.title || 'Chương mới',
-    text: normalizeText(article.textContent || ''),
+    title: title || articleForContent.title || 'Chương mới',
+    text: normalizeText(articleForContent.textContent || ''),
     selector: 'readability',
     url
   };

@@ -41,151 +41,123 @@ const HUMANIZE_PRESETS = {
 
 const PROMPT_PRESETS = {
   default: {
-    aiNaturalVn: `Bạn là biên tập viên truyện chuyên nghiệp.
+    aiNaturalVn: `Bạn là biên tập viên truyện chuyên nghiệp kiêm chuyên gia Việt hóa tiểu thuyết.
 
-Nhiệm vụ:
-Chuyển nội dung truyện sang tiếng Việt tự nhiên hơn.
+Nhiệm vụ của bạn là chuyển đổi nội dung chương truyện dưới đây sang tiếng Việt tự nhiên, mượt mà, đậm chất văn học như truyện dịch xuất bản, đồng thời loại bỏ các lỗi dịch máy và từ ngữ convert.
 
-==================================================
-MỤC TIÊU
-==================================================
-Ưu tiên cao nhất:
-1. Giữ nguyên nội dung.
-2. Giữ nguyên tình tiết.
-3. Giữ nguyên quan hệ nhân vật.
-4. Giữ nguyên logic cốt truyện.
-5. Giữ nguyên tên riêng.
-
-Độc giả phải đọc được chính xác cùng một câu chuyện.
+BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG LÀ GIỮ NGUYÊN BẢN SẮC TRUYỆN GỐC):
 
 ==================================================
-KHÔNG ĐƯỢC PHÉP
+1. NGUYÊN TẮC TỐI GIẢN - STOP OVER-REWRITING & MINIMAL REWRITE MODE
 ==================================================
-Không sáng tác thêm.
-Không thêm:
-- suy nghĩ nhân vật
-- cảm xúc nhân vật
-- nội tâm
-- miêu tả mới
-- lời thoại mới
-- tình tiết mới
-
-Không được:
-- viết lại truyện
-- mở rộng nội dung
-- tự suy diễn
-
-Nếu bản gốc có 100 ý:
-Bản kết quả cũng phải là 100 ý đó.
+- Mục tiêu tối thượng là "Dịch tốt hơn", KHÔNG phải là "AI viết lại truyện".
+- Ưu tiên hàng đầu: Giữ nguyên nghĩa gốc, giữ nhịp kể gốc, giữ cảm xúc gốc của truyện.
+- NGƯỠNG REWRITE (Rewrite Threshold):
+  + Nếu một câu/văn bản đã đọc tự nhiên, trôi chảy bằng tiếng Việt: GIỮ NGUYÊN. Tuyệt đối không rewrite, không cố làm đẹp hay "văn vẻ hóa" không cần thiết.
+- CHỈ REWRITE (Minimal Rewrite Mode) khi gặp:
+  + Từ ngữ convert, dịch máy thô cứng.
+  + Sai ngữ pháp tiếng Việt.
+  + Sai xưng hô/quan hệ nhân vật.
+  + Sai chủ thể hành động hoặc chủ thể nói.
+  + Sai lệch ý nghĩa của câu gốc.
+- Đối với tất cả các câu bình thường khác: Giữ nguyên cấu trúc và từ vựng tương đương của bản gốc.
 
 ==================================================
-XỬ LÝ MÙI CONVERT
+2. CẤM SÁNG TÁC THÊM - ANTI CREATIVE WRITING
 ==================================================
-Nếu gặp:
-- thành ngữ convert
-- cụm dịch máy
-- cụm Hán Việt khó hiểu
-- cách diễn đạt quá sát tiếng Trung
-
-=> chuyển sang tiếng Việt tự nhiên hơn.
-
-Ví dụ:
-"trong lòng cả kinh" → "giật mình"
-"vận khí tốt" → "gặp may"
-"khẩu thị tâm phi" → "ngoài miệng một đằng, trong lòng một nẻo"
-"đội nón xanh" → "bị cắm sừng"
-"tai ương lao ngục" → "vận hạn tù tội"
-"sắc mặt đại biến" → "biến sắc"
-"thần sắc khó coi" → "sắc mặt khó coi"
+- Tuyệt đối cấm thêm thắt các nội dung không có trong bản gốc:
+  + Cấm tự ý thêm suy nghĩ của nhân vật.
+  + Cấm tự ý thêm cảm xúc hoặc nội tâm của nhân vật.
+  + Cấm tự ý thêm các chi tiết miêu tả ngoại hình, cảnh vật, hoặc hành động mới.
+- CẤM TỰ Ý THÊM các từ đệm miêu tả hành động/cảm xúc nếu bản gốc không có, đặc biệt là:
+  + "khẽ", "bất giác", "không khỏi", "theo bản năng", "vô thức", "bất đắc dĩ", v.v.
+- Không tự ý thêm các từ liên kết câu dư thừa làm kéo dài câu văn hoặc làm biến đổi nhịp điệu kể chuyện của tác giả gốc.
 
 ==================================================
-PHÂN LOẠI THUẬT NGỮ
+3. BẢN ĐỒ QUAN HỆ NHÂN VẬT & KHÓA XƯNG HÔ
 ==================================================
-NHÓM A
-Thuật ngữ cốt truyện:
-- phong thủy
-- tướng số
-- huyền học
-- đạo pháp
-- pháp khí
-- linh khí
-- tu luyện
-=> GIỮ NGUYÊN.
-Không tự ý Việt hóa làm mất ý nghĩa.
-
-Các thuật ngữ bảo vệ khác cần giữ nguyên:
-- {{preserveTerms}}
-
---------------------------------------------------
-NHÓM B
-Thành ngữ convert phổ biến:
-- khẩu thị tâm phi
-- đội nón xanh
-- trong lòng cả kinh
-- vận khí
-- cơ duyên
-- tai ương lao ngục
-=> Ưu tiên chuyển sang cách diễn đạt Việt tự nhiên.
-
---------------------------------------------------
-NHÓM C
-Câu văn dịch sát nghĩa:
-Ví dụ:
-"Vương Dương lúc này kinh ngạc phát hiện..."
-Có thể đổi thành:
-"Lúc này Vương Dương mới phát hiện..."
-hoặc
-"Vương Dương chợt phát hiện..."
-Miễn không đổi nội dung.
+- Trước khi biên tập, bạn phải suy luận kỹ lưỡng về ngữ cảnh của đoạn văn để xác định:
+  + Ai lớn tuổi hơn, ai nhỏ tuổi hơn.
+  + Mối quan hệ giữa các nhân vật (bạn bè, cha con, chú cháu, anh em, đối thủ, cấp trên - cấp dưới, v.v.).
+- Sau khi xác định, phải KHÓA xưng hô thống nhất trong toàn bộ chương/đoạn văn.
+  + Ví dụ: Vương Dương ↔ Diêm Bằng Phi (xưng hô anh - em), Vương Dương ↔ Diêm Phúc Khánh (xưng hô cháu - chú).
+  + Tuyệt đối KHÔNG được thay đổi xưng hô lung tung (như lúc xưng tôi, lúc xưng ta, ngươi, bác, chú, cháu, hắn, cậu) một cách vô lý trong cùng một cuộc đối thoại hoặc cùng một chương.
 
 ==================================================
-GIẢM LẶP TÊN RIÊNG
+4. PHÂN ĐỊNH CHỦ THỂ THOẠI & HÀNH ĐỘNG
 ==================================================
-Không cần lặp:
-Vương Dương...
-Vương Dương...
-Vương Dương...
-ở mọi câu.
-
-Khi ngữ cảnh đã rõ:
-Cho phép dùng:
-- anh
-- cậu
-- hắn
-để câu văn tự nhiên hơn.
-Tuy nhiên:
-Không gây nhầm lẫn nhân vật.
+- Tuyệt đối KHÔNG được để xảy ra tình trạng:
+  + Câu thoại của nhân vật A được xếp liền kề với hành động của nhân vật B trong cùng một dòng/đoạn văn khiến người đọc hiểu lầm nhân vật B là người nói.
+- Hãy kiểm tra kỹ lưỡng chủ thể thực hiện hành động và chủ thể phát ngôn trước khi viết câu để đảm bảo phân định rõ ràng ai nói, ai hành động.
 
 ==================================================
-HỘI THOẠI
+5. KHỬ MÙI CONVERT & DỊCH MÁY THỰC TẾ
 ==================================================
-Ưu tiên hội thoại tự nhiên như người Việt.
-Ví dụ:
-"Cậu đi đâu vậy?" tốt hơn "Cậu đã đi đâu vậy?" nếu nội dung không thay đổi.
+- Loại bỏ hoàn toàn các từ ngữ, cụm từ convert hoặc dịch máy thô cứng. Hãy diễn đạt lại bằng tiếng Việt thuần thục, tự nhiên và giữ đúng ý nghĩa.
+- Tuyệt đối không dùng các cụm từ kiểu:
+  + "máu về" (dùng "máu chảy về", "hồi máu", "dồn máu", hoặc cách diễn đạt phù hợp ngữ cảnh).
+  + "theo hướng chỉ dẫn" (dùng "theo hướng dẫn", "theo chỉ dẫn", "theo hướng chỉ").
+  + "chơi đùa ở đây" (dùng "đùa giỡn", "bỡn cợt", "ở đây làm loạn").
+  + "ba lần lên ba lần xuống" (dùng "ba chìm bảy nổi", "ba lần vực dậy rồi sụp đổ", "nhiều lần thăng trầm").
+  + "không nên gọi ta" (dùng "đừng gọi tôi", "đừng gọi ta").
+- Hãy viết sao cho giống người Việt đang kể chuyện và đối thoại tự nhiên.
+
+==================================================
+6. VĂN PHONG KỂ CHUYỆN TỰ NHIÊN, BỎ GIẢI THÍCH
+==================================================
+- Loại bỏ hoàn toàn các cụm từ giải thích mang phong cách AI hoặc văn thuyết minh học thuật, ví dụ như:
+  + "Phải biết rằng..."
+  + "Điều này cho thấy..."
+  + "Dù là ai..."
+  + "Hoàn toàn là hai chuyện khác nhau..."
+- Chỉ giữ lại thông tin cốt lõi và diễn đạt một cách tự nhiên trong dòng chảy tự sự của truyện mà không làm mất đi thông tin ban đầu.
+
+==================================================
+7. CHỐNG TỰ PHÁT MINH Ý NGHĨA / XUYÊN TẠC
+==================================================
+- Tuyệt đối KHÔNG tự ý suy diễn nghĩa hoặc sáng tác thêm tình tiết mới khi không chắc chắn.
+- Ví dụ: từ "lạp phong" (bản gốc Trung Quốc nghĩa là ngầu, phong cách) KHÔNG được tự ý dịch bừa thành "xe cũ kỹ" hay các từ sai nghĩa khác.
+- Nếu không chắc chắn nghĩa của một từ cổ, từ lóng hoặc từ convert lạ, hãy giữ nghĩa ở mức trung tính hoặc dùng từ Hán Việt tương đương phổ biến, tuyệt đối không đoán bừa.
+
+==================================================
+8. NHẤT QUÁN THUẬT NGỮ CỐT TRUYỆN
+==================================================
+- Khóa chặt các thuật ngữ chuyên môn hoặc thuật ngữ huyền học trong suốt tác phẩm, không được thay đổi linh tinh giữa các chương.
+- Các thuật ngữ huyền học cần giữ nguyên:
+  + "Trời thương khố", "Đất khố", "Lục sát", "Sửu quỷ", v.v.
+- Các từ ngữ cần bảo vệ khác:
+  + {{preserveTerms}}
+
+==================================================
+9. KHÔNG SÁNG TÁC TIÊU ĐỀ/NỘI DUNG PHỤ
+==================================================
+- Tuyệt đối KHÔNG tự ý thêm tiêu đề phụ, tiêu đề chương mới tự nghĩ (như "Xem tướng của truyện Siêu Cấp Thần Tướng"), tiêu đề giới thiệu truyện/chương, dòng mô tả truyện/chương ở đầu hoặc ở cuối.
+- Nếu tiêu đề gốc là "Chương X: [Tên chương]", hãy giữ đúng định dạng và nội dung đó, không thêm thắt.
 
 ==================================================
 CÁC CÀI ĐẶT BỔ SUNG
 ==================================================
-Ghi nhớ riêng bộ truyện:
-{{novelMemory}}
-
-Yêu cầu xưng hô:
-{{pronounStyle}}
-
-Mức biên tập:
-{{humanizeStrength}}
-
-Ghi chú thêm từ người dùng:
-{{extraInstructions}}
+- Ghi nhớ riêng bộ truyện: {{novelMemory}}
+- Yêu cầu xưng hô cụ thể: {{pronounStyle}}
+- Mức biên tập: {{humanizeStrength}}
+- Ghi chú thêm của người dùng: {{extraInstructions}}
 
 ==================================================
-ĐẦU RA
+10. CỔNG KIỂM SOÁT CHẤT LƯỢNG - QUALITY GATE
 ==================================================
-Chỉ trả về nội dung truyện đã biên tập.
-Không giải thích.
-Không nhận xét.
-Không thêm ghi chú.
-Không thêm tiêu đề.`,
+Sau khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh giá kết quả theo checklist dưới đây trước khi trả về đầu ra:
+1. Xưng hô giữa các nhân vật đã nhất quán và khóa chặt từ đầu đến cuối chương chưa?
+2. Có câu thoại nào bị nhầm lẫn chủ thể nói hoặc bị xếp liền kề hành động nhân vật khác gây hiểu lầm vai không?
+3. Bạn có tự ý rewrite các câu vốn dĩ đã tự nhiên không? (Nếu có, hãy khôi phục lại câu văn gốc).
+4. Bạn có tự ý thêm các từ cấm ("khẽ", "bất giác", "không khỏi", "theo bản năng", "vô thức", "bất đắc dĩ") không? (Nếu có, hãy loại bỏ).
+5. Có từ ngữ nào bị tự ý sáng tác, phóng đại hoặc suy diễn sai nghĩa (ví dụ "lạp phong" thành "xe cũ kỹ") không?
+6. Có còn sót cụm từ convert/dịch máy thô cứng nào (như "máu về", "theo hướng chỉ dẫn") không?
+* Nếu phát hiện bất kỳ lỗi nào trong các câu hỏi trên, bạn PHẢI tự viết lại đoạn lỗi đó cho chuẩn xác rồi mới xuất ra kết quả cuối cùng.
+
+==================================================
+ĐẦU RA (OUTPUT FORMAT)
+==================================================
+Chỉ trả về phần nội dung chương truyện đã được biên tập sạch sẽ. Không giải thích, không thêm ghi chú, không thêm nhận xét hay bất cứ nội dung rác nào khác ở đầu hoặc ở cuối.`,
     storyCleaner: `VAI TRÒ:
 Bạn là công cụ làm sạch văn bản truyện.
 
@@ -206,151 +178,123 @@ NHIỆM VỤ:
 VĂN BẢN CẦN XỬ LÝ:`
   },
   naturalVn: {
-    aiNaturalVn: `Bạn là biên tập viên truyện chuyên nghiệp.
+    aiNaturalVn: `Bạn là biên tập viên truyện chuyên nghiệp kiêm chuyên gia Việt hóa tiểu thuyết.
 
-Nhiệm vụ:
-Chuyển nội dung truyện sang tiếng Việt tự nhiên hơn.
+Nhiệm vụ của bạn là chuyển đổi nội dung chương truyện dưới đây sang tiếng Việt tự nhiên, mượt mà, đậm chất văn học như truyện dịch xuất bản, đồng thời loại bỏ các lỗi dịch máy và từ ngữ convert.
 
-==================================================
-MỤC TIÊU
-==================================================
-Ưu tiên cao nhất:
-1. Giữ nguyên nội dung.
-2. Giữ nguyên tình tiết.
-3. Giữ nguyên quan hệ nhân vật.
-4. Giữ nguyên logic cốt truyện.
-5. Giữ nguyên tên riêng.
-
-Độc giả phải đọc được chính xác cùng một câu chuyện.
+BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG LÀ GIỮ NGUYÊN BẢN SẮC TRUYỆN GỐC):
 
 ==================================================
-KHÔNG ĐƯỢC PHÉP
+1. NGUYÊN TẮC TỐI GIẢN - STOP OVER-REWRITING & MINIMAL REWRITE MODE
 ==================================================
-Không sáng tác thêm.
-Không thêm:
-- suy nghĩ nhân vật
-- cảm xúc nhân vật
-- nội tâm
-- miêu tả mới
-- lời thoại mới
-- tình tiết mới
-
-Không được:
-- viết lại truyện
-- mở rộng nội dung
-- tự suy diễn
-
-Nếu bản gốc có 100 ý:
-Bản kết quả cũng phải là 100 ý đó.
+- Mục tiêu tối thượng là "Dịch tốt hơn", KHÔNG phải là "AI viết lại truyện".
+- Ưu tiên hàng đầu: Giữ nguyên nghĩa gốc, giữ nhịp kể gốc, giữ cảm xúc gốc của truyện.
+- NGƯỠNG REWRITE (Rewrite Threshold):
+  + Nếu một câu/văn bản đã đọc tự nhiên, trôi chảy bằng tiếng Việt: GIỮ NGUYÊN. Tuyệt đối không rewrite, không cố làm đẹp hay "văn vẻ hóa" không cần thiết.
+- CHỈ REWRITE (Minimal Rewrite Mode) khi gặp:
+  + Từ ngữ convert, dịch máy thô cứng.
+  + Sai ngữ pháp tiếng Việt.
+  + Sai xưng hô/quan hệ nhân vật.
+  + Sai chủ thể hành động hoặc chủ thể nói.
+  + Sai lệch ý nghĩa của câu gốc.
+- Đối với tất cả các câu bình thường khác: Giữ nguyên cấu trúc và từ vựng tương đương của bản gốc.
 
 ==================================================
-XỬ LÝ MÙI CONVERT
+2. CẤM SÁNG TÁC THÊM - ANTI CREATIVE WRITING
 ==================================================
-Nếu gặp:
-- thành ngữ convert
-- cụm dịch máy
-- cụm Hán Việt khó hiểu
-- cách diễn đạt quá sát tiếng Trung
-
-=> chuyển sang tiếng Việt tự nhiên hơn.
-
-Ví dụ:
-"trong lòng cả kinh" → "giật mình"
-"vận khí tốt" → "gặp may"
-"khẩu thị tâm phi" → "ngoài miệng một đằng, trong lòng một nẻo"
-"đội nón xanh" → "bị cắm sừng"
-"tai ương lao ngục" → "vận hạn tù tội"
-"sắc mặt đại biến" → "biến sắc"
-"thần sắc khó coi" → "sắc mặt khó coi"
+- Tuyệt đối cấm thêm thắt các nội dung không có trong bản gốc:
+  + Cấm tự ý thêm suy nghĩ của nhân vật.
+  + Cấm tự ý thêm cảm xúc hoặc nội tâm của nhân vật.
+  + Cấm tự ý thêm các chi tiết miêu tả ngoại hình, cảnh vật, hoặc hành động mới.
+- CẤM TỰ Ý THÊM các từ đệm miêu tả hành động/cảm xúc nếu bản gốc không có, đặc biệt là:
+  + "khẽ", "bất giác", "không khỏi", "theo bản năng", "vô thức", "bất đắc dĩ", v.v.
+- Không tự ý thêm các từ liên kết câu dư thừa làm kéo dài câu văn hoặc làm biến đổi nhịp điệu kể chuyện của tác giả gốc.
 
 ==================================================
-PHÂN LOẠI THUẬT NGỮ
+3. BẢN ĐỒ QUAN HỆ NHÂN VẬT & KHÓA XƯNG HÔ
 ==================================================
-NHÓM A
-Thuật ngữ cốt truyện:
-- phong thủy
-- tướng số
-- huyền học
-- đạo pháp
-- pháp khí
-- linh khí
-- tu luyện
-=> GIỮ NGUYÊN.
-Không tự ý Việt hóa làm mất ý nghĩa.
-
-Các thuật ngữ bảo vệ khác cần giữ nguyên:
-- {{preserveTerms}}
-
---------------------------------------------------
-NHÓM B
-Thành ngữ convert phổ biến:
-- khẩu thị tâm phi
-- đội nón xanh
-- trong lòng cả kinh
-- vận khí
-- cơ duyên
-- tai ương lao ngục
-=> Ưu tiên chuyển sang cách diễn đạt Việt tự nhiên.
-
---------------------------------------------------
-NHÓM C
-Câu văn dịch sát nghĩa:
-Ví dụ:
-"Vương Dương lúc này kinh ngạc phát hiện..."
-Có thể đổi thành:
-"Lúc này Vương Dương mới phát hiện..."
-hoặc
-"Vương Dương chợt phát hiện..."
-Miễn không đổi nội dung.
+- Trước khi biên tập, bạn phải suy luận kỹ lưỡng về ngữ cảnh của đoạn văn để xác định:
+  + Ai lớn tuổi hơn, ai nhỏ tuổi hơn.
+  + Mối quan hệ giữa các nhân vật (bạn bè, cha con, chú cháu, anh em, đối thủ, cấp trên - cấp dưới, v.v.).
+- Sau khi xác định, phải KHÓA xưng hô thống nhất trong toàn bộ chương/đoạn văn.
+  + Ví dụ: Vương Dương ↔ Diêm Bằng Phi (xưng hô anh - em), Vương Dương ↔ Diêm Phúc Khánh (xưng hô cháu - chú).
+  + Tuyệt đối KHÔNG được thay đổi xưng hô lung tung (như lúc xưng tôi, lúc xưng ta, ngươi, bác, chú, cháu, hắn, cậu) một cách vô lý trong cùng một cuộc đối thoại hoặc cùng một chương.
 
 ==================================================
-GIẢM LẶP TÊN RIÊNG
+4. PHÂN ĐỊNH CHỦ THỂ THOẠI & HÀNH ĐỘNG
 ==================================================
-Không cần lặp:
-Vương Dương...
-Vương Dương...
-Vương Dương...
-ở mọi câu.
-
-Khi ngữ cảnh đã rõ:
-Cho phép dùng:
-- anh
-- cậu
-- hắn
-để câu văn tự nhiên hơn.
-Tuy nhiên:
-Không gây nhầm lẫn nhân vật.
+- Tuyệt đối KHÔNG được để xảy ra tình trạng:
+  + Câu thoại của nhân vật A được xếp liền kề với hành động của nhân vật B trong cùng một dòng/đoạn văn khiến người đọc hiểu lầm nhân vật B là người nói.
+- Hãy kiểm tra kỹ lưỡng chủ thể thực hiện hành động và chủ thể phát ngôn trước khi viết câu để đảm bảo phân định rõ ràng ai nói, ai hành động.
 
 ==================================================
-HỘI THOẠI
+5. KHỬ MÙI CONVERT & DỊCH MÁY THỰC TẾ
 ==================================================
-Ưu tiên hội thoại tự nhiên như người Việt.
-Ví dụ:
-"Cậu đi đâu vậy?" tốt hơn "Cậu đã đi đâu vậy?" nếu nội dung không thay đổi.
+- Loại bỏ hoàn toàn các từ ngữ, cụm từ convert hoặc dịch máy thô cứng. Hãy diễn đạt lại bằng tiếng Việt thuần thục, tự nhiên và giữ đúng ý nghĩa.
+- Tuyệt đối không dùng các cụm từ kiểu:
+  + "máu về" (dùng "máu chảy về", "hồi máu", "dồn máu", hoặc cách diễn đạt phù hợp ngữ cảnh).
+  + "theo hướng chỉ dẫn" (dùng "theo hướng dẫn", "theo chỉ dẫn", "theo hướng chỉ").
+  + "chơi đùa ở đây" (dùng "đùa giỡn", "bỡn cợt", "ở đây làm loạn").
+  + "ba lần lên ba lần xuống" (dùng "ba chìm bảy nổi", "ba lần vực dậy rồi sụp đổ", "nhiều lần thăng trầm").
+  + "không nên gọi ta" (dùng "đừng gọi tôi", "đừng gọi ta").
+- Hãy viết sao cho giống người Việt đang kể chuyện và đối thoại tự nhiên.
+
+==================================================
+6. VĂN PHONG KỂ CHUYỆN TỰ NHIÊN, BỎ GIẢI THÍCH
+==================================================
+- Loại bỏ hoàn toàn các cụm từ giải thích mang phong cách AI hoặc văn thuyết minh học thuật, ví dụ như:
+  + "Phải biết rằng..."
+  + "Điều này cho thấy..."
+  + "Dù là ai..."
+  + "Hoàn toàn là hai chuyện khác nhau..."
+- Chỉ giữ lại thông tin cốt lõi và diễn đạt một cách tự nhiên trong dòng chảy tự sự của truyện mà không làm mất đi thông tin ban đầu.
+
+==================================================
+7. CHỐNG TỰ PHÁT MINH Ý NGHĨA / XUYÊN TẠC
+==================================================
+- Tuyệt đối KHÔNG tự ý suy diễn nghĩa hoặc sáng tác thêm tình tiết mới khi không chắc chắn.
+- Ví dụ: từ "lạp phong" (bản gốc Trung Quốc nghĩa là ngầu, phong cách) KHÔNG được tự ý dịch bừa thành "xe cũ kỹ" hay các từ sai nghĩa khác.
+- Nếu không chắc chắn nghĩa của một từ cổ, từ lóng hoặc từ convert lạ, hãy giữ nghĩa ở mức trung tính hoặc dùng từ Hán Việt tương đương phổ biến, tuyệt đối không đoán bừa.
+
+==================================================
+8. NHẤT QUÁN THUẬT NGỮ CỐT TRUYỆN
+==================================================
+- Khóa chặt các thuật ngữ chuyên môn hoặc thuật ngữ huyền học trong suốt tác phẩm, không được thay đổi linh tinh giữa các chương.
+- Các thuật ngữ huyền học cần giữ nguyên:
+  + "Trời thương khố", "Đất khố", "Lục sát", "Sửu quỷ", v.v.
+- Các từ ngữ cần bảo vệ khác:
+  + {{preserveTerms}}
+
+==================================================
+9. KHÔNG SÁNG TÁC TIÊU ĐỀ/NỘI DUNG PHỤ
+==================================================
+- Tuyệt đối KHÔNG tự ý thêm tiêu đề phụ, tiêu đề chương mới tự nghĩ (như "Xem tướng của truyện Siêu Cấp Thần Tướng"), tiêu đề giới thiệu truyện/chương, dòng mô tả truyện/chương ở đầu hoặc ở cuối.
+- Nếu tiêu đề gốc là "Chương X: [Tên chương]", hãy giữ đúng định dạng và nội dung đó, không thêm thắt.
 
 ==================================================
 CÁC CÀI ĐẶT BỔ SUNG
 ==================================================
-Ghi nhớ riêng bộ truyện:
-{{novelMemory}}
-
-Yêu cầu xưng hô:
-{{pronounStyle}}
-
-Mức biên tập:
-{{humanizeStrength}}
-
-Ghi chú thêm từ người dùng:
-{{extraInstructions}}
+- Ghi nhớ riêng bộ truyện: {{novelMemory}}
+- Yêu cầu xưng hô cụ thể: {{pronounStyle}}
+- Mức biên tập: {{humanizeStrength}}
+- Ghi chú thêm của người dùng: {{extraInstructions}}
 
 ==================================================
-ĐẦU RA
+10. CỔNG KIỂM SOÁT CHẤT LƯỢNG - QUALITY GATE
 ==================================================
-Chỉ trả về nội dung truyện đã biên tập.
-Không giải thích.
-Không nhận xét.
-Không thêm ghi chú.
-Không thêm tiêu đề.`,
+Sau khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh giá kết quả theo checklist dưới đây trước khi trả về đầu ra:
+1. Xưng hô giữa các nhân vật đã nhất quán và khóa chặt từ đầu đến cuối chương chưa?
+2. Có câu thoại nào bị nhầm lẫn chủ thể nói hoặc bị xếp liền kề hành động nhân vật khác gây hiểu lầm vai không?
+3. Bạn có tự ý rewrite các câu vốn dĩ đã tự nhiên không? (Nếu có, hãy khôi phục lại câu văn gốc).
+4. Bạn có tự ý thêm các từ cấm ("khẽ", "bất giác", "không khỏi", "theo bản năng", "vô thức", "bất đắc dĩ") không? (Nếu có, hãy loại bỏ).
+5. Có từ ngữ nào bị tự ý sáng tác, phóng đại hoặc suy diễn sai nghĩa (ví dụ "lạp phong" thành "xe cũ kỹ") không?
+6. Có còn sót cụm từ convert/dịch máy thô cứng nào (như "máu về", "theo hướng chỉ dẫn") không?
+* Nếu phát hiện bất kỳ lỗi nào trong các câu hỏi trên, bạn PHẢI tự viết lại đoạn lỗi đó cho chuẩn xác rồi mới xuất ra kết quả cuối cùng.
+
+==================================================
+ĐẦU RA (OUTPUT FORMAT)
+==================================================
+Chỉ trả về phần nội dung chương truyện đã được biên tập sạch sẽ. Không giải thích, không thêm ghi chú, không thêm nhận xét hay bất cứ nội dung rác nào khác ở đầu hoặc ở cuối.`,
     storyCleaner: `VAI TRÒ:
 Bạn là biên tập viên xử lý convert truyện.
 
@@ -419,6 +363,211 @@ function escapeRegExp(s='') { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 function escapeHtml(text='') { return text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 function slugify(text='') { return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'ebook'; }
 function splitTerms(s='') { return s.split('\n').map(x=>x.trim()).filter(Boolean).sort((a,b)=>b.length-a.length); }
+function normalizeForCompare(str='') {
+  return String(str || '').toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
+}
+
+
+function formatChapterTitleForExport(title, index, bookTitleStr = '') {
+  let t = String(title || '').trim();
+  
+  if (bookTitleStr) {
+    const bookTitleEscaped = escapeRegExp(bookTitleStr);
+    const cleanRegex = new RegExp(`(?:của\\s+)?(?:truyện\\s+)?${bookTitleEscaped}\\s*[-_:]*\\s*`, 'gi');
+    t = t.replace(cleanRegex, '');
+  }
+
+  t = t.replace(/\s*[-_:]*\s*(truyenfull|sstruyen|tangthuvien|truyenyyeu|dtruyen|metruyenchu|wikidich|bachngocsach)\b.*$/i, '');
+
+  let name = t;
+  const chMatch = t.match(/^(?:ch[ươ]ng|chapter|ch|tập|vol|volume|quyển)\s*(\d+(?:\.\d+)?)\s*[-_:]*\s*/i);
+  let parsedNum = '';
+  if (chMatch) {
+    parsedNum = chMatch[1];
+    name = t.substring(chMatch[0].length).trim();
+  } else {
+    const digitMatch = t.match(/^\s*(\d+(?:\.\d+)?)\s*[-_:\.\/\)\}\]]+\s*/);
+    if (digitMatch) {
+      parsedNum = digitMatch[1];
+      name = t.substring(digitMatch[0].length).trim();
+    }
+  }
+
+  name = name.replace(/^[-_:\s\.\/\)\}\]]+/, '').trim();
+  name = name.replace(/[-_:\s\.\/\(\{\[]+$/, '').trim();
+
+  const finalNum = parsedNum || String(index + 1);
+  if (!name || (bookTitleStr && normalizeForCompare(name) === normalizeForCompare(bookTitleStr))) {
+    return `Chương ${finalNum}`;
+  }
+  return `Chương ${finalNum}: ${name}`;
+}
+
+function stripTitleFromText(text, title, bookTitleStr = '') {
+  if (!text) return '';
+  const lines = text.split('\n');
+  if (lines.length === 0) return text;
+
+  const normalizeMetadataCompare = (str) => {
+    return String(str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+  };
+
+  const normTitle = normalizeMetadataCompare(title);
+  const normBookTitle = normalizeMetadataCompare(bookTitleStr);
+
+  let namePart = title || '';
+  const chMatch = namePart.match(/^(?:ch[ươ]ng|chapter|ch|tập|vol|volume|quyển)\s*(\d+(?:\.\d+)?)\s*[-_:]*\s*/i);
+  if (chMatch) {
+    namePart = namePart.substring(chMatch[0].length).trim();
+  } else {
+    const digitMatch = namePart.match(/^\s*(\d+(?:\.\d+)?)\s*[-_:\.\/\)\}\]]+\s*/);
+    if (digitMatch) {
+      namePart = namePart.substring(digitMatch[0].length).trim();
+    }
+  }
+  namePart = namePart.replace(/^[-_:\s\.\/\)\}\]]+/, '').trim();
+  namePart = namePart.replace(/[-_:\s\.\/\(\{\[]+$/, '').trim();
+  const normNamePart = normalizeMetadataCompare(namePart);
+
+  const chNum = extractChapterNumber({ title: title });
+
+  const matchTargets = new Set();
+  if (normBookTitle) matchTargets.add(normBookTitle);
+  if (normTitle) matchTargets.add(normTitle);
+  if (normNamePart) matchTargets.add(normNamePart);
+
+  if (normBookTitle && normTitle) {
+    matchTargets.add(normBookTitle + normTitle);
+    matchTargets.add(normTitle + normBookTitle);
+  }
+  if (normBookTitle && normNamePart) {
+    matchTargets.add(normBookTitle + normNamePart);
+    matchTargets.add(normNamePart + normBookTitle);
+  }
+
+  if (chNum !== 999999) {
+    const numStrStr = String(chNum);
+    const paddedStr = numStrStr.padStart(2, '0');
+    const numVariations = [numStrStr];
+    if (paddedStr !== numStrStr) numVariations.push(paddedStr);
+
+    numVariations.forEach(numStr => {
+      matchTargets.add("chuong" + numStr);
+      matchTargets.add("chapter" + numStr);
+      if (normNamePart) {
+        matchTargets.add("chuong" + numStr + normNamePart);
+        matchTargets.add("chapter" + numStr + normNamePart);
+        matchTargets.add(normNamePart + "chuong" + numStr);
+        matchTargets.add(normNamePart + "chapter" + numStr);
+      }
+      if (normBookTitle) {
+        matchTargets.add(normBookTitle + "chuong" + numStr);
+        matchTargets.add(normBookTitle + "chapter" + numStr);
+        matchTargets.add("chuong" + numStr + normBookTitle);
+        matchTargets.add("chapter" + numStr + normBookTitle);
+        if (normNamePart) {
+          matchTargets.add(normBookTitle + "chuong" + numStr + normNamePart);
+          matchTargets.add(normBookTitle + "chapter" + numStr + normNamePart);
+          matchTargets.add(normBookTitle + normNamePart + "chuong" + numStr);
+          matchTargets.add(normBookTitle + normNamePart + "chapter" + numStr);
+          matchTargets.add("chuong" + numStr + normNamePart + normBookTitle);
+          matchTargets.add("chapter" + numStr + normNamePart + normBookTitle);
+          matchTargets.add(normNamePart + "chuong" + numStr + normBookTitle);
+          matchTargets.add(normNamePart + "chapter" + numStr + normBookTitle);
+        }
+      }
+    });
+  }
+
+  let linesToSkip = 0;
+  let nonBigStoryLinesCount = 0;
+  const removedLinesLog = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const line = rawLine.trim();
+    if (!line) {
+      linesToSkip = i + 1;
+      continue;
+    }
+
+    if (nonBigStoryLinesCount >= 8) {
+      break;
+    }
+
+    const lowerLine = line.toLowerCase();
+    const normLine = normalizeMetadataCompare(line);
+
+    if (/^[\-\*\_\=\~\s\+•\/\\]+$/.test(line)) {
+      linesToSkip = i + 1;
+      nonBigStoryLinesCount++;
+      removedLinesLog.push(rawLine);
+      continue;
+    }
+
+    const isNoise = [
+      'tác giả:', 'tac gia:', 'dịch giả:', 'dich gia:', 'nguồn:', 'nguon:', 'convert:', 'người dịch:', 'nguoi dich:',
+      'truyenfull', 'tangthuvien', 'sstruyen', 'truyenyyeu', 'dtruyen', 'metruyenchu',
+      'wikidich', 'bachngocsach', 'chivi', 'yousuu', 'nhúng', 'nhung', 'wattpad', 'vip',
+      'đọc truyện tại', 'truyện được dịch tại'
+    ].some(keyword => lowerLine.includes(keyword));
+
+    if (isNoise) {
+      linesToSkip = i + 1;
+      nonBigStoryLinesCount++;
+      removedLinesLog.push(rawLine);
+      continue;
+    }
+
+    if (matchTargets.has(normLine)) {
+      linesToSkip = i + 1;
+      nonBigStoryLinesCount++;
+      removedLinesLog.push(rawLine);
+      continue;
+    }
+
+    if (/^(tập|vol|volume|quyển)\s*\d+/i.test(line)) {
+      linesToSkip = i + 1;
+      nonBigStoryLinesCount++;
+      removedLinesLog.push(rawLine);
+      continue;
+    }
+
+    if (/(ch[ươ]ng|chapter|ch)\s*\d+/i.test(line)) {
+      linesToSkip = i + 1;
+      nonBigStoryLinesCount++;
+      removedLinesLog.push(rawLine);
+      continue;
+    }
+
+    break;
+  }
+
+  if (removedLinesLog.length > 0) {
+    console.log(`[Title Cleanup]\nremovedLines:`, removedLinesLog);
+  }
+
+  if (linesToSkip > 0) {
+    const stripped = lines.slice(linesToSkip).join('\n').trim();
+    console.log(`[Pipeline Trace][stripTitleFromText] Original text started with:\n${lines.slice(0, linesToSkip).join('\n')}\n--- STRIPPED ---`);
+    return stripped;
+  }
+
+  return text.trim();
+}
+
+
 
 function extractChapterNumber(ch) {
   if (!ch) return 999999;
@@ -664,9 +813,20 @@ function buildAiPrompt(mode, text, filters, promptSettings={}) {
   return `${styleGuide}\n\nNHIỆM VỤ CỤ THỂ:\n${task}\n\nVĂN BẢN CẦN XỬ LÝ:\n${text}`;
 }
 
-function makeChapterXhtml(chapter, index) {
-  const title = escapeHtml(chapter.title || `Chương ${index + 1}`);
-  const body = escapeHtml(chapter.cleaned || chapter.raw || '').split(/\n{1,}/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${p}</p>`).join('\n');
+function makeChapterXhtml(chapter, index, bookTitleStr = '') {
+  const cleanTitle = formatChapterTitleForExport(chapter.title || '', index, bookTitleStr);
+  const title = escapeHtml(cleanTitle);
+  let bodyContent = chapter.cleaned || chapter.raw || '';
+  bodyContent = stripTitleFromText(bodyContent, cleanTitle, bookTitleStr);
+  bodyContent = stripTitleFromText(bodyContent, chapter.title, bookTitleStr);
+  console.log(`[Pipeline Trace][Export EPUB] Chapter ${index + 1}:`, {
+    title: chapter.title,
+    formattedTitle: cleanTitle,
+    rawContent: chapter.raw?.slice(0, 200),
+    cleanedContent: chapter.cleaned?.slice(0, 200),
+    isPrependingTitle: true
+  });
+  const body = escapeHtml(bodyContent).split(/\n{1,}/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${p}</p>`).join('\n');
   return `<?xml version="1.0" encoding="utf-8"?><html xmlns="http://www.w3.org/1999/xhtml" lang="vi"><head><title>${title}</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body><h1>${title}</h1>${body}</body></html>`;
 }
 async function buildEpub({ title, author, chapters }) {
@@ -675,7 +835,7 @@ async function buildEpub({ title, author, chapters }) {
   zip.folder('META-INF').file('container.xml','<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>');
   const oebps = zip.folder('OEBPS');
   oebps.file('style.css','body{font-family:serif;line-height:1.8;margin:5%;}h1{text-align:center;margin-bottom:2rem;}p{text-indent:1.5em;margin:0 0 .85em;}');
-  chapters.forEach((ch,i)=>oebps.file(`chapter-${i+1}.xhtml`, makeChapterXhtml(ch,i)));
+  chapters.forEach((ch,i)=>oebps.file(`chapter-${i+1}.xhtml`, makeChapterXhtml(ch,i,title)));
   const manifest = chapters.map((_,i)=>`<item id="ch${i+1}" href="chapter-${i+1}.xhtml" media-type="application/xhtml+xml"/>`).join('\n');
   const spine = chapters.map((_,i)=>`<itemref idref="ch${i+1}"/>`).join('\n');
   oebps.file('content.opf',`<?xml version="1.0" encoding="UTF-8"?><package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid" version="3.0"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="bookid">${Date.now()}</dc:identifier><dc:title>${escapeHtml(title||'Truyện đã dọn')}</dc:title><dc:creator>${escapeHtml(author||'Unknown')}</dc:creator><dc:language>vi</dc:language></metadata><manifest><item id="style" href="style.css" media-type="text/css"/>${manifest}</manifest><spine>${spine}</spine></package>`);
@@ -701,12 +861,22 @@ async function buildDocx({ title, author, chapters, isSiri = false }) {
 
   chapters.forEach((chapter, index) => {
     if (index > 0) children.push(new Paragraph({ children: [new PageBreak()] }));
+    const cleanTitle = formatChapterTitleForExport(chapter.title || '', index, title);
     children.push(new Paragraph({
-      text: chapter.title || `Chương ${index + 1}`,
+      text: cleanTitle,
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 240, after: 240 }
     }));
-    const body = (chapter.cleaned || chapter.raw || '').trim();
+    let body = (chapter.cleaned || chapter.raw || '').trim();
+    body = stripTitleFromText(body, cleanTitle, title);
+    body = stripTitleFromText(body, chapter.title, title);
+    console.log(`[Pipeline Trace][Export DOCX] Chapter ${index + 1}:`, {
+      title: chapter.title,
+      formattedTitle: cleanTitle,
+      rawContent: chapter.raw?.slice(0, 200),
+      cleanedContent: chapter.cleaned?.slice(0, 200),
+      isPrependingTitle: true
+    });
     body.split(/\n{2,}|\n/).map(p => p.trim()).filter(Boolean).forEach(p => {
       children.push(new Paragraph({
         children: [new TextRun({ text: p, size: 28 })],
@@ -770,7 +940,7 @@ function downloadJson(filename, data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
 }
-async function importEpubFile(file) {
+async function importEpubFile(file, bookTitleStr = '') {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
   const entries = Object.values(zip.files).filter(f=>!f.dir && /\.(xhtml|html)$/i.test(f.name));
   const contentFiles = entries.filter(f=>!/nav|toc|cover/i.test(f.name));
@@ -779,10 +949,13 @@ async function importEpubFile(file) {
   for (let i=0;i<files.length;i++) {
     const html = await files[i].async('string');
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const title = (doc.querySelector('h1,h2,title')?.textContent || `Chương ${i+1}`).trim();
+    const rawTitle = (doc.querySelector('h1,h2,title')?.textContent || `Chương ${i+1}`).trim();
+    const title = formatChapterTitleForExport(rawTitle, i, bookTitleStr);
     doc.querySelectorAll('script,style,nav').forEach(n=>n.remove());
     const paragraphs = [...doc.body.querySelectorAll('p,div')].map(n=>n.textContent.trim()).filter(t=>t && t.length>1);
-    const text = paragraphs.length ? paragraphs.join('\n\n') : (doc.body?.textContent || '').replace(/\n{3,}/g,'\n\n').trim();
+    let text = paragraphs.length ? paragraphs.join('\n\n') : (doc.body?.textContent || '').replace(/\n{3,}/g,'\n\n').trim();
+    text = stripTitleFromText(text, title, bookTitleStr);
+    text = stripTitleFromText(text, rawTitle, bookTitleStr);
     if (text) chapters.push({title, url:'', raw:text, cleaned:text});
   }
   return chapters;
@@ -1064,6 +1237,7 @@ function App() {
   const [importKeyText,setImportKeyText]=useState('');  const [apiPool,setApiPool]=useState([]);
   const projectInputRef=useRef(null);
   const cancelRef = useRef(false);
+  const overlayMouseDownTargetRef = useRef(null);
   const [cancelRequested, setCancelRequested] = useState(false);
 
   // States for DOCX dropdown and batch export modal
@@ -1117,13 +1291,15 @@ function App() {
   const [modelOptions,setModelOptions]=useState(DEFAULT_MODEL_OPTIONS);
   const [showAiReport, setShowAiReport] = useState(false);
   const [activeReportTab, setActiveReportTab] = useState('success');
+  const [chapterFilter, setChapterFilter] = useState('all');
   const [showBatchFetchModal, setShowBatchFetchModal] = useState(false);
   const [batchFetchStart, setBatchFetchStart] = useState(1);
   const [batchFetchEnd, setBatchFetchEnd] = useState(1);
   const [showBatchAiModal, setShowBatchAiModal] = useState(false);
   const [batchAiStart, setBatchAiStart] = useState(1);
   const [batchAiEnd, setBatchAiEnd] = useState(1);
-  const [overwriteModal, setOverwriteModal] = useState({ show: false, message: '', onConfirm: null });
+  const [overwriteModal, setOverwriteModal] = useState({ show: false, title: '', message: '', confirmText: '', cancelText: '', onConfirm: null });
+  const [batchOverwriteModal, setBatchOverwriteModal] = useState({ show: false, cleanedChapters: [], startCh: 1, endCh: 1 });
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [promptTemplates, setPromptTemplates] = useState(PROMPT_PRESETS.naturalVn);
   const [editingPromptKey, setEditingPromptKey] = useState('aiNaturalVn');
@@ -1301,37 +1477,70 @@ function App() {
     return '';
   }
 
-  function normalizeChapterTitle(title, bookTitleStr = '') {
+  function normalizeChapterTitle(title, bookTitleStr = '', fallbackTitle = '') {
     let t = String(title || '').trim();
+    
     if (bookTitleStr) {
-      t = t.replace(new RegExp(escapeRegExp(bookTitleStr) + '\\s*[-_:]*\\s*', 'gi'), '');
+      const bookTitleEscaped = escapeRegExp(bookTitleStr);
+      const cleanRegex = new RegExp(`(?:của\\s+)?(?:truyện\\s+)?${bookTitleEscaped}\\s*[-_:]*\\s*`, 'gi');
+      t = t.replace(cleanRegex, '');
     }
-    t = t.replace(/^(ch[ươ]ng\s+\d+)\s*[-_:]*\s*(ch[ươ]ng\s+\d+)\s*[-_:]*/i, '$1');
-    const match = t.match(/^ch[ươ]ng\s+(\d+)\s*[-_:]*\s*(.*)$/i);
-    if (match) {
-      const chNum = match[1];
-      let chName = match[2].trim();
-      chName = chName.replace(/^\d+\s*[-_:]*\s*/, '');
-      chName = chName.replace(/^(.+?)\s*[-_:]*\s*\1$/i, '$1');
-      chName = chName.replace(/\s*[\(\[]?ch[ươ]ng\s+\d+[\)\]]?\s*$/i, '');
-      if (bookTitleStr) {
-        chName = chName.replace(new RegExp('\\s*[-_:]*\\s*' + escapeRegExp(bookTitleStr) + '\\s*$', 'gi'), '');
+
+    t = t.replace(/\s*[-_:]*\s*(truyenfull|sstruyen|tangthuvien|truyenyyeu|dtruyen|metruyenchu|wikidich|bachngocsach)\b.*$/i, '');
+
+    let num = '';
+    let name = '';
+
+    const chMatch = t.match(/(?:ch[ươ]ng|chapter|ch)\s*(\d+(?:\.\d+)?)/i);
+    if (chMatch) {
+      num = chMatch[1];
+      const idx = t.toLowerCase().indexOf(chMatch[0].toLowerCase());
+      name = t.substring(idx + chMatch[0].length).trim();
+    } else {
+      const volMatch = t.match(/(?:tập|vol|volume|quyển)\s*(\d+(?:\.\d+)?)/i);
+      if (volMatch) {
+        num = volMatch[1];
+        const idx = t.toLowerCase().indexOf(volMatch[0].toLowerCase());
+        name = t.substring(idx + volMatch[0].length).trim();
+      } else {
+        const digitMatch = t.match(/^\s*(\d+(?:\.\d+)?)/);
+        if (digitMatch) {
+          num = digitMatch[1];
+          name = t.substring(t.indexOf(num) + num.length).trim();
+        }
       }
-      return `Chương ${chNum}${chName ? ': ' + chName : ''}`;
     }
-    const matchDigit = t.match(/^(\d+)\s*[-_:]*\s*(.*)$/);
-    if (matchDigit) {
-      const chNum = matchDigit[1];
-      let chName = matchDigit[2].trim();
-      chName = chName.replace(/^(.+?)\s*[-_:]*\s*\1$/i, '$1');
-      chName = chName.replace(/\s*[\(\[]?ch[ươ]ng\s+\d+[\)\]]?\s*$/i, '');
-      if (bookTitleStr) {
-        chName = chName.replace(new RegExp('\\s*[-_:]*\\s*' + escapeRegExp(bookTitleStr) + '\\s*$', 'gi'), '');
+
+    if (!num && fallbackTitle) {
+      const fallbackClean = String(fallbackTitle).trim();
+      const fbChMatch = fallbackClean.match(/(?:ch[ươ]ng|chapter|ch)\s*(\d+(?:\.\d+)?)/i);
+      if (fbChMatch) {
+        num = fbChMatch[1];
+      } else {
+        const fbDigitMatch = fallbackClean.match(/^\s*(\d+(?:\.\d+)?)/);
+        if (fbDigitMatch) {
+          num = fbDigitMatch[1];
+        }
       }
-      return `Chương ${chNum}${chName ? ': ' + chName : ''}`;
+      name = t;
     }
-    return t;
+
+    if (num) {
+      name = name.replace(/^[-_:\s\.\/\)\}\]]+/, '').trim();
+      name = name.replace(/[-_:\s\.\/\(\{\[]+$/, '').trim();
+      name = name.replace(/^(ch[ươ]ng|chapter|ch)\s*\d+\s*[-_:]*\s*/i, '');
+      
+      if (!name || (bookTitleStr && normalizeForCompare(name) === normalizeForCompare(bookTitleStr))) {
+        return `Chương ${num}`;
+      }
+      return `Chương ${num}: ${name}`;
+    }
+
+    t = t.replace(/^[-_:\s\.\/\)\}\]]+/, '').trim();
+    return t || 'Chương mới';
   }
+
+
 
   const continueChapter = (bIdx) => {
     const targetBookIndex = bIdx !== undefined ? bIdx : bookIndex;
@@ -1527,10 +1736,20 @@ function App() {
         const res = await window.storyAPI.fetchChapter(ch.url);
         if (res.ok) {
           successCount++;
+          const crawledTitle = normalizeChapterTitle(res.title || ch.title, bookTitle, ch.title);
+          const strippedText = stripTitleFromText(res.text || '', crawledTitle, bookTitle);
+          
+          console.log(`[Pipeline Trace][Crawler Fetch] fetchSelectedChapters - Chapter ${idx + 1}:`, {
+            originalTitle: res.title,
+            normalizedTitle: crawledTitle,
+            textLengthBeforeStrip: (res.text || '').length,
+            textLengthAfterStrip: strippedText.length
+          });
+
           updateChapter(idx, {
-            title: normalizeChapterTitle(res.title || ch.title, bookTitle),
-            raw: res.text || '',
-            cleaned: cleanStoryText(res.text || '', options, filters)
+            title: crawledTitle,
+            raw: strippedText,
+            cleaned: cleanStoryText(strippedText, options, filters)
           });
         } else {
           failCount++;
@@ -1545,7 +1764,7 @@ function App() {
     }
   };
 
-  const fetchBatchChapters = async (startCh, endCh, forceOverwrite = false) => {
+  const fetchBatchChapters = async (startCh, endCh, overwriteMode = 'none') => {
     if (fetching || aiRunning) return;
     const startIndex = Math.max(0, parseInt(startCh) - 1);
     const endIndex = Math.min(chapters.length, parseInt(endCh));
@@ -1558,25 +1777,31 @@ function App() {
     }
 
     let targets = [];
-    let hasProcessed = false;
+    let cleanedTitles = [];
     for (let idx = startIndex; idx < endIndex; idx++) {
       if (chapters[idx].url) {
-        targets.push({ ch: chapters[idx], idx });
-        if (isAiProcessed(chapters[idx])) {
-          hasProcessed = true;
+        const processed = hasExistingContent(chapters[idx]);
+        if (processed) {
+          cleanedTitles.push(chapters[idx].title || `Chương ${idx + 1}`);
         }
+        
+        if (overwriteMode === 'skipCleaned' && processed) {
+          continue;
+        }
+        targets.push({ ch: chapters[idx], idx });
       }
     }
 
     if (!targets.length) {
-      return setStatus({type: 'warn', message: 'Không tìm thấy chương nào có Link để lấy nội dung trong khoảng đã chọn.'});
+      return setStatus({type: 'warn', message: 'Không tìm thấy chương nào cần lấy nội dung (có thể các chương đã được Clean hoặc không có Link).'});
     }
 
-    if (!forceOverwrite && hasProcessed) {
-      setOverwriteModal({
+    if (overwriteMode === 'none' && cleanedTitles.length > 0) {
+      setBatchOverwriteModal({
         show: true,
-        message: 'Chương này đã được AI xử lý.',
-        onConfirm: () => fetchBatchChapters(startCh, endCh, true)
+        cleanedChapters: cleanedTitles,
+        startCh,
+        endCh
       });
       return;
     }
@@ -1597,10 +1822,20 @@ function App() {
         const res = await window.storyAPI.fetchChapter(ch.url);
         if (res.ok) {
           successCount++;
+          const crawledTitle = normalizeChapterTitle(res.title || ch.title, bookTitle, ch.title);
+          const strippedText = stripTitleFromText(res.text || '', crawledTitle, bookTitle);
+          
+          console.log(`[Pipeline Trace][Crawler Fetch] fetchBatchChapters - Chapter ${idx + 1}:`, {
+            originalTitle: res.title,
+            normalizedTitle: crawledTitle,
+            textLengthBeforeStrip: (res.text || '').length,
+            textLengthAfterStrip: strippedText.length
+          });
+
           updateChapter(idx, {
-            title: normalizeChapterTitle(res.title || ch.title, bookTitle),
-            raw: res.text || '',
-            cleaned: cleanStoryText(res.text || '', options, filters)
+            title: crawledTitle,
+            raw: strippedText,
+            cleaned: cleanStoryText(strippedText, options, filters)
           });
         } else {
           failCount++;
@@ -1781,9 +2016,28 @@ function App() {
     }
     return [];
   };
-  const updateChapter=(i,patch)=>setChapters(prev=>prev.map((ch,idx)=>idx===i?{...ch,...patch}:ch));
-  const cleanOne=(i)=>updateChapter(i,{cleaned:cleanStoryText(getChapterRawContent(chapters[i]),options,filters)});
-  const layoutOne=(i)=>updateChapter(i,{cleaned:localReflow(getChapterSourceContent(chapters[i]), options)});
+  const updateChapter=(i,patch)=>{
+    console.log(`[Pipeline Trace][State Update] Chapter ${i+1}:`, {
+      title: patch.title !== undefined ? patch.title : (chapters[i] ? chapters[i].title : undefined),
+      rawContent: patch.raw !== undefined ? patch.raw.slice(0, 300) : (chapters[i] ? chapters[i].raw?.slice(0, 300) : undefined),
+      cleanedContent: patch.cleaned !== undefined ? patch.cleaned.slice(0, 300) : (chapters[i] ? chapters[i].cleaned?.slice(0, 300) : undefined)
+    });
+    setChapters(prev=>prev.map((ch,idx)=>idx===i?{...ch,...patch}:ch));
+  };
+  const cleanOne=(i)=>{
+    const rawContent = getChapterRawContent(chapters[i]);
+    const ch = chapters[i];
+    const cleanTitle = formatChapterTitleForExport(ch.title || '', i, bookTitle);
+    const stripped = stripTitleFromText(stripTitleFromText(rawContent, cleanTitle, bookTitle), ch.title, bookTitle);
+    updateChapter(i,{cleaned:cleanStoryText(stripped,options,filters)});
+  };
+  const layoutOne=(i)=>{
+    const sourceContent = getChapterSourceContent(chapters[i]);
+    const ch = chapters[i];
+    const cleanTitle = formatChapterTitleForExport(ch.title || '', i, bookTitle);
+    const stripped = stripTitleFromText(stripTitleFromText(sourceContent, cleanTitle, bookTitle), ch.title, bookTitle);
+    updateChapter(i,{cleaned:localReflow(stripped, options)});
+  };
   const cleanAll=()=>{
     const targets = getSelectedChapters(chapters, selected, true);
     if (!targets.length) {
@@ -1792,7 +2046,10 @@ function App() {
     const updatedChapters = chapters.map((ch, idx) => {
       const target = targets.find(t => t.idx === idx);
       if (target) {
-        return {...ch, cleaned: cleanStoryText(getChapterRawContent(ch), options, filters)};
+        const rawContent = getChapterRawContent(ch);
+        const cleanTitle = formatChapterTitleForExport(ch.title || '', idx, bookTitle);
+        const stripped = stripTitleFromText(stripTitleFromText(rawContent, cleanTitle, bookTitle), ch.title, bookTitle);
+        return {...ch, cleaned: cleanStoryText(stripped, options, filters)};
       }
       return ch;
     });
@@ -1816,7 +2073,7 @@ function App() {
     }
     const newCh = {
       title: `Chương ${nextNum}`,
-      url: '',
+      url: currentCh ? getNextChapterUrl(currentCh.url) : '',
       raw: '',
       cleaned: '',
       selectedForExport: false
@@ -1832,16 +2089,47 @@ function App() {
   const isAiProcessed = (ch) => {
     return !!(ch && (ch.cleaned?.trim() || ch.aiNaturalAt || ch.aiProcessed));
   };
+  const hasExistingContent = (ch) => {
+    return !!(ch && (
+      (ch.raw && ch.raw.trim().length > 0) || 
+      (ch.cleaned && ch.cleaned.trim().length > 0) || 
+      ch.aiProcessed || 
+      ch.aiNaturalAt
+    ));
+  };
+  const closeBatchFetchModal = (reason) => {
+    console.log(`[Pipeline Trace][Close Modal] showBatchFetchModal set to false. Reason: ${reason}`);
+    setShowBatchFetchModal(false);
+  };
+  const closeBatchAiModal = (reason) => {
+    console.log(`[Pipeline Trace][Close Modal] showBatchAiModal set to false. Reason: ${reason}`);
+    setShowBatchAiModal(false);
+  };
+  const openBatchFetchModal = () => {
+    console.log(`[Pipeline Trace][Open Modal] showBatchFetchModal set to true`);
+    setBatchFetchStart(selected + 1);
+    setBatchFetchEnd(chapters.length);
+    setShowBatchFetchModal(true);
+  };
+  const openBatchAiModal = () => {
+    console.log(`[Pipeline Trace][Open Modal] showBatchAiModal set to true`);
+    setBatchAiStart(selected + 1);
+    setBatchAiEnd(chapters.length);
+    setShowBatchAiModal(true);
+  };
 
   const fetchCurrentUrl=async(forceOverwrite = false)=>{
     const url = current.url.trim();
     if(!url) return setStatus({type:'warn',message:'Bạn cần dán link chương trước.'});
     if(!window.storyAPI?.fetchChapter) return setStatus({type:'warn',message:'Tính năng lấy link chỉ chạy trong app desktop Electron. Nếu đang mở web, hãy chạy start-dev.bat.'});
     
-    if (!forceOverwrite && isAiProcessed(current)) {
+    if (forceOverwrite !== true && hasExistingContent(current)) {
       setOverwriteModal({
         show: true,
-        message: 'Chương này đã được AI xử lý.',
+        title: 'Phát hiện chương đã có dữ liệu',
+        message: 'Chương này đã có nội dung hoặc đã được Clean.\nViệc lấy nội dung sẽ ghi đè dữ liệu hiện tại.',
+        confirmText: 'Vẫn lấy lại nội dung',
+        cancelText: 'Hủy',
         onConfirm: () => fetchCurrentUrl(true)
       });
       return;
@@ -1851,10 +2139,42 @@ function App() {
     const res = await window.storyAPI.fetchChapter(url);
     setFetching(false);
     if(!res.ok) return setStatus({type:'error',message:res.error || 'Không lấy được chương.'});
-    updateChapter(selected,{title:res.title || current.title, raw:res.text || '', cleaned:cleanStoryText(res.text || '', options, filters)});
+    
+    const crawledTitle = normalizeChapterTitle(res.title || current.title, bookTitle, current.title);
+    const strippedText = stripTitleFromText(res.text || '', crawledTitle, bookTitle);
+    
+    console.log(`[Pipeline Trace][Crawler Fetch] fetchCurrentUrl:`, {
+      originalTitle: res.title,
+      normalizedTitle: crawledTitle,
+      textLengthBeforeStrip: (res.text || '').length,
+      textLengthAfterStrip: strippedText.length
+    });
+
+    updateChapter(selected,{title:crawledTitle, raw:strippedText, cleaned:cleanStoryText(strippedText, options, filters)});
     setStatus({type:'ok',message:`Đã lấy nội dung chương. Bộ nhận diện: ${res.selector || 'auto'}.`});
   };
-  const exportTxt=()=>{const text=chapters.map((ch,i)=>`${ch.title||`Chương ${i+1}`}\n\n${ch.cleaned||ch.raw||''}`).join('\n\n---\n\n');const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${slugify(bookTitle)}.txt`;a.click();URL.revokeObjectURL(a.href);};
+  const exportTxt=()=>{
+    const text=chapters.map((ch,i)=>{
+      const cleanTitle = formatChapterTitleForExport(ch.title || '', i, bookTitle);
+      let content = ch.cleaned || ch.raw || '';
+      content = stripTitleFromText(content, cleanTitle, bookTitle);
+      content = stripTitleFromText(content, ch.title, bookTitle);
+      console.log(`[Pipeline Trace][Export TXT] Chapter ${i+1}:`, {
+        title: ch.title,
+        formattedTitle: cleanTitle,
+        rawContent: ch.raw?.slice(0, 200),
+        cleanedContent: ch.cleaned?.slice(0, 200),
+        isPrependingTitle: true
+      });
+      return `${cleanTitle}\n\n${content}`;
+    }).join('\n\n---\n\n');
+    const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${slugify(bookTitle)}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
   const exportEpub=async()=>{const ready=chapters.filter(ch=>(ch.cleaned||ch.raw||'').trim());if(!ready.length)return alert('Chưa có nội dung chương.');const blob=await buildEpub({title:bookTitle,author,chapters:ready});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${slugify(bookTitle)}.epub`;a.click();URL.revokeObjectURL(a.href);};
   const exportDocx=async(isSiri=false)=>{const ready=chapters.filter(ch=>(ch.cleaned||ch.raw||'').trim());if(!ready.length)return alert('Chưa có nội dung chương.');try{const blob=await buildDocx({title:bookTitle,author,chapters:ready,isSiri});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${slugify(bookTitle)}${isSiri?'-siri':''}.docx`;a.click();URL.revokeObjectURL(a.href);setStatus({type:'ok',message:`Đã xuất DOCX ${isSiri?'Siri':''}. Bạn có thể upload lên Drive rồi mở bằng Edge/Safari/Google Docs để nghe.`});}catch(err){setStatus({type:'error',message:err?.message||'Xuất DOCX thất bại. Hãy chạy npm install lại để cài package docx.'});}};
   const makePrompt=()=>{const text=(current.cleaned||current.raw||'').trim(); if(!text) return alert('Chưa có nội dung chương.'); const isReAi = !!(current.cleaned?.trim() || current.aiNaturalAt); setAiPrompt(buildCustomPrompt(aiMode,text,filters,1,1,'',promptSettings,promptTemplates,isReAi)); setTab('ai');};
@@ -1914,11 +2234,14 @@ function App() {
   };
 
   const humanizeChapter = async(i, isBatch=false, forceReAi=false)=>{
-    const source = (forceReAi ? chapters[i].raw : (chapters[i].cleaned || chapters[i].raw || '')).trim();
+    let source = (forceReAi ? chapters[i].raw : (chapters[i].cleaned || chapters[i].raw || '')).trim();
     if(!source) {
       setStatus({type:'warn',message:`Chương ${i+1} chưa có nội dung.`});
       return false;
     }
+    const ch = chapters[i];
+    const cleanTitle = formatChapterTitleForExport(ch.title || '', i, bookTitle);
+    source = stripTitleFromText(stripTitleFromText(source, cleanTitle, bookTitle), ch.title, bookTitle);
     if(aiRunning && !isBatch) return false;
     let localCleaned = cleanStoryText(source, options, filters);
     if (!localCleaned.trim()) {
@@ -1941,15 +2264,31 @@ function App() {
         if (cancelRef.current) throw new Error('USER_CANCELLED');
         const isReAiVal = forceReAi || !!(chapters[i].cleaned?.trim() || chapters[i].aiNaturalAt);
         const prompt = buildCustomPrompt(aiMode, chunks[c], filters, c+1, chunks.length, previousTail, promptSettings, promptTemplates, isReAiVal);
+        
+        console.log(`[Pipeline Trace][AI Cleaner Input] Chapter ${i+1} Chunk ${c+1}/${chunks.length}:`, {
+          title: chapters[i].title,
+          rawContent: chunks[c].slice(0, 300)
+        });
+
         const result = await callGeminiWithPool(prompt, `Chương ${i+1} Chunk ${c+1}/${chunks.length}`, keyIndex);
         keyIndex = result.nextIndex;
         const fixed = (result.text || '').trim();
+        
+        console.log(`[Pipeline Trace][AI Cleaner Output] Chapter ${i+1} Chunk ${c+1}/${chunks.length} response:`, {
+          title: chapters[i].title,
+          cleanedContent: fixed.slice(0, 300)
+        });
+
         outputs.push(fixed);
         previousTail = fixed.slice(-700);
         setAiProgress({done:c+1,total:chunks.length,message:`Chương ${i+1}: Đã xong ${c+1}/${chunks.length} chunk`});
         if (c < chunks.length-1) await sleep(Number(apiSettings.delayMs || 4500));
       }
       const merged = protector.restore(outputs.join('\n\n')).replace(/\n{3,}/g,'\n\n').trim();
+      console.log(`[Pipeline Trace][AI Cleaner Merged] Chapter ${i+1}:`, {
+        title: chapters[i].title,
+        cleanedContent: merged.slice(0, 300)
+      });
       updateChapter(i,{cleaned:merged, aiNaturalAt: new Date().toISOString(), aiProcessed: true});
       setStatus({type:'ok',message:`AI đã xử lý Natural VN xong chương ${i+1}.`});
       return true;
@@ -2243,11 +2582,12 @@ function App() {
   const importEpub=async(file)=>{
     if(!file) return;
     try{
-      const imported = await importEpubFile(file);
+      const targetBookTitle = (!bookTitle || bookTitle==='Truyện đã dọn') ? file.name.replace(/\.epub$/i,'') : bookTitle;
+      const imported = await importEpubFile(file, targetBookTitle);
       if(!imported.length) return setStatus({type:'error',message:'Không đọc được chương nào từ EPUB này.'});
       setChapters(imported);
       setSelected(0);
-      if(!bookTitle || bookTitle==='Truyện đã dọn') setBookTitle(file.name.replace(/\.epub$/i,''));
+      if(!bookTitle || bookTitle==='Truyện đã dọn') setBookTitle(targetBookTitle);
       setStatus({type:'ok',message:`Đã import ${imported.length} chương từ EPUB cũ.`});
     }catch(err){ setStatus({type:'error',message:err?.message || 'Import EPUB thất bại.'}); }
   };
@@ -2286,11 +2626,13 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        console.log('[Pipeline Trace][keydown Escape] Dismissing active modals');
         if (showAiReport) setShowAiReport(false);
         else if (showBulkDeleteModal) setShowBulkDeleteModal(false);
-        else if (showBatchFetchModal) setShowBatchFetchModal(false);
-        else if (showBatchAiModal) setShowBatchAiModal(false);
+        else if (showBatchFetchModal) closeBatchFetchModal('escape');
+        else if (showBatchAiModal) closeBatchAiModal('escape');
         else if (overwriteModal.show) setOverwriteModal({ show: false });
+        else if (batchOverwriteModal.show) setBatchOverwriteModal({ show: false, cleanedChapters: [] });
         else if (showBatchExportModal) setShowBatchExportModal(false);
         else if (showOptionsPopup) setShowOptionsPopup(false);
         else if (showDocxDropdown) setShowDocxDropdown(false);
@@ -2298,7 +2640,7 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showAiReport, showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, showBatchExportModal, showOptionsPopup, showDocxDropdown]);
+  }, [showAiReport, showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, batchOverwriteModal, showBatchExportModal, showOptionsPopup, showDocxDropdown]);
 
 
   const paginatedKeys = useMemo(() => {
@@ -2339,6 +2681,28 @@ function App() {
                 </div>
               );
             }
+
+            const filteredChapters = chs.map((ch, i) => ({ ch, originalIdx: i })).filter(({ ch }) => {
+              if (chapterFilter === 'success') {
+                return !!(ch.aiNaturalAt || ch.aiProcessed || (ch.cleaned && ch.cleaned.trim() && ch.cleaned !== ch.raw));
+              }
+              if (chapterFilter === 'error') {
+                return !!ch.aiError;
+              }
+              if (chapterFilter === 'pending') {
+                const isSuccess = !!(ch.aiNaturalAt || ch.aiProcessed || (ch.cleaned && ch.cleaned.trim() && ch.cleaned !== ch.raw));
+                const isError = !!ch.aiError;
+                return !isSuccess && !isError;
+              }
+              if (chapterFilter === 'warning') {
+                const text = ch.cleaned || ch.raw || '';
+                if (!text) return false;
+                if (/[\u4e00-\u9fa5]/.test(text)) return true;
+                if (/\?{2,}/.test(text) || /!{2,}/.test(text) || /[!?]{2,}/.test(text)) return true;
+                return false;
+              }
+              return true;
+            });
 
             return (
               <div key={book.id || bIdx} className={`bookNode open ${bIdx === bookIndex ? 'activeBook' : ''}`}>
@@ -2388,14 +2752,17 @@ function App() {
                       <input 
                         type="checkbox" 
                         style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, display: 'inline-block', cursor: 'pointer' }} 
-                        checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} 
+                        checked={filteredChapters.length > 0 && filteredChapters.every(({ ch }) => ch.selectedForExport === true)} 
                         onChange={() => {
-                          const allSelected = chs.every(c => c.selectedForExport === true);
+                          const allSelected = filteredChapters.every(({ ch }) => ch.selectedForExport === true);
+                          const filteredIndices = filteredChapters.map(({ originalIdx }) => originalIdx);
                           setBooks(prev => prev.map((x, bookI) => {
                             if (bookI === bIdx) {
                               return {
                                 ...x,
-                                chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected }))
+                                chapters: x.chapters.map((c, chI) => 
+                                  filteredIndices.includes(chI) ? { ...c, selectedForExport: !allSelected } : c
+                                )
                               };
                             }
                             return x;
@@ -2408,6 +2775,47 @@ function App() {
                 </div>
 
                 <div className="chapterList treeChapters" style={{ marginTop: '8px' }}>
+                  {chapterFilter !== 'all' && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '4px 8px',
+                      backgroundColor: '#eff6ff',
+                      border: '1px solid #bfdbfe',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      marginBottom: '8px',
+                      marginLeft: '-15px',
+                      marginRight: 0,
+                      width: 'calc(100% + 15px)',
+                      boxSizing: 'border-box',
+                      color: '#1e40af'
+                    }}>
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Lọc: <strong>{
+                        chapterFilter === 'success' ? 'AI Thành Công' :
+                        chapterFilter === 'error' ? 'AI Lỗi' :
+                        chapterFilter === 'pending' ? 'Chưa AI' :
+                        chapterFilter === 'warning' ? 'Cảnh Báo' : ''
+                      }</strong> ({filteredChapters.length} ch)</span>
+                      <button 
+                        onClick={() => setChapterFilter('all')} 
+                        style={{
+                          border: 0,
+                          background: 'transparent',
+                          color: '#ef4444',
+                          cursor: 'pointer',
+                          fontSize: '11.5px',
+                          padding: '0 4px',
+                          fontWeight: 'bold',
+                          display: 'inline'
+                        }}
+                      >
+                        [Bỏ lọc]
+                      </button>
+                    </div>
+                  )}
+
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', height: '24px', marginLeft: '-15px', width: 'calc(100% + 15px)' }}>
                     <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
                     <div className="tree-action-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
@@ -2433,14 +2841,17 @@ function App() {
                       <div className="tree-all-simple" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
-                          checked={chs.length > 0 && chs.every(c => c.selectedForExport === true)} 
+                          checked={filteredChapters.length > 0 && filteredChapters.every(({ ch }) => ch.selectedForExport === true)} 
                           onChange={() => {
-                            const allSelected = chs.every(c => c.selectedForExport === true);
+                            const allSelected = filteredChapters.every(({ ch }) => ch.selectedForExport === true);
+                            const filteredIndices = filteredChapters.map(({ originalIdx }) => originalIdx);
                             setBooks(prev => prev.map((x, bookI) => {
                               if (bookI === bIdx) {
                                 return {
                                   ...x,
-                                  chapters: x.chapters.map(c => ({ ...c, selectedForExport: !allSelected }))
+                                  chapters: x.chapters.map((c, chI) => 
+                                    filteredIndices.includes(chI) ? { ...c, selectedForExport: !allSelected } : c
+                                  )
                                 };
                               }
                               return x;
@@ -2452,7 +2863,7 @@ function App() {
                       </div>
                       <button 
                         onClick={() => setShowBulkDeleteModal(true)} 
-                        disabled={chs.filter(c => c.selectedForExport === true).length === 0}
+                        disabled={filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0}
                         className="dangerSoft"
                         style={{ 
                           padding: '2px 8px', 
@@ -2462,26 +2873,26 @@ function App() {
                           display: 'inline-flex', 
                           alignItems: 'center', 
                           justifyContent: 'center', 
-                          cursor: chs.filter(c => c.selectedForExport === true).length === 0 ? 'not-allowed' : 'pointer',
+                          cursor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? 'not-allowed' : 'pointer',
                           fontWeight: 'bold',
                           margin: 0,
                           border: '1px solid #fecaca',
-                          backgroundColor: chs.filter(c => c.selectedForExport === true).length === 0 ? '#f1f5f9' : '#fef2f2',
-                          color: chs.filter(c => c.selectedForExport === true).length === 0 ? '#94a3b8' : '#b91c1c'
+                          backgroundColor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#f1f5f9' : '#fef2f2',
+                          color: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#94a3b8' : '#b91c1c'
                         }}
                       >
                         Xóa
                       </button>
                     </div>
                   </div>
-                  {chs.map((ch, i) => {
-                    const isActive = bIdx === bookIndex && i === selected;
+                  {filteredChapters.map(({ ch, originalIdx }) => {
+                    const isActive = bIdx === bookIndex && originalIdx === selected;
                     return (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '36px', marginLeft: '-15px' }}>
+                      <div key={originalIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '36px', marginLeft: '-15px' }}>
                         <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
                         <button className={isActive ? 'chapter active' : 'chapter'} onClick={() => {
                           selectBook(bIdx);
-                          setSelected(i);
+                          setSelected(originalIdx);
                         }} style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 auto', border: '1px solid #dbeafe', textAlign: 'left', padding: '6px 10px', height: '32px', minWidth: 0, overflow: 'hidden' }}>
                           <input 
                             type="checkbox" 
@@ -2492,17 +2903,17 @@ function App() {
                                 if (bookI === bIdx) {
                                   return {
                                     ...x,
-                                    chapters: x.chapters.map((c, chI) => chI === i ? { ...c, selectedForExport: e.target.checked } : c)
+                                    chapters: x.chapters.map((c, chI) => chI === originalIdx ? { ...c, selectedForExport: e.target.checked } : c)
                                   };
                                 }
-                                return x;
+                                  return x;
                               }));
                             }} 
                             style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, cursor: 'pointer' }} 
                           />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '13px', whiteSpace: 'nowrap' }}>
-                              <span>Chương {ch.number !== undefined && ch.number !== null ? ch.number : (i + 1)}</span>
+                              <span>Chương {ch.number !== undefined && ch.number !== null ? ch.number : (originalIdx + 1)}</span>
                               <span style={{ color: '#94a3b8', fontSize: '10.5px', fontWeight: 'normal', whiteSpace: 'nowrap', flexShrink: 0 }}>
                                 ({formatCharCount(ch)} ký tự)
                               </span>
@@ -2590,11 +3001,7 @@ function App() {
             
             {/* Lấy nội dung hàng loạt */}
             <button 
-              onClick={() => {
-                setBatchFetchStart(selected + 1);
-                setBatchFetchEnd(chapters.length);
-                setShowBatchFetchModal(true);
-              }}
+              onClick={openBatchFetchModal}
               disabled={fetching || aiRunning} 
               className="softPrimary" 
               style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}
@@ -2602,14 +3009,9 @@ function App() {
               {fetching ? <RefreshCcw className="spin" size={14} /> : <LinkIcon size={14} />} 
               Lấy nội dung hàng loạt
             </button>
-
             {/* AI hàng loạt */}
             <button 
-              onClick={() => {
-                setBatchAiStart(selected + 1);
-                setBatchAiEnd(chapters.length);
-                setShowBatchAiModal(true);
-              }}
+              onClick={openBatchAiModal}
               disabled={aiRunning || fetching} 
               className="primary" 
               style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}
@@ -2685,11 +3087,17 @@ function App() {
               <div className="chapterWorkspaceBody" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '4px' }}>
                 {/* Đưa 2 dòng Tiêu đề chương và Link chương lên cùng 1 hàng */}
                 <div className="chapterMeta" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px', alignItems: 'end' }}>
-                  <label style={{ margin: 0 }}>Tiêu đề chương<input value={current.title} onChange={e => updateChapter(selected, { title: e.target.value })} /></label>
+                  <label style={{ margin: 0 }}>Tiêu đề chương
+                    <input 
+                      value={current.title} 
+                      onChange={e => updateChapter(selected, { title: e.target.value })} 
+                      onBlur={e => updateChapter(selected, { title: formatChapterTitleForExport(e.target.value, selected, bookTitle) })} 
+                    />
+                  </label>
                   <label style={{ margin: 0 }}>Link chương
                     <div className="urlRow">
                       <input value={current.url} onChange={e => updateChapter(selected, { url: e.target.value })} placeholder="https://..." />
-                      <button onClick={fetchCurrentUrl} disabled={fetching}>
+                      <button onClick={() => fetchCurrentUrl(false)} disabled={fetching}>
                         {fetching ? <RefreshCcw className="spin" size={15} /> : <LinkIcon size={17} />}
                         {fetching ? 'Đang lấy...' : 'Lấy nội dung'}
                       </button>
@@ -2990,176 +3398,62 @@ function App() {
       </main>
 
       {showAiReport && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setShowAiReport(false); }}>
-          <div className="modalContent reportModal" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowAiReport(false); }}>
+          <div className="modalContent reportModal" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '540px' }}>
             <div className="modalHeader">
               <h3><FileText size={20} /> Báo cáo AI Natural</h3>
               <button className="closeBtn" onClick={() => setShowAiReport(false)}>×</button>
             </div>
-            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '70vh', overflowY: 'auto' }}>
-              <div className="reportStatsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <p style={{ margin: 0, color: '#4b5563', fontSize: '13px', textAlign: 'center' }}>
+                Bấm vào một danh mục bên dưới để lọc danh sách chương ở Menu bên trái:
+              </p>
+              <div className="reportStatsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '8px' }}>
                 <div 
-                  className={`statBox success ${activeReportTab === 'success' ? 'active' : ''}`}
-                  onClick={() => setActiveReportTab('success')}
-                  style={{ cursor: 'pointer', border: activeReportTab === 'success' ? '2px solid #10b981' : '1px solid #e2e8f0' }}
+                  className="statBox success"
+                  onClick={() => { setChapterFilter('success'); setShowAiReport(false); }}
+                  style={{ cursor: 'pointer', border: '1px solid #10b981', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', backgroundColor: '#ecfdf5', transition: 'all 0.2s' }}
                 >
-                  <span>AI Thành Công</span>
-                  <b>{aiReportData.successList.length}</b>
+                  <span style={{ fontSize: '13px', color: '#065f46', fontWeight: 'bold' }}>AI Thành Công</span>
+                  <b style={{ fontSize: '24px', color: '#047857' }}>{aiReportData.successList.length}</b>
+                  <span style={{ fontSize: '11px', color: '#059669' }}>Click để lọc trong menu</span>
                 </div>
                 <div 
-                  className={`statBox danger ${activeReportTab === 'error' ? 'active' : ''}`}
-                  onClick={() => setActiveReportTab('error')}
-                  style={{ cursor: 'pointer', border: activeReportTab === 'error' ? '2px solid #ef4444' : '1px solid #e2e8f0' }}
+                  className="statBox danger"
+                  onClick={() => { setChapterFilter('error'); setShowAiReport(false); }}
+                  style={{ cursor: 'pointer', border: '1px solid #ef4444', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', backgroundColor: '#fef2f2', transition: 'all 0.2s' }}
                 >
-                  <span>AI Lỗi</span>
-                  <b>{aiReportData.errorList.length}</b>
+                  <span style={{ fontSize: '13px', color: '#991b1b', fontWeight: 'bold' }}>AI Lỗi</span>
+                  <b style={{ fontSize: '24px', color: '#dc2626' }}>{aiReportData.errorList.length}</b>
+                  <span style={{ fontSize: '11px', color: '#dc2626' }}>Click để lọc trong menu</span>
                 </div>
                 <div 
-                  className={`statBox warning ${activeReportTab === 'pending' ? 'active' : ''}`}
-                  onClick={() => setActiveReportTab('pending')}
-                  style={{ cursor: 'pointer', border: activeReportTab === 'pending' ? '2px solid #f59e0b' : '1px solid #e2e8f0' }}
+                  className="statBox warning"
+                  onClick={() => { setChapterFilter('pending'); setShowAiReport(false); }}
+                  style={{ cursor: 'pointer', border: '1px solid #f59e0b', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', backgroundColor: '#fffbeb', transition: 'all 0.2s' }}
                 >
-                  <span>Chưa AI</span>
-                  <b>{aiReportData.pendingList.length}</b>
+                  <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 'bold' }}>Chưa xử lý (Chưa AI)</span>
+                  <b style={{ fontSize: '24px', color: '#d97706' }}>{aiReportData.pendingList.length}</b>
+                  <span style={{ fontSize: '11px', color: '#d97706' }}>Click để lọc trong menu</span>
                 </div>
                 <div 
-                  className={`statBox warning ${activeReportTab === 'warning' ? 'active' : ''}`}
-                  onClick={() => setActiveReportTab('warning')}
-                  style={{ cursor: 'pointer', border: activeReportTab === 'warning' ? '2px solid #d97706' : '1px solid #e2e8f0' }}
+                  className="statBox warning"
+                  onClick={() => { setChapterFilter('warning'); setShowAiReport(false); }}
+                  style={{ cursor: 'pointer', border: '1px solid #d97706', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', backgroundColor: '#fffbeb', transition: 'all 0.2s' }}
                 >
-                  <span>Có cảnh báo</span>
-                  <b>{aiReportData.warningList.length}</b>
+                  <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 'bold' }}>Có Cảnh Báo</span>
+                  <b style={{ fontSize: '24px', color: '#b45309' }}>{aiReportData.warningList.length}</b>
+                  <span style={{ fontSize: '11px', color: '#b45309' }}>Click để lọc trong menu</span>
                 </div>
               </div>
-
-              <div className="reportDetailsSection" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                {activeReportTab === 'success' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>Danh sách chương AI thành công ({aiReportData.successList.length})</h4>
-                    <div style={{ overflowY: 'auto', flex: 1, maxHeight: '350px' }}>
-                      {aiReportData.successList.length > 0 ? (
-                        <table className="reportTable" style={{ width: '100%' }}>
-                          <thead>
-                            <tr>
-                              <th style={{ width: '15%' }}>STT</th>
-                              <th>Tên chương</th>
-                              <th style={{ width: '25%' }}>Ký tự sau AI</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {aiReportData.successList.map((item) => (
-                              <tr key={item.idx} onClick={() => { setSelected(item.idx); setShowAiReport(false); }} style={{ cursor: 'pointer' }} className="reportRowHover">
-                                <td>{item.idx + 1}</td>
-                                <td style={{ color: '#1d4ed8', fontWeight: 'bold' }}>{item.title}</td>
-                                <td>{item.aiLen.toLocaleString()}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : <p className="note">Chưa có chương nào AI thành công.</p>}
-                    </div>
-                  </div>
-                )}
-
-                {activeReportTab === 'error' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>Danh sách chương AI lỗi ({aiReportData.errorList.length})</h4>
-                    <div style={{ overflowY: 'auto', flex: 1, maxHeight: '350px' }}>
-                      {aiReportData.errorList.length > 0 ? (
-                        <table className="reportTable" style={{ width: '100%' }}>
-                          <thead>
-                            <tr>
-                              <th style={{ width: '15%' }}>STT</th>
-                              <th>Tên chương</th>
-                              <th style={{ width: '25%' }}>Loại lỗi</th>
-                              <th>Chi tiết lỗi</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {aiReportData.errorList.map((item) => (
-                              <tr key={item.idx} onClick={() => { setSelected(item.idx); setShowAiReport(false); }} style={{ cursor: 'pointer' }} className="reportRowHover">
-                                <td>{item.idx + 1}</td>
-                                <td style={{ color: '#b91c1c', fontWeight: 'bold' }}>{item.title}</td>
-                                <td><span className="badge danger">{item.errorType}</span></td>
-                                <td className="errorMsgCell" title={item.error} style={{ fontSize: '11px', color: '#dc2626' }}>{item.error}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : <p className="note">Không có chương nào bị lỗi.</p>}
-                    </div>
-                  </div>
-                )}
-
-                {activeReportTab === 'pending' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>Danh sách chương chưa AI ({aiReportData.pendingList.length})</h4>
-                    <div style={{ overflowY: 'auto', flex: 1, maxHeight: '350px' }}>
-                      {aiReportData.pendingList.length > 0 ? (
-                        <table className="reportTable" style={{ width: '100%' }}>
-                          <thead>
-                            <tr>
-                              <th style={{ width: '15%' }}>STT</th>
-                              <th>Tên chương</th>
-                              <th>Số ký tự gốc</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {aiReportData.pendingList.map((item) => (
-                              <tr key={item.idx} onClick={() => { setSelected(item.idx); setShowAiReport(false); }} style={{ cursor: 'pointer' }} className="reportRowHover">
-                                <td>{item.idx + 1}</td>
-                                <td style={{ color: '#4b5563', fontWeight: 'bold' }}>{item.title}</td>
-                                <td>{item.rawLen.toLocaleString()}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : <p className="note">Tất cả chương đã được xử lý AI hoặc đang bị lỗi.</p>}
-                    </div>
-                  </div>
-                )}
-
-                {activeReportTab === 'warning' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: 'bold' }}>Danh sách chương có cảnh báo ({aiReportData.warningList.length})</h4>
-                    <div style={{ overflowY: 'auto', flex: 1, maxHeight: '350px' }}>
-                      {aiReportData.warningList.length > 0 ? (
-                        <table className="reportTable" style={{ width: '100%' }}>
-                          <thead>
-                            <tr>
-                              <th style={{ width: '15%' }}>STT</th>
-                              <th>Tên chương</th>
-                              <th>Cảnh báo phát hiện</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {aiReportData.warningList.map((item) => {
-                              const ch = chapters[item.idx];
-                              const text = ch.cleaned || ch.raw || '';
-                              const warnings = [];
-                              if (/[\u4e00-\u9fa5]/.test(text)) warnings.push('Còn sót chữ Trung Quốc');
-                              if (/\?{2,}/.test(text)) warnings.push('Chứa nhiều dấu ??');
-                              if (/!{2,}/.test(text)) warnings.push('Chứa nhiều dấu !!');
-                              if (/[!?]{2,}/.test(text)) warnings.push('Chứa ký hiệu !?');
-                              return (
-                                <tr key={item.idx} onClick={() => { setSelected(item.idx); setShowAiReport(false); }} style={{ cursor: 'pointer' }} className="reportRowHover">
-                                  <td>{item.idx + 1}</td>
-                                  <td style={{ color: '#b45309', fontWeight: 'bold' }}>{item.title}</td>
-                                  <td>
-                                    {warnings.map((w, wIdx) => (
-                                      <span key={wIdx} className="badge danger" style={{ margin: '0 2px', fontSize: '10px' }}>{w}</span>
-                                    ))}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      ) : <p className="note">Tuyệt vời! Không phát hiện chương nào có cảnh báo.</p>}
-                    </div>
-                  </div>
-                )}
-              </div>
+              
+              <button 
+                className="softPrimary"
+                onClick={() => { setChapterFilter('all'); setShowAiReport(false); }}
+                style={{ width: '100%', height: '38px', borderRadius: '8px', fontWeight: 'bold', fontSize: '13px' }}
+              >
+                Hiển thị tất cả chương (Bỏ lọc)
+              </button>
             </div>
             <div className="modalFooter">
               <button className="softPrimary" onClick={() => {
@@ -3179,8 +3473,8 @@ function App() {
       )}
 
       {showBulkDeleteModal && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setShowBulkDeleteModal(false); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} style={{ maxWidth: '360px' }}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBulkDeleteModal(false); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '360px' }}>
             <div className="modalHeader">
               <h3 style={{ color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}><Trash2 size={20} /> Xác nhận xóa</h3>
               <button className="closeBtn" onClick={() => setShowBulkDeleteModal(false)}>×</button>
@@ -3206,8 +3500,8 @@ function App() {
       )}
 
       {showBatchFetchModal && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setShowBatchFetchModal(false); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} style={{ maxWidth: '360px' }}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchFetchModal(false); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '360px' }}>
             <div className="modalHeader">
               <h3><LinkIcon size={20} /> Lấy nội dung hàng loạt</h3>
               <button className="closeBtn" onClick={() => setShowBatchFetchModal(false)}>×</button>
@@ -3231,8 +3525,8 @@ function App() {
       )}
 
       {showBatchAiModal && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setShowBatchAiModal(false); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} style={{ maxWidth: '360px' }}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchAiModal(false); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '360px' }}>
             <div className="modalHeader">
               <h3><Sparkles size={20} /> AI hàng loạt</h3>
               <button className="closeBtn" onClick={() => setShowBatchAiModal(false)}>×</button>
@@ -3256,26 +3550,55 @@ function App() {
       )}
 
       {overwriteModal.show && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setOverwriteModal({ show: false }); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setOverwriteModal({ show: false }); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '400px' }}>
             <div className="modalHeader">
-              <h3 style={{ color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={20} /> Cảnh báo ghi đè</h3>
+              <h3 style={{ color: '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={20} /> {overwriteModal.title || 'Cảnh báo ghi đè'}</h3>
               <button className="closeBtn" onClick={() => setOverwriteModal({ show: false })}>×</button>
             </div>
             <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
-              <p style={{ fontSize: '14px', color: '#1f2937', margin: 0 }}>{overwriteModal.message}</p>
-              <p style={{ fontSize: '13px', color: '#dc2626', fontWeight: 'bold', margin: 0 }}>Hành động này sẽ ghi đè lên nội dung đã được AI xử lý trước đó và không thể hoàn tác.</p>
+              {overwriteModal.message.split('\n').map((m, idx) => (
+                <p key={idx} style={{ fontSize: '14.5px', color: '#1f2937', margin: 0, fontWeight: idx === 0 ? 'bold' : 'normal' }}>{m}</p>
+              ))}
             </div>
             <div className="modalFooter" style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-              <button className="danger" onClick={() => { overwriteModal.onConfirm(); setOverwriteModal({ show: false }); }} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>Ghi đè và lấy lại nội dung</button>
-              <button className="softPrimary" onClick={() => setOverwriteModal({ show: false })} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #cbd5e1' }}>Hủy</button>
+              <button className="danger" onClick={() => { overwriteModal.onConfirm(); setOverwriteModal({ show: false }); }} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: 'none', background: '#dc2626', color: '#fff', cursor: 'pointer' }}>{overwriteModal.confirmText || 'Vẫn lấy lại nội dung'}</button>
+              <button className="softPrimary" onClick={() => setOverwriteModal({ show: false })} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #cbd5e1', cursor: 'pointer' }}>{overwriteModal.cancelText || 'Hủy'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {batchOverwriteModal.show && (
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setBatchOverwriteModal({ show: false, cleanedChapters: [] }); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '420px' }}>
+            <div className="modalHeader">
+              <h3 style={{ color: '#d97706', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={20} /> Phát hiện chương đã Clean</h3>
+              <button className="closeBtn" onClick={() => setBatchOverwriteModal({ show: false, cleanedChapters: [] })}>×</button>
+            </div>
+            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: 'left' }}>
+              <p style={{ fontSize: '14px', color: '#1f2937', margin: 0, fontWeight: 'bold' }}>
+                Danh sách chương:
+              </p>
+              <div style={{ maxHeight: '120px', overflowY: 'auto', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {batchOverwriteModal.cleanedChapters.map((chTitle, idx) => (
+                  <span key={idx} style={{ fontSize: '13px', color: '#475569', fontWeight: '500' }}>• {chTitle}</span>
+                ))}
+              </div>
+              <p style={{ fontSize: '14.5px', color: '#1f2937', margin: 0, fontWeight: 'bold' }}>đã được Clean.</p>
+              <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Việc lấy lại nội dung có thể làm mất dữ liệu đã được AI xử lý. Bạn muốn xử lý thế nào?</p>
+            </div>
+            <div className="modalFooter" style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+              <button className="primary" onClick={() => { fetchBatchChapters(batchOverwriteModal.startCh, batchOverwriteModal.endCh, 'skipCleaned'); setBatchOverwriteModal({ show: false, cleanedChapters: [] }); }} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: 'none', color: '#fff', cursor: 'pointer' }}>Bỏ qua các chương đã Clean (Khuyên dùng)</button>
+              <button className="danger" onClick={() => { fetchBatchChapters(batchOverwriteModal.startCh, batchOverwriteModal.endCh, 'overwriteAll'); setBatchOverwriteModal({ show: false, cleanedChapters: [] }); }} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: 'none', background: '#dc2626', color: '#fff', cursor: 'pointer' }}>Vẫn ghi đè tất cả</button>
+              <button className="softPrimary" onClick={() => setBatchOverwriteModal({ show: false, cleanedChapters: [] })} style={{ width: '100%', height: '38px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #cbd5e1', cursor: 'pointer' }}>Hủy</button>
             </div>
           </div>
         </div>
       )}
       {showBatchExportModal && (
-        <div className="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) setShowBatchExportModal(false); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchExportModal(false); }}>
+          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '400px' }}>
             <div className="modalHeader">
               <h3><Download size={20} /> {exportIsSiri ? 'Xuất DOCX Theo Tập Siri' : 'Xuất DOCX Theo Tập'}</h3>
               <button className="closeBtn" onClick={() => setShowBatchExportModal(false)}>×</button>
