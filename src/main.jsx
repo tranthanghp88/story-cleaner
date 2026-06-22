@@ -29,9 +29,9 @@ console.log = (...args) => {
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import JSZip from 'jszip';
-import {  BookOpen, FileText, Wand2, FolderOpen, Download, Trash2, ArrowUp, ArrowDown,
-  Languages, ShieldCheck, Copy, Plus, Link as LinkIcon, Sparkles,
-  AlignLeft, RefreshCcw, CheckCircle2, AlertTriangle, Upload, Save, EyeOff, Database, Search, ToggleLeft, ToggleRight, Clock, Sliders
+import {  FileText, Wand2, FolderOpen, Trash2,
+  ShieldCheck, Copy, Plus, Link as LinkIcon, Sparkles,
+  AlignLeft, RefreshCcw, CheckCircle2, AlertTriangle, Upload, Save, Database, Search, ToggleLeft, ToggleRight, Sliders
 } from 'lucide-react';
 import './styles.css';
 import { CONVERT_PATTERNS, formatConvertPatternsForPrompt } from './convertPatterns';
@@ -1873,17 +1873,7 @@ function App() {
   const [exportFilename, setExportFilename] = useState('Tập 01');
   const [exportIsTTS, setExportIsTTS] = useState(false);
 
-  // States for split buttons
-  const [batchAiSelection, setBatchAiSelection] = useState('3');
-  const [batchAiValue, setBatchAiValue] = useState(3);
-  const [batchFetchSelection, setBatchFetchSelection] = useState('all');
-  const [batchFetchValue, setBatchFetchValue] = useState('all');
-  const [showFetchDropdown, setShowFetchDropdown] = useState(false);
-  const [isEnteringFetchCustom, setIsEnteringFetchCustom] = useState(false);
-  const [tempFetchCustomValue, setTempFetchCustomValue] = useState(10);
-  const [showBatchAiDropdown, setShowBatchAiDropdown] = useState(false);
-  const [isEnteringAiCustom, setIsEnteringAiCustom] = useState(false);
-  const [tempAiCustomValue, setTempAiCustomValue] = useState(5);
+
   const [showOptionsPopup, setShowOptionsPopup] = useState(false);
 
   const updateDefaultFilename = (start, end) => {
@@ -1914,7 +1904,7 @@ function App() {
   const [aiProgress,setAiProgress]=useState({done:0,total:0,message:''});
   const [keyCooldowns,setKeyCooldowns]=useState({});
   const [modelOptions,setModelOptions]=useState(DEFAULT_MODEL_OPTIONS);
-  const [showAiReport, setShowAiReport] = useState(false);
+  const [aiSubTab, setAiSubTab] = useState('settings');
   const [activeReportTab, setActiveReportTab] = useState('success');
   const [expandedIssues, setExpandedIssues] = useState({});
   const [chapterFilter, setChapterFilter] = useState('all');
@@ -1931,6 +1921,7 @@ function App() {
   const [editingPromptKey, setEditingPromptKey] = useState('aiNaturalVn');
   const [editingPromptText, setEditingPromptText] = useState(PROMPT_PRESETS.naturalVn.aiNaturalVn);
   const [selectedPresetKey, setSelectedPresetKey] = useState('');
+  const [copyStatus, setCopyStatus] = useState('');
 
   useEffect(() => {
     setEditingPromptText(promptTemplates[editingPromptKey] || '');
@@ -3236,7 +3227,7 @@ function App() {
       setStatus({ type: 'error', message: 'Tính năng này chỉ hỗ trợ trên ứng dụng Desktop.' });
     }
   };
-  const makePrompt=()=>{const text=(current.cleaned||current.raw||'').trim(); if(!text) return alert('Chưa có nội dung chương.'); setAiPrompt(buildCustomPrompt(aiMode,text,filters,1,1,'',promptSettings,promptTemplates)); setTab('ai');};
+  const makePrompt=()=>{const text=(current.cleaned||current.raw||'').trim(); if(!text) return alert('Chưa có nội dung chương.'); setAiPrompt(buildCustomPrompt(aiMode,text,filters,1,1,'',promptSettings,promptTemplates)); setTab('ai'); setAiSubTab('prompts');};
   const copyPrompt=async()=>{await navigator.clipboard.writeText(aiPrompt); setStatus({type:'ok',message:'Đã copy prompt.'});};
 
   const updateApi=(patch)=>setApiSettings(prev=>({...prev,...patch}));
@@ -3875,8 +3866,7 @@ ${prompt.slice(-1500)}
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         console.log('[Pipeline Trace][keydown Escape] Dismissing active modals');
-        if (showAiReport) setShowAiReport(false);
-        else if (showBulkDeleteModal) setShowBulkDeleteModal(false);
+        if (showBulkDeleteModal) setShowBulkDeleteModal(false);
         else if (showBatchFetchModal) closeBatchFetchModal('escape');
         else if (showBatchAiModal) closeBatchAiModal('escape');
         else if (overwriteModal.show) setOverwriteModal({ show: false });
@@ -3889,7 +3879,7 @@ ${prompt.slice(-1500)}
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showAiReport, showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, batchOverwriteModal, showBatchExportModal, showOptionsPopup, showDocxDropdown, showCacheDropdown]);
+  }, [showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, batchOverwriteModal, showBatchExportModal, showOptionsPopup, showDocxDropdown, showCacheDropdown]);
 
 
   const paginatedKeys = useMemo(() => {
@@ -3917,53 +3907,54 @@ ${prompt.slice(-1500)}
             <img src="/icon.png" alt="Story Cleaner" className="brandLogo" />
             <b style={{ fontSize: '20px' }}>Story Cleaner</b>
           </div>
-          {lastAutoSaved && (
-            <span className="autosave" style={{ fontSize: '11px', color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '4px', margin: '4px 0 0 0', padding: '2px 6px', background: '#f1f5f9', borderRadius: '6px', whiteSpace: 'nowrap' }}>
-              <Database size={11} /> Auto saved {lastAutoSaved}
-            </span>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px', fontSize: '11px', color: '#64748b', flexWrap: 'nowrap' }}>
+            {lastAutoSaved && (
+              <span className="autosave" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>
+                Auto saved {lastAutoSaved}
+              </span>
+            )}
+            {lastAutoSaved && <span style={{ color: '#cbd5e1' }}>|</span>}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <button 
+                onClick={() => setShowCacheDropdown(!showCacheDropdown)} 
+                className="cache-btn"
+              >
+                Cache <span style={{ fontSize: '8px', opacity: 0.7 }}>{showCacheDropdown ? '▲' : '▼'}</span>
+              </button>
+              {showCacheDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: '4px',
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  zIndex: 1000,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '4px 0',
+                  minWidth: '150px'
+                }}>
+                  <button 
+                    style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '6px 12px', background: 'transparent', width: '100%', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }} 
+                    onClick={() => { setShowCacheDropdown(false); projectInputRef.current?.click(); }}
+                  >
+                    <Upload size={12} /> Nhập Project từ File
+                  </button>
+                  <button 
+                    style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '6px 12px', background: 'transparent', width: '100%', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }} 
+                    onClick={() => { setShowCacheDropdown(false); saveProject(); }}
+                  >
+                    <Save size={12} /> Xuất Project ra File
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         <button className="newBookBtn" onClick={addBook}><Plus size={16}/> Tạo truyện mới</button>
-        
-        <div style={{ position: 'relative', width: '100%', marginBottom: '4px' }}>
-          <button 
-            className="softPrimary" 
-            onClick={() => setShowCacheDropdown(!showCacheDropdown)} 
-            style={{ width: '100%', height: '40px', padding: '11px 12px', borderRadius: '14px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
-          >
-            <Database size={14} /> Cache <span style={{ fontSize: '9px' }}>{showCacheDropdown ? '▲' : '▼'}</span>
-          </button>
-          {showCacheDropdown && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              marginTop: '4px',
-              background: '#ffffff',
-              border: '1px solid #cbd5e1',
-              borderRadius: '12px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-              zIndex: 1000,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '6px 0'
-            }}>
-              <button 
-                style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', color: '#1e293b' }} 
-                onClick={() => { setShowCacheDropdown(false); projectInputRef.current?.click(); }}
-              >
-                <Upload size={14} /> Import Cache
-              </button>
-              <button 
-                style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '10px 16px', background: 'transparent', width: '100%', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', color: '#1e293b' }} 
-                onClick={() => { setShowCacheDropdown(false); saveProject(); }}
-              >
-                <Save size={14} /> Export Backup
-              </button>
-            </div>
-          )}
-        </div>
         <div className="bookTree">
           {books.map((book, bIdx) => {
             const isOpen = !collapsedBooks[bIdx];
@@ -4253,6 +4244,7 @@ ${prompt.slice(-1500)}
             <button className={tab === 'editor' ? 'on' : ''} onClick={() => setTab('editor')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>Biên tập</button>
             <button className={tab === 'filters' ? 'on' : ''} onClick={() => setTab('filters')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><ShieldCheck size={14} /> Bộ lọc từ</button>
             <button className={tab === 'ai' ? 'on' : ''} onClick={() => setTab('ai')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><Sparkles size={14} /> Gemini AI</button>
+            <button className={tab === 'report' ? 'on' : ''} onClick={() => setTab('report')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><FileText size={14} /> Báo cáo AI</button>
           </div>
           <div className="actions" style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: 0, flexWrap: 'nowrap', flexShrink: 0 }}>
             <input ref={projectInputRef} type="file" accept=".json" hidden onChange={e => importProject(e.target.files?.[0])} />
@@ -4394,25 +4386,7 @@ ${prompt.slice(-1500)}
                 AI hàng loạt
               </button>
 
-              {/* Báo cáo AI */}
-              <button 
-                onClick={() => setShowAiReport(true)} 
-                disabled={aiRunning || fetching} 
-                className="softPrimary" 
-                style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1', background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}
-              >
-                <FileText size={13} /> Báo cáo AI
-              </button>
 
-              {/* AI Prompt Manager */}
-              <button 
-                onClick={() => setTab('prompts')} 
-                disabled={aiRunning || fetching} 
-                className="softPrimary" 
-                style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1' }}
-              >
-                <Sliders size={13} /> AI Prompt Manager
-              </button>
 
             </div>
 
@@ -4441,7 +4415,7 @@ ${prompt.slice(-1500)}
           <button className="dangerSoft equalBtn" onClick={() => deleteBook(bookIndex)} style={{ height: '42px', alignSelf: 'flex-end' }}><Trash2 size={16} /> Xóa truyện</button>
         </section>
 
-        <div className="scrollContent" style={{ overflowY: tab === 'editor' ? 'hidden' : 'auto', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="scrollContent" style={{ overflowY: (tab === 'editor' || tab === 'report') ? 'hidden' : 'auto', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           {tab === 'editor' && (
             <section className="chapterWorkspace card" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, paddingBottom: '14px', gap: '6px' }}>
               {/* Fix cứng Header Chương đang sửa */}
@@ -4563,235 +4537,329 @@ ${prompt.slice(-1500)}
 
           {tab === 'ai' && (
             <section className="ai card compactAi">
-              <div className="aiHeader">
-                <div><h2>Gemini AI Pool</h2></div>
-                <div className="poolStats managerStats">
-                  <span>Tổng key <b>{keySummary.totalKeys}</b></span>
-                  <span>Đang bật <b>{keySummary.activeKeys}</b></span>
-                  <span>Limited <b>{keySummary.limitedKeys}</b></span>
-                  <span>Lỗi <b>{keySummary.errorKeys}</b></span>
-                  <span>OK/Fail <b>{keySummary.totalSuccess}/{keySummary.totalFail}</b></span>
+              <div className="aiHeader" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '12px' }}>
+                <div><h2>Cấu hình Gemini AI</h2></div>
+                <div className="poolStats managerStats" style={{ display: 'flex', gap: '12px', fontSize: '12.5px', color: '#475569' }}>
+                  <span>Tổng key: <b>{keySummary.totalKeys}</b></span>
+                  <span>Đang bật: <b>{keySummary.activeKeys}</b></span>
+                  <span>Limited: <b>{keySummary.limitedKeys}</b></span>
+                  <span>Lỗi: <b>{keySummary.errorKeys}</b></span>
+                  <span>OK/Fail: <b>{keySummary.totalSuccess}/{keySummary.totalFail}</b></span>
                 </div>
               </div>
-              <div className="managerTabs">
-                <button className="on"><ShieldCheck size={16} /> Keys</button>
-                <button><Sparkles size={16} /> Prompt Preset</button>
-                <button onClick={() => setStatus({ type: 'ok', message: `Session: auto-cache đang bật. Key đã dùng: ${apiPool.filter(k => k.lastUsedAt).map(k => k.label).join(', ') || 'chưa có'}.` })}><Database size={16} /> Session</button>
+              
+              <div className="managerTabs" style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', flexWrap: 'wrap' }}>
+                <button className={aiSubTab === 'settings' ? 'on' : ''} onClick={() => setAiSubTab('settings')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sliders size={16} /> Cài đặt AI</button>
+                <button className={aiSubTab === 'presets' ? 'on' : ''} onClick={() => setAiSubTab('presets')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sparkles size={16} /> Preset AI</button>
+                <button className={aiSubTab === 'prompts' ? 'on' : ''} onClick={() => setAiSubTab('prompts')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sliders size={16} /> Prompt</button>
+                <button className={aiSubTab === 'pool' ? 'on' : ''} onClick={() => setAiSubTab('pool')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><ShieldCheck size={16} /> API/Gemini Pool</button>
+                <button className={aiSubTab === 'advanced' ? 'on' : ''} onClick={() => setAiSubTab('advanced')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Database size={16} /> Nâng cao</button>
               </div>
-              <div className="keyManagerLayout">
-                <div className="keyImportPanel">
-                  <div className="panelTitle"><FileText size={16} /><b>Import Gemini Keys</b></div>
-                  <label>Nhập key <span className="hint">mỗi dòng một key, hoặc GEMINI_045=AIza...</span>
-                    <textarea className="keyBox" value={importKeyText} onChange={e => setImportKeyText(e.target.value)} placeholder={`GEMINI_001=AIza...\nGEMINI_002=AIza...\nAIza...`} />
-                  </label>
-                  <div className="miniActions left">
-                    <button className="softPrimary" onClick={importKeys}><Upload size={16} /> Import</button>
-                    <button onClick={testAllGeminiKeys} disabled={aiRunning}><Sparkles size={16} /> Test all</button>
-                    <button onClick={loadGeminiModels} disabled={aiRunning}><RefreshCcw size={16} /> Lấy model</button>
+
+              {aiSubTab === 'settings' && (
+                <div className="apiConfigPanel" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
+                  <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b' }}>
+                    <Sliders size={16} /> <span>Cấu hình tham số API</span>
+                  </div>
+                  <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+                    <label>Model
+                      <select value={apiSettings.model} onChange={e => updateApi({ model: e.target.value })}>
+                        {modelOptions.map(m => <option key={m.name} value={m.name}>{m.displayName || m.name}</option>)}
+                      </select>
+                    </label>
+                    <label>Chunk Size<input type="number" value={apiSettings.chunkSize} onChange={e => updateApi({ chunkSize: Number(e.target.value) })} /></label>
+                    <label>Delay ms<input type="number" value={apiSettings.delayMs} onChange={e => updateApi({ delayMs: Number(e.target.value) })} /></label>
+                    <label>Cooldown ms<input type="number" value={apiSettings.cooldownMs} onChange={e => updateApi({ cooldownMs: Number(e.target.value) })} /></label>
+                    <label>Retry<input type="number" value={apiSettings.maxRetries} onChange={e => updateApi({ maxRetries: Number(e.target.value) })} /></label>
                   </div>
                 </div>
-                <div className="keyTablePanel">
-                  <div className="tableToolbar" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div className="searchBox" style={{ width: '130px', flex: 'none' }}>
-                      <Search size={15} />
-                      <input value={keySearch} onChange={e => setKeySearch(e.target.value)} placeholder="Tìm..." />
-                    </div>
-                    <select value={keyStatusFilter} style={{ width: '110px' }} onChange={e => setKeyStatusFilter(e.target.value)}>
-                      <option value="all">Tất cả</option>
-                      <option value="enabled">Đang bật</option>
-                      <option value="active">Active</option>
-                      <option value="limited">Limited</option>
-                      <option value="error">Error</option>
-                      <option value="unknown">Unknown</option>
-                    </select>
-                    <select value={keysPerPage} style={{ width: '110px' }} onChange={e => { setKeysPerPage(e.target.value); setKeyPage(1); }}>
-                      <option value="10">10 Key/trang</option>
-                      <option value="20">20 / trang</option>
-                      <option value="50">50 / trang</option>
-                      <option value="all">Tất cả</option>
-                    </select>
-                    <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: true })))}><ToggleRight size={15} /> Bật all</button>
-                    <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: false })))}><ToggleLeft size={15} /> Tắt all</button>
-                    <button onClick={() => setApiPool([])}><Trash2 size={15} /> Xóa pool</button>
+              )}
+
+              {aiSubTab === 'presets' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
+                  <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b' }}>
+                    <Sparkles size={16} /> <span>Preset AI / Context xưng hô</span>
                   </div>
-                  <div className="keyTable">
-                    <div className="keyRow head">
-                      <span>Key</span>
-                      <span>Masked</span>
-                      <span>Status</span>
-                      <span>OK/Fail</span>
-                      <span>Chars</span>
-                      <span>Last used</span>
-                      <span></span>
+                  <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <label>Mode xử lý
+                      <select value={aiMode} onChange={e => setAiMode(e.target.value)}>
+                        <option value="humanize">Natural VN Audio — Việt hóa để nghe</option>
+                        <option value="structure">Sửa bố cục + câu chữ</option>
+                        <option value="proofread">Check/sửa nhẹ text</option>
+                        <option value="selective">AI Biên tập chọn lọc</option>
+                      </select>
+                    </label>
+                    <label>Mức biên tập
+                      <select value={promptSettings.humanizeStrength} onChange={e => setPromptSettings({ ...promptSettings, humanizeStrength: e.target.value })}>
+                        <option value="cleanup">Cleanup — ít sửa nhất</option>
+                        <option value="naturalAudio">Natural VN Audio — khuyên dùng</option>
+                        <option value="light">Light — giữ gần văn gốc</option>
+                        <option value="balanced">Balanced — mượt vừa phải</option>
+                        <option value="strong">Strong — mượt hơn</option>
+                      </select>
+                    </label>
+                    <label>Xưng hô
+                      <select value={promptSettings.pronounStyle} onChange={e => setPromptSettings({ ...promptSettings, pronounStyle: e.target.value })}>
+                        <option value="preserve">Preserve — giữ ta/ngươi</option>
+                        <option value="balanced">Balanced — theo ngữ cảnh</option>
+                        <option value="modern">Modern VN — mềm hóa mạnh hơn</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="memoryGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+                    <label>Novel Memory <span className="hint">chỉ áp dụng cho bộ truyện hiện tại</span>
+                      <textarea value={promptSettings.novelMemory} onChange={e => setPromptSettings({ ...promptSettings, novelMemory: e.target.value })} style={{ minHeight: '80px' }} />
+                    </label>
+                    <label>Ghi chú thêm <span className="hint">không bắt buộc</span>
+                      <textarea value={promptSettings.additionalInstructions} onChange={e => setPromptSettings({ ...promptSettings, additionalInstructions: e.target.value })} placeholder="Ví dụ: Giữ nguyên xưng hô sư phụ/đệ tử. Không đổi Lâm Thiếu thành cậu Lâm..." style={{ minHeight: '80px' }} />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {aiSubTab === 'prompts' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0 }}>Chọn Prompt:</label>
+                      <select 
+                        value={editingPromptKey} 
+                        onChange={e => {
+                          setEditingPromptKey(e.target.value);
+                          setEditingPromptText(promptTemplates[e.target.value] || '');
+                        }}
+                        style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                      >
+                        <option value="aiNaturalVn">AI Natural VN (Việt hóa chính)</option>
+                        <option value="storyCleaner">Story Cleaner (Xử lý convert)</option>
+                      </select>
                     </div>
-                    {paginatedKeys.length ? paginatedKeys.map((item, idx) => (
-                      <div key={item.id || idx} className={`keyRow ${item.lastStatus || 'unknown'}`}>
-                        <label className="check slim">
-                          <input type="checkbox" checked={item.enabled !== false} onChange={e => setApiPool(prev => prev.map(k => k.id === item.id ? { ...k, enabled: e.target.checked } : k))} />
-                          <b>{item.label}</b>
-                        </label>
-                        <code>{maskKey(item.key)}</code>
-                        <span className={`badge ${item.lastStatus || 'unknown'}`}>{item.lastStatus || 'unknown'}</span>
-                        <span>{item.totalSuccess || 0}/{item.totalFail || 0}</span>
-                        <span>{(item.totalChars || 0).toLocaleString()}</span>
-                        <span className="lastUsed">{item.lastUsedAt ? new Date(item.lastUsedAt).toLocaleTimeString() : '-'}</span>
-                        <button onClick={() => setApiPool(prev => prev.filter(k => k.id !== item.id))}><Trash2 size={14} /></button>
-                        {item.lastError && <small className="keyError">{item.lastError}</small>}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input type="file" id="import-prompts-input" accept=".json" style={{ display: 'none' }} onChange={handleImportPrompts} />
+                      <button className="softPrimary" onClick={() => document.getElementById('import-prompts-input').click()} style={{ height: '30px', padding: '2px 10px', fontSize: '12px' }}>Import Pack</button>
+                      <button className="softPrimary" onClick={handleExportPrompts} style={{ height: '30px', padding: '2px 10px', fontSize: '12px' }}>Export Pack</button>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0 }}>Preset nhanh:</label>
+                    <select 
+                      value={selectedPresetKey}
+                      onChange={e => {
+                        setSelectedPresetKey(e.target.value);
+                        handleApplyPreset(e.target.value);
+                      }}
+                      style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                    >
+                      <option value="">-- Chọn Preset --</option>
+                      <option value="default">Default (Nguyên bản)</option>
+                      <option value="naturalVn">Natural VN (Ưu tiên V2)</option>
+                      <option value="strictOriginal">Strict Original (Dịch sát gốc)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      * Bạn có thể sử dụng các biến placeholder tự động điền giá trị từ các cài đặt của truyện: 
+                      <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{preserveTerms}}"}</code>, 
+                      <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{novelMemory}}"}</code>, 
+                      <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{pronounStyle}}"}</code>, 
+                      <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{humanizeStrength}}"}</code>
+                    </span>
+                    <textarea 
+                      value={editingPromptText} 
+                      onChange={e => setEditingPromptText(e.target.value)} 
+                      style={{ width: '100%', minHeight: '200px', fontFamily: 'monospace', fontSize: '12.5px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px' }}
+                    />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                    <button 
+                      className="softPrimary" 
+                      onClick={() => {
+                        if (confirm('Bạn muốn khôi phục prompt này về mặc định?')) {
+                          const defaults = PROMPT_PRESETS.naturalVn;
+                          setEditingPromptText(defaults[editingPromptKey]);
+                        }
+                      }}
+                      style={{ height: '34px', padding: '4px 12px', borderRadius: '8px', fontSize: '12.5px' }}
+                    >
+                      Khôi phục mặc định
+                    </button>
+                    <button 
+                      className="primary" 
+                      onClick={() => {
+                        const updated = { ...promptTemplates, [editingPromptKey]: editingPromptText };
+                        savePrompts(updated);
+                      }}
+                      style={{ height: '34px', padding: '4px 12px', borderRadius: '8px', fontSize: '12.5px' }}
+                    >
+                      Lưu Prompt
+                    </button>
+                  </div>
+
+                  <hr style={{ border: 0, borderTop: '1px solid #e2e8f0', margin: '16px 0' }} />
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '14px' }}>
+                      <FileText size={16} /> <span>Prompt thủ công / nâng cao</span>
+                    </div>
+                    <div className="aiControls" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button 
+                        className="softPrimary" 
+                        onClick={makePrompt}
+                        style={{ height: '30px', padding: '2px 10px', fontSize: '12.5px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Sliders size={14} /> Tạo prompt thủ công
+                      </button>
+                      <button 
+                        className="softPrimary" 
+                        onClick={copyPrompt} 
+                        disabled={!aiPrompt} 
+                        style={{ height: '30px', padding: '2px 10px', fontSize: '12.5px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Copy size={14} /> Copy prompt
+                      </button>
+                    </div>
+                    <textarea 
+                      className="promptBox" 
+                      value={aiPrompt} 
+                      onChange={e => setAiPrompt(e.target.value)} 
+                      placeholder="Prompt thủ công sẽ hiện ở đây nếu bạn bấm Tạo prompt thủ công..." 
+                      style={{ width: '100%', minHeight: '120px', fontFamily: 'monospace', fontSize: '12.5px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px' }} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {aiSubTab === 'pool' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
+                  <div className="keyManagerLayout">
+                    <div className="keyImportPanel">
+                      <div className="panelTitle"><FileText size={16} /><b>Import Gemini Keys</b></div>
+                      <label>Nhập key <span className="hint">mỗi dòng một key, hoặc GEMINI_045=AIza...</span>
+                        <textarea className="keyBox" value={importKeyText} onChange={e => setImportKeyText(e.target.value)} placeholder={`GEMINI_001=AIza...\nGEMINI_002=AIza...\nAIza...`} />
+                      </label>
+                      <div className="miniActions left">
+                        <button className="softPrimary" onClick={importKeys}><Upload size={16} /> Import</button>
+                        <button onClick={testAllGeminiKeys} disabled={aiRunning}><Sparkles size={16} /> Test all</button>
+                        <button onClick={loadGeminiModels} disabled={aiRunning}><RefreshCcw size={16} /> Lấy model</button>
                       </div>
-                    )) : <p className="note emptyKey">Chưa có key hoặc không có key khớp bộ lọc.</p>}
-                  </div>
-                  {visibleKeys.length > 0 && (
-                    <div className="pagination" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-                      <button onClick={() => setKeyPage(p => Math.max(1, p - 1))} disabled={keyPage <= 1}>Trang trước</button>
-                      <span>Trang {keyPage} / {totalPages}</span>
-                      <button onClick={() => setKeyPage(p => Math.min(totalPages, p + 1))} disabled={keyPage >= totalPages}>Trang sau</button>
-                      <span className="totalKeys" style={{ marginLeft: 'auto' }}>Tổng số key: {visibleKeys.length}</span>
                     </div>
-                  )}
+                    <div className="keyTablePanel">
+                      <div className="tableToolbar" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <div className="searchBox" style={{ width: '130px', flex: 'none' }}>
+                          <Search size={15} />
+                          <input value={keySearch} onChange={e => setKeySearch(e.target.value)} placeholder="Tìm..." />
+                        </div>
+                        <select value={keyStatusFilter} style={{ width: '110px' }} onChange={e => setKeyStatusFilter(e.target.value)}>
+                          <option value="all">Tất cả</option>
+                          <option value="enabled">Đang bật</option>
+                          <option value="active">Active</option>
+                          <option value="limited">Limited</option>
+                          <option value="error">Error</option>
+                          <option value="unknown">Unknown</option>
+                        </select>
+                        <select value={keysPerPage} style={{ width: '110px' }} onChange={e => { setKeysPerPage(e.target.value); setKeyPage(1); }}>
+                          <option value="10">10 Key/trang</option>
+                          <option value="20">20 / trang</option>
+                          <option value="50">50 / trang</option>
+                          <option value="all">Tất cả</option>
+                        </select>
+                        <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: true })))}><ToggleRight size={15} /> Bật all</button>
+                        <button onClick={() => setApiPool(prev => prev.map(k => ({ ...k, enabled: false })))}><ToggleLeft size={15} /> Tắt all</button>
+                        <button onClick={() => setApiPool([])}><Trash2 size={15} /> Xóa pool</button>
+                      </div>
+                      <div className="keyTable">
+                        <div className="keyRow head">
+                          <span>Key</span>
+                          <span>Masked</span>
+                          <span>Status</span>
+                          <span>OK/Fail</span>
+                          <span>Chars</span>
+                          <span>Last used</span>
+                          <span></span>
+                        </div>
+                        {paginatedKeys.length ? paginatedKeys.map((item, idx) => (
+                          <div key={item.id || idx} className={`keyRow ${item.lastStatus || 'unknown'}`}>
+                            <label className="check slim">
+                              <input type="checkbox" checked={item.enabled !== false} onChange={e => setApiPool(prev => prev.map(k => k.id === item.id ? { ...k, enabled: e.target.checked } : k))} />
+                              <b>{item.label}</b>
+                            </label>
+                            <code>{maskKey(item.key)}</code>
+                            <span className={`badge ${item.lastStatus || 'unknown'}`}>{item.lastStatus || 'unknown'}</span>
+                            <span>{item.totalSuccess || 0}/{item.totalFail || 0}</span>
+                            <span>{(item.totalChars || 0).toLocaleString()}</span>
+                            <span className="lastUsed">{item.lastUsedAt ? new Date(item.lastUsedAt).toLocaleTimeString() : '-'}</span>
+                            <button onClick={() => setApiPool(prev => prev.filter(k => k.id !== item.id))}><Trash2 size={14} /></button>
+                            {item.lastError && <small className="keyError">{item.lastError}</small>}
+                          </div>
+                        )) : <p className="note emptyKey">Chưa có key hoặc không có key khớp bộ lọc.</p>}
+                      </div>
+                      {visibleKeys.length > 0 && (
+                        <div className="pagination" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                          <button onClick={() => setKeyPage(p => Math.max(1, p - 1))} disabled={keyPage <= 1}>Trang trước</button>
+                          <span>Trang {keyPage} / {totalPages}</span>
+                          <button onClick={() => setKeyPage(p => Math.min(totalPages, p + 1))} disabled={keyPage >= totalPages}>Trang sau</button>
+                          <span className="totalKeys" style={{ marginLeft: 'auto' }}>Tổng số key: {visibleKeys.length}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="promptPanel">
-                <div className="panelTitle"><Sparkles size={16} /><b>Prompt Engine / Context xưng hô</b></div>
-                <div className="promptGrid">
-                  <label>Model<select value={apiSettings.model} onChange={e => updateApi({ model: e.target.value })}>{modelOptions.map(m => <option key={m.name} value={m.name}>{m.displayName || m.name}</option>)}</select></label>
-                  <label>Mode xử lý<select value={aiMode} onChange={e => setAiMode(e.target.value)}><option value="humanize">Natural VN Audio — Việt hóa để nghe</option><option value="structure">Sửa bố cục + câu chữ</option><option value="proofread">Check/sửa nhẹ text</option></select></label>
-                  <label>Mức biên tập<select value={promptSettings.humanizeStrength} onChange={e => setPromptSettings({ ...promptSettings, humanizeStrength: e.target.value })}><option value="cleanup">Cleanup — ít sửa nhất</option><option value="naturalAudio">Natural VN Audio — khuyên dùng</option><option value="light">Light — giữ gần văn gốc</option><option value="balanced">Balanced — mượt vừa phải</option><option value="strong">Strong — mượt hơn</option></select></label>
-                  <label>Xưng hô<select value={promptSettings.pronounStyle} onChange={e => setPromptSettings({ ...promptSettings, pronounStyle: e.target.value })}><option value="preserve">Preserve — giữ ta/ngươi</option><option value="balanced">Balanced — theo ngữ cảnh</option><option value="modern">Modern VN — mềm hóa mạnh hơn</option></select></label>
-                  <label>Chunk<input type="number" value={apiSettings.chunkSize} onChange={e => updateApi({ chunkSize: Number(e.target.value) })} /></label>
-                  <label>Delay ms<input type="number" value={apiSettings.delayMs} onChange={e => updateApi({ delayMs: Number(e.target.value) })} /></label>
-                  <label>Cooldown ms<input type="number" value={apiSettings.cooldownMs} onChange={e => updateApi({ cooldownMs: Number(e.target.value) })} /></label>
-                  <label>Retry<input type="number" value={apiSettings.maxRetries} onChange={e => updateApi({ maxRetries: Number(e.target.value) })} /></label>
+              )}
+
+              {aiSubTab === 'advanced' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px 0' }}>
+                  <div className="promptPanel" style={{ border: 'none', padding: 0 }}>
+                    <div className="panelTitle" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: '#1e293b' }}>
+                      <Database size={16} /> <span>Tùy chọn nâng cao & Session</span>
+                    </div>
+                    <div className="aiControls" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                      <button className="softPrimary" onClick={clearCache} style={{ borderColor: '#fecdd3', color: '#be123c', background: '#fff1f2' }}><Trash2 size={17} /> Xóa auto-cache</button>
+                    </div>
+                  </div>
+                  <div className="sessionLog" style={{ padding: '12px', background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                    <b>Session log (Key đã dùng trong phiên)</b>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px', maxHeight: '120px', overflowY: 'auto', fontSize: '12.5px', color: '#475569' }}>
+                      {apiPool.filter(k => k.lastUsedAt).length ? apiPool.filter(k => k.lastUsedAt).slice(0, 8).map(k => <span key={k.id}>• {k.label}: {k.lastStatus || 'unknown'} · {new Date(k.lastUsedAt).toLocaleTimeString()}</span>) : <span>Chưa có key nào được dùng trong phiên này.</span>}
+                    </div>
+                  </div>
                 </div>
-                <div className="memoryGrid">
-                  <label>Novel Memory <span className="hint">chỉ áp dụng cho bộ truyện hiện tại</span><textarea value={promptSettings.novelMemory} onChange={e => setPromptSettings({ ...promptSettings, novelMemory: e.target.value })} /></label>
-                  <label>Ghi chú thêm <span className="hint">không bắt buộc</span><textarea value={promptSettings.additionalInstructions} onChange={e => setPromptSettings({ ...promptSettings, additionalInstructions: e.target.value })} placeholder="Ví dụ: Giữ nguyên xưng hô sư phụ/đệ tử. Không đổi Lâm Thiếu thành cậu Lâm..." /></label>
-                </div>
-              </div>
-              <div className="aiControls compactControls">
-                <button onClick={() => humanizeChapter(selected, 'current_chapter')} disabled={aiRunning}><Sparkles size={17} /> AI chương hiện tại</button>
-                <button onClick={humanizeAll} disabled={aiRunning}><Sparkles size={17} /> AI tất cả chương</button>
-                <button onClick={makePrompt}><Copy size={17} /> Tạo prompt thủ công</button>
-                <button onClick={saveProject}><Save size={17} /> Export project backup</button>
-                <button onClick={clearCache}><Trash2 size={17} /> Xóa auto-cache</button>
-                <button onClick={() => setTab('prompts')} disabled={aiRunning || fetching}><Sliders size={17} /> AI Prompt Manager</button>
-                <button onClick={() => setShowAiReport(true)} disabled={aiRunning || fetching} style={{ background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}><FileText size={17} /> Báo cáo AI</button>
-              </div>
-              <details className="promptDetails">
-                <summary>Prompt thủ công / nâng cao</summary>
-                <div className="aiControls">
-                  <button onClick={copyPrompt} disabled={!aiPrompt}><Copy size={17} /> Copy prompt</button>
-                </div>
-                <textarea className="promptBox" value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} placeholder="Prompt thủ công sẽ hiện ở đây nếu bạn bấm Tạo prompt thủ công..." />
-              </details>
-              <div className="sessionLog">
-                <b>Session log</b>
-                <div>
-                  {apiPool.filter(k => k.lastUsedAt).length ? apiPool.filter(k => k.lastUsedAt).slice(0, 8).map(k => <span key={k.id}>{k.label}: {k.lastStatus || 'unknown'} · {new Date(k.lastUsedAt).toLocaleTimeString()}</span>) : <span>Chưa có key nào được dùng trong phiên này.</span>}
-                </div>
-              </div>
+              )}
             </section>
           )}
 
-          {tab === 'prompts' && (
-            <div className="tabContent" style={{ padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {tab === 'report' && (
+            <div className="tabContent" style={{ padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>AI Prompt Manager</h3>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="file" id="import-prompts-input" accept=".json" style={{ display: 'none' }} onChange={handleImportPrompts} />
-                  <button className="softPrimary" onClick={() => document.getElementById('import-prompts-input').click()} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>Import Prompt Pack</button>
-                  <button className="softPrimary" onClick={handleExportPrompts} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>Export Prompt Pack</button>
+                <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '18px' }}>
+                  <FileText size={20} /> <span>Báo cáo & Kiểm tra chất lượng AI</span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button className="softPrimary" onClick={() => {
+                    const text = getReportText('txt');
+                    navigator.clipboard.writeText(text);
+                    setCopyStatus('txt');
+                    setTimeout(() => setCopyStatus(''), 1500);
+                  }} style={{ minWidth: '130px', justifyContent: 'center' }}>
+                    <Copy size={16} /> {copyStatus === 'txt' ? 'Đã sao chép ✓' : 'Copy văn bản'}
+                  </button>
+                  <button className="softPrimary" onClick={() => {
+                    const text = getReportText('md');
+                    navigator.clipboard.writeText(text);
+                    setCopyStatus('md');
+                    setTimeout(() => setCopyStatus(''), 1500);
+                  }} style={{ minWidth: '140px', justifyContent: 'center' }}>
+                    <Copy size={16} /> {copyStatus === 'md' ? 'Đã sao chép ✓' : 'Copy Markdown'}
+                  </button>
                 </div>
               </div>
-              
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '14px', color: '#475569' }}>Chọn Prompt chỉnh sửa:</label>
-                <select 
-                  className="prompt-manager-select"
-                  value={editingPromptKey} 
-                  onChange={e => {
-                    setEditingPromptKey(e.target.value);
-                  }}
-                >
-                  <option value="aiNaturalVn">AI Natural VN (Việt hóa chính)</option>
-                  <option value="storyCleaner">Story Cleaner (Xử lý convert)</option>
-                  
-                </select>
-                
-                <label style={{ fontWeight: 'bold', fontSize: '14px', color: '#475569', marginLeft: '24px' }}>Preset nhanh:</label>
-                <select 
-                  className="prompt-manager-select"
-                  value={selectedPresetKey}
-                  onChange={e => {
-                    setSelectedPresetKey(e.target.value);
-                    handleApplyPreset(e.target.value);
-                  }}
-                >
-                  <option value="">-- Chọn Preset --</option>
-                  <option value="default">Default (Nguyên bản)</option>
-                  <option value="naturalVn">Natural VN (Ưu tiên V2)</option>
-                  <option value="strictOriginal">Strict Original (Dịch sát gốc)</option>
-                </select>
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <span style={{ fontSize: '12.5px', color: '#64748b' }}>
-                  * Bạn có thể sử dụng các biến placeholder tự động điền giá trị từ các cài đặt của truyện: 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{preserveTerms}}"}</code>, 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{novelMemory}}"}</code>, 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{pronounStyle}}"}</code>, 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{humanizeStrength}}"}</code>, 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{extraInstructions}}"}</code>, 
-                  <code style={{ background: '#f1f5f9', padding: '2px 4px', borderRadius: '4px', margin: '0 4px', color: '#0f172a', fontFamily: 'monospace' }}>{"{{convertPatterns}}"}</code>
-                </span>
-                <textarea 
-                  className="prompt-manager-textarea"
-                  value={editingPromptText} 
-                  onChange={e => setEditingPromptText(e.target.value)} 
-                />
-              </div>
-              
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button 
-                  className="softPrimary" 
-                  onClick={() => {
-                    if (confirm('Bạn muốn khôi phục prompt này về mặc định?')) {
-                      const defaults = PROMPT_PRESETS.naturalVn;
-                      setEditingPromptText(defaults[editingPromptKey]);
-                    }
-                  }}
-                  style={{ height: '36px', padding: '6px 16px', borderRadius: '8px', fontSize: '13px' }}
-                >
-                  Khôi phục mặc định
-                </button>
-                <button 
-                  className="primary" 
-                  onClick={() => {
-                    const updated = { ...promptTemplates, [editingPromptKey]: editingPromptText };
-                    savePrompts(updated);
-                  }}
-                  style={{ height: '36px', padding: '6px 16px', borderRadius: '8px', fontSize: '13px' }}
-                >
-                  Lưu Prompt
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {showAiReport && (
-        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowAiReport(false); }}>
-          <div className="modalContent reportModal" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '680px', width: '90%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-            <div className="modalHeader">
-              <h3><FileText size={20} /> Báo cáo AI Natural</h3>
-              <button className="closeBtn" onClick={() => setShowAiReport(false)}>×</button>
-            </div>
-            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: '1 1 auto', overflowY: 'auto', minHeight: 0 }}>
-              <p style={{ margin: 0, color: '#475569', fontSize: '13px', textAlign: 'center' }}>
+              <p style={{ margin: 0, color: '#475569', fontSize: '13px' }}>
                 Chọn nhóm bên dưới để xem chi tiết danh sách chương:
               </p>
               
-              <div className="reportStatsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '4px' }}>
+              <div className="reportStatsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', marginBottom: '4px' }}>
                 {[
                   { key: 'success', label: 'AI Success', count: aiReportData.successList.length, color: '#10b981', bgColor: '#ecfdf5', textColor: '#047857' },
                   { key: 'warning', label: 'AI Success With Warning', count: aiReportData.warningList.length, color: '#d97706', bgColor: '#fffbeb', textColor: '#b45309' },
@@ -4809,27 +4877,26 @@ ${prompt.slice(-1500)}
                       style={{ 
                         cursor: 'pointer', 
                         border: isActive ? `2px solid ${s.color}` : '1px solid #e2e8f0', 
-                        padding: '8px 4px', 
+                        padding: '12px 8px', 
                         borderRadius: '8px', 
                         display: 'flex', 
                         flexDirection: 'column', 
                         alignItems: 'center', 
-                        gap: '2px', 
+                        gap: '4px', 
                         backgroundColor: isActive ? s.bgColor : '#ffffff', 
                         transition: 'all 0.2s',
-                        boxShadow: isActive ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
-                        gridColumn: s.key === 'warning' ? 'span 2' : 'span 1'
+                        boxShadow: isActive ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
                       }}
                     >
                       <span style={{ fontSize: '11px', color: s.textColor, fontWeight: 'bold', textAlign: 'center' }}>{s.label}</span>
-                      <b style={{ fontSize: '16px', color: s.textColor }}>{s.count}</b>
+                      <b style={{ fontSize: '18px', color: s.textColor }}>{s.count}</b>
                     </div>
                   );
                 })}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0 2px 0' }}>
-                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e293b' }}>
+                <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b' }}>
                   Danh sách chương: {
                     activeReportTab === 'success' ? 'Thành công' :
                     activeReportTab === 'error' ? 'Lỗi' :
@@ -4850,19 +4917,18 @@ ${prompt.slice(-1500)}
 
               {activeReportTab === 'warning' && aiReportData.factWarningList.length > 0 && (
                 <div style={{ 
-                  padding: '8px 12px', 
+                  padding: '12px', 
                   backgroundColor: '#fffbeb', 
                   border: '1px solid #fed7aa', 
                   borderRadius: '8px', 
-                  fontSize: '12px', 
+                  fontSize: '13px', 
                   color: '#7c2d12', 
                   display: 'flex', 
                   flexDirection: 'column', 
-                  gap: '6px',
-                  marginBottom: '6px'
+                  gap: '6px'
                 }}>
                   <div style={{ fontWeight: 'bold', color: '#c2410c' }}>Thống kê cảnh báo dữ kiện:</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       <span style={{ fontWeight: '600' }}>Theo danh xưng:</span>
                       {Object.keys(aiReportData.factTermCounts).map(term => (
@@ -4880,14 +4946,13 @@ ${prompt.slice(-1500)}
               )}
 
               <div style={{ 
-                flex: '1 1 auto', 
-                maxHeight: '320px', 
-                overflowY: 'auto', 
                 border: '1px solid #e2e8f0', 
                 borderRadius: '8px', 
-                padding: '6px', 
+                padding: '10px', 
                 backgroundColor: '#f8fafc',
-                minHeight: '120px'
+                flex: 1,
+                overflowY: 'auto',
+                minHeight: 0
               }}>
                 {(() => {
                   const list = 
@@ -4901,14 +4966,14 @@ ${prompt.slice(-1500)}
 
                   if (list.length === 0) {
                     return (
-                      <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8', fontSize: '13px' }}>
+                      <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8', fontSize: '13px' }}>
                         Không có chương nào trong nhóm này.
                       </div>
                     );
                   }
 
                   return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {list.map(item => {
                         let label = '';
                         let color = '#475569';
@@ -4931,7 +4996,6 @@ ${prompt.slice(-1500)}
                           color = hasFact ? '#dc2626' : '#d97706';
                           bg = hasFact ? '#fef2f2' : '#fffbeb';
                         } else {
-                          // 'processed' tab
                           const isErr = !!chapters[item.idx]?.aiError;
                           const hasFact = chapters[item.idx]?.aiFactIssues?.length > 0;
                           const text = chapters[item.idx]?.cleaned || chapters[item.idx]?.raw || '';
@@ -4947,138 +5011,218 @@ ${prompt.slice(-1500)}
                           }
                         }
 
+                        const hasSelectiveDetails = chapters[item.idx]?.aiSelectiveDetails?.length > 0;
                         return (
                           <div 
                             key={item.idx} 
                             style={{ 
                               display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'space-between', 
-                              padding: '8px 12px', 
+                              flexDirection: 'column',
+                              padding: '10px 16px', 
                               backgroundColor: '#ffffff', 
                               border: '1px solid #e2e8f0', 
-                              borderRadius: '6px',
-                              gap: '10px'
+                              borderRadius: '8px',
+                              gap: '8px',
+                              alignItems: 'stretch'
                             }}
                           >
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0, flex: 1 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>
-                                  Chương {item.number}
-                                </span>
-                                <span style={{ 
-                                  fontSize: '11px', 
-                                  padding: '1px 5px', 
-                                  borderRadius: '4px', 
-                                  fontWeight: '600',
-                                  color,
-                                  backgroundColor: bg
-                                }}>
-                                  {label}
-                                </span>
-                                {item.aiFactIssues && item.aiFactIssues.length > 0 && (
-                                  <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 'bold', backgroundColor: '#fffbeb', padding: '1px 5px', borderRadius: '4px', border: '1px solid #fde68a' }}>
-                                    Fact Warnings: {item.aiFactIssues.length}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0, flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                  <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#1e293b' }}>
+                                    Chương {item.number}
                                   </span>
-                                )}
-                                <span style={{ fontSize: '11px', color: '#64748b' }}>
-                                  ({item.rawLen} → {item.aiLen} ký tự)
-                                </span>
-                              </div>
-                              <div style={{ fontSize: '12px', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.title}>
-                                {item.title}
-                              </div>
-                              {item.error && (
-                                <div style={{ fontSize: '11px', color: '#ef4444', marginTop: '2px', wordBreak: 'break-all' }}>
-                                  Lỗi: {item.errorType ? `[${item.errorType}] ` : ''}{item.error}
+                                  <span style={{ 
+                                    fontSize: '11px', 
+                                    padding: '1px 6px', 
+                                    borderRadius: '4px', 
+                                    fontWeight: '600',
+                                    color,
+                                    backgroundColor: bg
+                                  }}>
+                                    {label}
+                                  </span>
+                                  {item.aiFactIssues && item.aiFactIssues.length > 0 && (
+                                    <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 'bold', backgroundColor: '#fffbeb', padding: '1px 5px', borderRadius: '4px', border: '1px solid #fde68a' }}>
+                                      Fact Warnings: {item.aiFactIssues.length}
+                                    </span>
+                                  )}
+                                  <span style={{ fontSize: '11px', color: '#64748b' }}>
+                                    ({item.rawLen} → {item.aiLen} ký tự)
+                                  </span>
                                 </div>
-                              )}
-                              {item.aiFactIssues && item.aiFactIssues.length > 0 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-                                  {item.aiFactIssues.map((issue, idxIssues) => {
-                                    const issueKey = `${item.idx}-${idxIssues}`;
-                                    const isExpanded = !!expandedIssues[issueKey];
-                                    return (
-                                      <div key={idxIssues} style={{ display: 'flex', flexDirection: 'column', border: '1px solid #fed7aa', borderRadius: '6px', backgroundColor: '#fffbeb', overflow: 'hidden' }}>
-                                        <div 
-                                          onClick={() => setExpandedIssues(prev => ({ ...prev, [issueKey]: !isExpanded }))}
+                                <div style={{ fontSize: '12.5px', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.title}>
+                                  {item.title}
+                                </div>
+                                {chapters[item.idx]?.aiSelectiveStats && (
+                                  <div style={{ fontSize: '11.5px', color: '#047857', marginTop: '2px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <span style={{ backgroundColor: '#d1fae5', padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>Biên tập chọn lọc</span>
+                                    <span>Tổng câu: {chapters[item.idx].aiSelectiveStats.total}</span>
+                                    <span>•</span>
+                                    <span>Nghi ngờ: {chapters[item.idx].aiSelectiveStats.flagged}</span>
+                                    <span>•</span>
+                                    <span>Đã sửa: {chapters[item.idx].aiSelectiveStats.edited}</span>
+                                    <span>•</span>
+                                    <span>Giữ nguyên: {chapters[item.idx].aiSelectiveStats.preserved}</span>
+                                    {hasSelectiveDetails && (
+                                      <>
+                                        <span>•</span>
+                                        <button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const isSelExpanded = !!expandedIssues['selective-' + item.idx];
+                                            setExpandedIssues(prev => ({ ...prev, ['selective-' + item.idx]: !isSelExpanded }));
+                                          }}
                                           style={{ 
-                                            padding: '6px 10px', 
-                                            fontSize: '12px', 
-                                            color: '#c2410c', 
-                                            fontWeight: 'bold', 
+                                            background: 'none', 
+                                            border: 'none', 
+                                            color: '#2563eb', 
                                             cursor: 'pointer', 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            justifyContent: 'space-between',
-                                            userSelect: 'none',
-                                            backgroundColor: '#ffedd5'
+                                            fontSize: '11.5px', 
+                                            fontWeight: 'bold', 
+                                            padding: 0,
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '2px'
                                           }}
                                         >
-                                          <span>⚠️ {issue.message}</span>
-                                          <span style={{ fontSize: '10px' }}>{isExpanded ? '▼ Ẩn chi tiết' : '▶ Xem chi tiết'}</span>
-                                        </div>
-                                        {isExpanded && (
-                                          <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#431407', borderTop: '1px dashed #fed7aa' }}>
-                                            <div>
-                                              <strong style={{ color: '#ea580c' }}>Missing title:</strong> <code style={{ backgroundColor: '#ffedd5', padding: '2px 4px', borderRadius: '4px', fontWeight: 'bold' }}>{issue.term}</code>
-                                            </div>
-                                            <div>
-                                              <strong style={{ color: '#ea580c' }}>Original sentence/paragraph:</strong>
-                                              <div style={{ marginTop: '4px', padding: '6px', backgroundColor: '#fafaf9', borderLeft: '3px solid #f97316', fontStyle: 'italic', wordBreak: 'break-word', color: '#444' }}>
-                                                {issue.origSnippet}
-                                              </div>
-                                            </div>
-                                            <div>
-                                              <strong style={{ color: '#ea580c' }}>AI output snippet:</strong>
-                                              <div style={{ marginTop: '4px', padding: '6px', backgroundColor: '#fafaf9', borderLeft: '3px solid #ea580c', fontStyle: 'italic', wordBreak: 'break-word', color: '#444' }}>
-                                                {issue.aiSnippet}
-                                              </div>
+                                          {expandedIssues['selective-' + item.idx] ? '▼ Ẩn chi tiết câu' : '▶ Xem chi tiết câu'}
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+                                {item.error && (
+                                  <div style={{ fontSize: '11px', color: '#ef4444', marginTop: '2px', wordBreak: 'break-all' }}>
+                                    Lỗi: {item.errorType ? `[${item.errorType}] ` : ''}{item.error}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                                <button 
+                                  onClick={() => updateChapter(item.idx, { skipped: !item.skipped })}
+                                  className="softPrimary"
+                                  style={{ 
+                                    fontSize: '11.5px', 
+                                    padding: '4px 10px', 
+                                    height: '30px',
+                                    borderRadius: '6px',
+                                    backgroundColor: item.skipped ? '#fef3c7' : '#f1f5f9',
+                                    color: item.skipped ? '#b45309' : '#475569',
+                                    borderColor: item.skipped ? '#fde68a' : '#cbd5e1',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {item.skipped ? 'Khôi phục' : 'Bỏ qua AI'}
+                                </button>
+                                <button 
+                                  onClick={() => {
+                                    selectBook(bookIndex);
+                                    setSelected(item.idx);
+                                    setTab('editor');
+                                  }}
+                                  className="softPrimary"
+                                  style={{ 
+                                    fontSize: '11.5px', 
+                                    padding: '4px 10px', 
+                                    height: '30px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Đi tới chương
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Fact Warnings Section */}
+                            {item.aiFactIssues && item.aiFactIssues.length > 0 && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                                {item.aiFactIssues.map((issue, idxIssues) => {
+                                  const issueKey = `${item.idx}-${idxIssues}`;
+                                  const isExpanded = !!expandedIssues[issueKey];
+                                  return (
+                                    <div key={idxIssues} style={{ display: 'flex', flexDirection: 'column', border: '1px solid #fed7aa', borderRadius: '6px', backgroundColor: '#fffbeb', overflow: 'hidden' }}>
+                                      <div 
+                                        onClick={() => setExpandedIssues(prev => ({ ...prev, [issueKey]: !isExpanded }))}
+                                        style={{ 
+                                          padding: '6px 10px', 
+                                          fontSize: '12.5px', 
+                                          color: '#c2410c', 
+                                          fontWeight: 'bold', 
+                                          cursor: 'pointer', 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          justifyContent: 'space-between',
+                                          userSelect: 'none',
+                                          backgroundColor: '#ffedd5'
+                                        }}
+                                      >
+                                        <span>⚠️ {issue.message}</span>
+                                        <span style={{ fontSize: '11px' }}>{isExpanded ? '▼ Ẩn chi tiết' : '▶ Xem chi tiết'}</span>
+                                      </div>
+                                      {isExpanded && (
+                                        <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12.5px', color: '#431407', borderTop: '1px dashed #fed7aa' }}>
+                                          <div>
+                                            <strong style={{ color: '#ea580c' }}>Missing title:</strong> <code style={{ backgroundColor: '#ffedd5', padding: '2px 4px', borderRadius: '4px', fontWeight: 'bold' }}>{issue.term}</code>
+                                          </div>
+                                          <div>
+                                            <strong style={{ color: '#ea580c' }}>Original sentence/paragraph:</strong>
+                                            <div style={{ marginTop: '4px', padding: '6px', backgroundColor: '#fafaf9', borderLeft: '3px solid #f97316', fontStyle: 'italic', wordBreak: 'break-word', color: '#444' }}>
+                                              {issue.origSnippet}
                                             </div>
                                           </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                              <button 
-                                onClick={() => updateChapter(item.idx, { skipped: !item.skipped })}
-                                className="softPrimary"
-                                style={{ 
-                                  fontSize: '11px', 
-                                  padding: '4px 8px', 
-                                  height: '28px',
-                                  borderRadius: '6px',
-                                  backgroundColor: item.skipped ? '#fef3c7' : '#f1f5f9',
-                                  color: item.skipped ? '#b45309' : '#475569',
-                                  borderColor: item.skipped ? '#fde68a' : '#cbd5e1',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                {item.skipped ? 'Khôi phục' : 'Bỏ qua AI'}
-                              </button>
-                              <button 
-                                onClick={() => {
-                                  selectBook(bookIndex);
-                                  setSelected(item.idx);
-                                  setShowAiReport(false);
-                                }}
-                                className="softPrimary"
-                                style={{ 
-                                  fontSize: '11px', 
-                                  padding: '4px 8px', 
-                                  height: '28px',
-                                  borderRadius: '6px',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                Đi tới chương
-                              </button>
-                            </div>
+                                          <div>
+                                            <strong style={{ color: '#ea580c' }}>AI output snippet:</strong>
+                                            <div style={{ marginTop: '4px', padding: '6px', backgroundColor: '#fafaf9', borderLeft: '3px solid #ea580c', fontStyle: 'italic', wordBreak: 'break-word', color: '#444' }}>
+                                              {issue.aiSnippet}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Selective Edit Details Table */}
+                            {hasSelectiveDetails && expandedIssues['selective-' + item.idx] && (
+                              <div style={{ 
+                                maxHeight: '300px', 
+                                overflowY: 'auto', 
+                                border: '1px solid #cbd5e1', 
+                                borderRadius: '6px', 
+                                marginTop: '4px',
+                                background: '#ffffff'
+                              }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
+                                  <thead>
+                                    <tr style={{ borderBottom: '1px solid #cbd5e1' }}>
+                                      <th style={{ position: 'sticky', top: 0, backgroundColor: '#f1f5f9', padding: '6px 8px', width: '50px', color: '#475569', fontWeight: 'bold', zIndex: 10 }}>ID</th>
+                                      <th style={{ position: 'sticky', top: 0, backgroundColor: '#f1f5f9', padding: '6px 8px', width: '80px', color: '#475569', fontWeight: 'bold', zIndex: 10 }}>Changed</th>
+                                      <th style={{ position: 'sticky', top: 0, backgroundColor: '#f1f5f9', padding: '6px 8px', color: '#475569', fontWeight: 'bold', zIndex: 10 }}>Original</th>
+                                      <th style={{ position: 'sticky', top: 0, backgroundColor: '#f1f5f9', padding: '6px 8px', color: '#475569', fontWeight: 'bold', zIndex: 10 }}>Edited</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {chapters[item.idx].aiSelectiveDetails.map((detail, dIdx) => (
+                                      <tr key={dIdx} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: detail.changed ? '#fffbeb' : 'transparent' }}>
+                                        <td style={{ padding: '6px 8px', color: '#64748b' }}>{detail.sentenceId || (dIdx + 1)}</td>
+                                        <td style={{ padding: '6px 8px', color: detail.changed ? '#b45309' : '#64748b', fontWeight: detail.changed ? 'bold' : 'normal' }}>
+                                          {detail.changed ? 'Yes' : 'No'}
+                                        </td>
+                                        <td style={{ padding: '6px 8px', color: '#475569', wordBreak: 'break-word' }}>{detail.original}</td>
+                                        <td style={{ padding: '6px 8px', color: detail.changed ? '#0f172a' : '#64748b', fontWeight: detail.changed ? '500' : 'normal', wordBreak: 'break-word' }}>
+                                          {detail.edited || '(Giữ nguyên)'}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -5087,23 +5231,9 @@ ${prompt.slice(-1500)}
                 })()}
               </div>
             </div>
-            
-            <div className="modalFooter">
-              <button className="softPrimary" onClick={() => {
-                const text = getReportText('txt');
-                navigator.clipboard.writeText(text);
-                setStatus({ type: 'ok', message: 'Đã copy báo cáo dạng text.' });
-              }}><Copy size={16} /> Copy Text</button>
-              <button className="softPrimary" onClick={() => {
-                const text = getReportText('md');
-                navigator.clipboard.writeText(text);
-                setStatus({ type: 'ok', message: 'Đã copy báo cáo dạng Markdown.' });
-              }}><Copy size={16} /> Copy MD</button>
-              <button onClick={() => setShowAiReport(false)}>Đóng</button>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </main>
 
       {showBulkDeleteModal && (
         <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBulkDeleteModal(false); }}>

@@ -1,0 +1,90 @@
+{
+  "summary": {
+    "totalSentences": 142,
+    "flaggedSentences": 11,
+    "requestsSent": 1,
+    "responsesReceived": 1,
+    "editedSentences": 11,
+    "patchedSentences": 11,
+    "preservedSentences": 131
+  },
+  "details": [
+    {
+      "sentenceId": 20,
+      "original": "Không phải Triệu Gia Thiếu chủ sao ”",
+      "edited": "Không phải Triệu Gia Thiếu chủ sao?",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 27,
+      "original": "Có thể, tại xốc lên hồng khăn cô dâu cái kia phút chốc, hắn liền minh bạch, chỉ không muốn thừa nhận mà thôi.",
+      "edited": "Nhưng vào lúc vén khăn voan cô dâu lên, hắn đã hiểu, chỉ là không muốn thừa nhận mà thôi.",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 28,
+      "original": "Hắn, Triệu Vân, Triệu Gia Thiếu chủ, ngày xưa võ đạo kỳ tài, hôm nay tịch đoạn mạch phế thể.",
+      "edited": "Hắn, Triệu Vân, Triệu Gia Thiếu chủ, từng là kỳ tài võ đạo, nay là phế nhân mạch đoạn.",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 42,
+      "original": "Đang khi nói chuyện, hắn đã tới Liễu gia phủ đệ trước.",
+      "edited": "Nói chưa dứt, hắn đã đi đến trước phủ đệ Liễu gia.",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 53,
+      "original": "Liễu Như Nguyệt nhẹ môi hé mở, thần tình đạm mạc như băng, đứng thẳng cuối bậc thang, như vân đoan Tiên Tử, độc hữu một phần hơi lạnh cùng cao ngạo, “Duyên phận đã hết, cần gì phải cưỡng cầu, ngươi nên minh bạch, ta và ngươi, sớm đã không phải nhất cái thế giới người.”",
+      "edited": "Liễu Như Nguyệt khẽ mở môi, thần sắc đạm mạc như băng, đứng ở cuối bậc thang, tựa như tiên tử trên mây, mang theo vẻ lạnh lùng và cao ngạo, “Duyên phận đã hết, hà tất cưỡng cầu, chàng nên hiểu, ta và chàng, sớm đã không thuộc về cùng một thế giới.”",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 54,
+      "original": "“Minh bạch, ta sớm nên minh bạch.”",
+      "edited": "“Hiểu, ta sớm nên hiểu.”",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 56,
+      "original": "“Gả liền gả cho, hảo hảo đối đãi muội muội ta.”",
+      "edited": "“Gả thì gả, chiếu cố tốt muội muội ta.”",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 58,
+      "original": "“Gả liền gả cho, hảo hảo đối đãi muội muội ta.”",
+      "edited": "“Gả thì gả, chiếu cố tốt muội muội ta.”",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 71,
+      "original": "Liễu gia gia chủ đến thời khắc này đều còn chưa thấy đi ra, rất hiển nhiên, trước đó cũng biết việc này, âm mưu, đây là âm mưu, đóng lại hỏa đùa giỡn Triệu Gia.”",
+      "edited": "Gia chủ Liễu gia đến giờ vẫn chưa nhận ra, rõ ràng trước đó đã biết chuyện này, đây là âm mưu, là âm mưu nhằm vào Triệu Gia.”",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 86,
+      "original": "Triệu Gia người đến, cầm đầu chính là Triệu Vân phụ thân, Triệu Gia gia chủ đương thời Triệu Uyên, biết được Triệu Vân chạy đến, mà lại tay cầm sát kiếm, lúc này mới đi phòng tân hôn xem qua, gặp tân nương là Liễu Như Tâm, bừng bừng tức giận.",
+      "edited": "Người Triệu Gia đến, dẫn đầu là phụ thân Triệu Vân, đương kim Gia chủ Triệu Uyên, biết Triệu Vân chạy đến, lại còn cầm kiếm, lúc này mới đến phòng tân hôn xem xét, thấy tân nương là Liễu Như Tâm, vô cùng tức giận.",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 93,
+      "original": "“Nhưng không biết, Triệu gia tộc trưởng muốn gì bàn giao.”",
+      "edited": "“Nhưng không biết, Tộc trưởng Triệu gia muốn giải thích thế nào.”",
+      "changed": true,
+      "patched": true
+    }
+  ]
+}

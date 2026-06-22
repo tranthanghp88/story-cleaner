@@ -1544,14 +1544,22 @@ ipcMain.handle('story:gemini-generate', async (_, payload = {}) => {
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const generationConfig = {
+      temperature: 0.35,
+      topP: 0.9,
+      topK: 40,
+      maxOutputTokens: 8192
+    };
+    if (payload.responseMimeType) {
+      generationConfig.responseMimeType = payload.responseMimeType;
+    }
+    if (payload.responseSchema) {
+      generationConfig.responseSchema = payload.responseSchema;
+    }
+
     const res = await axios.post(url, {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.35,
-        topP: 0.9,
-        topK: 40,
-        maxOutputTokens: 8192
-      },
+      generationConfig,
       safetySettings: [
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },

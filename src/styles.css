@@ -562,3 +562,26 @@ button {
   background-color: #f1f5f9;
 }
 
+/* Cache utility button inline with Auto Saved */
+.cache-btn {
+  height: auto;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cache-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+

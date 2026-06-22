@@ -1,0 +1,121 @@
+Found 30 sentences with remaining convert keywords.
+
+Candidate 1 (Keywords: chui tròng mắt):
+  - Original: "Liễu Như Tâm chui tròng mắt, thân thể lạnh run, nàng con mắt mặc dù thanh tịnh, rồi lại chất phác trống rỗng."
+  - Cleaned:  "Liễu Như Tâm chui tròng mắt, thân thể lạnh run, nàng con mắt mặc dù thanh tịnh, rồi lại đờ đẫn trống rỗng."
+
+Candidate 2 (Keywords: hạng gì):
+  - Original: "“Liễu gia đại tiểu thư hạng gì thiên phú, lại vẫn chịu gả hắn cái này người vô dụng.”"
+  - Cleaned:  "“Liễu gia đại tiểu thư hạng gì thiên phú, lại vẫn chịu gả hắn cái này người vô dụng.”"
+
+Candidate 3 (Keywords: vẫn là):
+  - Original: "Phía trước, Triệu Vân sát khí quấn thân, khuôn mặt tái nhợt vẫn là mang mấy phần dữ tợn."
+  - Cleaned:  "Phía trước, Triệu Vân sát khí quanh người, khuôn mặt tái nhợt vẫn là lộ vẻ dữ tợn."
+
+Candidate 4 (Keywords: tịch đoạn mạch phế thể):
+  - Original: "Hắn, Triệu Vân, Triệu Gia Thiếu chủ, ngày xưa võ đạo kỳ tài, hôm nay tịch đoạn mạch phế thể."
+  - Cleaned:  "Hắn, Triệu Vân, Triệu Gia Thiếu chủ, ngày xưa võ đạo kỳ tài, hôm nay tịch đoạn mạch phế thể."
+
+Candidate 5 (Keywords: treo đầu dê bán thịt chó):
+  - Original: "Một hồi treo đầu dê bán thịt chó hôn lễ, sẽ để cho Triệu Gia cũng như cái kia giống như, thành Vong Cổ Thành lớn nhất trò cười."
+  - Cleaned:  "Một hồi treo đầu dê bán thịt chó hôn lễ, sẽ để cho Triệu Gia cũng như cái kia giống như, thành Vong Cổ Thành lớn nhất trò cười."
+
+Candidate 6 (Keywords: nhượng):
+  - Original: "Kế tiếp một màn, nhượng thế nhân càng kinh ngạc."
+  - Cleaned:  "Kế tiếp một màn, nhượng thế nhân càng kinh ngạc."
+
+Candidate 7 (Keywords: sắt đá trên):
+  - Original: "Âm vang âm thanh nhất thời, Triệu Vân một kiếm, giống như bổ vào sắt đá trên, lau ra sáng như tuyết tia lửa, không thương tổn được Liễu Như Nguyệt, bị phản đánh bay ra ngoài, chờ rơi xuống đất, kiếm trong tay từng khúc đứt gãy, máu tươi cuồng bắn ra."
+  - Cleaned:  "Âm vang âm thanh nhất thời, Triệu Vân một kiếm, giống như bổ vào sắt đá trên, lau ra sáng như tuyết tia lửa, không thương tổn được Liễu Như Nguyệt, bị phản đánh bay ra ngoài, chờ rơi xuống đất, kiếm trong tay từng khúc đứt gãy, máu tươi cuồng bắn ra."
+
+Candidate 8 (Keywords: vẫn là):
+  - Original: "“Là hắn Triệu Vân không biết lượng sức, đã thành người vô dụng, vẫn là vọng tưởng con cóc ăn thịt thiên nga, chỉ là, Liễu Như Nguyệt làm được quả thực quá mức, hôn ước là nàng, không muốn gả liền không lấy chồng, đem Liễu Như Tâm gả đi tính chuyện gì xảy ra vậy, rõ ràng khi dễ người cái đó!"
+  - Cleaned:  "“Là hắn Triệu Vân không biết lượng sức, đã thành người vô dụng, vẫn là vọng tưởng đũa mốc đòi mâm son, chỉ là, Liễu Như Nguyệt làm được quả thực quá mức, hôn ước là nàng, không muốn gả liền không lấy chồng, đem Liễu Như Tâm gả đi tính chuyện gì xảy ra vậy, rõ ràng khi dễ người cái đó!"
+
+Candidate 9 (Keywords: treo đầu dê bán thịt chó):
+  - Original: "“Tốt một cái treo đầu dê bán thịt chó, việc này, ngươi Liễu gia cần cho Triệu Gia một cái công đạo.”"
+  - Cleaned:  "“Tốt một cái treo đầu dê bán thịt chó, việc này, ngươi Liễu gia cần cho Triệu Gia một cái công đạo.”"
+
+Candidate 10 (Keywords: hồn nhiên thiên thành):
+  - Original: "Liễu gia phủ đệ lại ra người, nhưng cũng không phải là Liễu Thương Không, mà là một cái đạo cô, tay cầm phất trần, tay áo nhẹ nhàng, có như vậy một loại xuất trần khí bao hàm, hồn nhiên thiên thành(tự nhiên hình thành chỉnh thể) , hoảng giống như trong tranh đi ra Tiên Nhân."
+  - Cleaned:  "Liễu gia phủ đệ lại ra người, nhưng cũng không phải là Liễu Thương Không, mà là một cái đạo cô, tay cầm phất trần, tay áo nhẹ nhàng, có như vậy một loại xuất trần khí bao hàm, hồn nhiên thiên thành(tự nhiên hình thành chỉnh thể) , hoảng giống như trong tranh đi ra Tiên Nhân."
+
+Candidate 11 (Keywords: không kiêng nể gì cả):
+  - Original: "“Khó trách, khó trách Liễu gia như vậy không kiêng nể gì cả, nguyên là có Thiên Tông chỗ dựa.”"
+  - Cleaned:  "“Khó trách, khó trách Liễu gia như vậy không kiêng nể gì cả, nguyên là có Thiên Tông chỗ dựa.”"
+
+Candidate 12 (Keywords: nhượng):
+  - Original: "Đúng là, nàng cái này âm thanh sư tôn, nhượng người Triệu gia tập thể nhíu mày."
+  - Cleaned:  "Đúng là, nàng cái này âm thanh sư tôn, nhượng người Triệu gia tập thể nhíu mày."
+
+Candidate 13 (Keywords: chúng nhân):
+  - Original: "Đạo cô nhạt đạo, một câu cô quạnh mà uy nghiêm, nàng thậm chí cũng không nhìn Triệu Vân liếc mắt một cái, đối với Triệu Gia Chúng nhân cũng đồng dạng không nhìn, đứng ở cuối bậc thang, giống như thế gian Chúa Tể, chân chính coi trời bằng vung."
+  - Cleaned:  "Đạo cô nhạt đạo, một câu cô quạnh mà uy nghiêm, nàng thậm chí cũng không nhìn Triệu Vân liếc mắt một cái, đối với Triệu Gia Chúng nhân cũng đồng dạng không nhìn, đứng ở cuối bậc thang, giống như thế gian Chúa Tể, chân chính coi trời bằng vung."
+
+Candidate 14 (Keywords: thưởng cùng):
+  - Original: "Dứt lời, nàng nhẹ phẩy ống tay áo, một phương hộp báu bay ra, treo ở giữa không trung, lời nói sắc Vô Tình cảm giác giống như lãnh đạm, “Đây chính là Luyện Tâm đan, thưởng cùng Triệu Gia rồi, về phần ngươi hai nhà sự tình, đến đây thôi.”"
+  - Cleaned:  "Dứt lời, nàng nhẹ phẩy ống tay áo, một phương hộp báu bay ra, treo ở giữa không trung, lời nói sắc Vô Tình cảm giác giống như lãnh đạm, “Đây chính là Luyện Tâm đan, thưởng cùng Triệu Gia rồi, về phần ngươi hai nhà sự tình, đến đây thôi.”"
+
+Candidate 15 (Keywords: nhượng):
+  - Original: "Thảng có một ngày, hắn trở lại võ tu, tối nay sỉ nhục, định nhượng Liễu gia gấp trăm lần hoàn lại."
+  - Cleaned:  "Thảng có một ngày, hắn trở lại võ tu, tối nay sỉ nhục, định nhượng Liễu gia gấp trăm lần hoàn lại."
+
+Candidate 16 (Keywords: vẫn là):
+  - Original: "Đường hạ Triệu Vân như một tòa khắc đá pho tượng, lẳng lặng đứng lặng, có từng sợi thất lạc lộn xộn trường phát, che hắn hé mở khuôn mặt, giữa ngón tay chảy tràn huyết, so với hắn chú rể quần áo vẫn là đỏ tươi chói mắt."
+  - Cleaned:  "Đường hạ Triệu Vân như một tòa khắc đá pho tượng, lặng lẽ đứng đó, có từng sợi thất lạc lộn xộn trường phát, che hắn hé mở khuôn mặt, giữa ngón tay máu chảy ròng ròng, so với hắn áo chú rể vẫn là đỏ tươi chói mắt."
+
+Candidate 17 (Keywords: nhượng):
+  - Original: "“Là hài nhi, nhượng Triệu Gia hổ thẹn rồi.”"
+  - Cleaned:  "“Là hài nhi, nhượng Triệu Gia hổ thẹn rồi.”"
+
+Candidate 18 (Keywords: nhượng, nhà mình nhi):
+  - Original: "“Như vậy vội vã, nhượng nhà mình nhi thượng vị sao” Triệu Uyên hừ lạnh một tiếng."
+  - Cleaned:  "“Như vậy vội vã, nhượng nhà mình nhi thượng vị sao” Triệu Uyên hừ lạnh một tiếng."
+
+Candidate 19 (Keywords: phế vật này nhi):
+  - Original: "“Chẳng lẽ lại, còn muốn đem Triệu Gia, giao cho ngươi phế vật này nhi” Đại trưởng lão đột nhiên một tiếng hét to, rất nhiều tộc lão, cũng đều tàn khốc gia tăng, mũi nhọn đều chỉ Triệu Uyên, rất có bức vua thoái vị tư thế."
+  - Cleaned:  "“Chẳng lẽ lại, còn muốn đem Triệu Gia, giao cho ngươi phế vật này nhi” Đại trưởng lão đột nhiên một tiếng hét to, rất nhiều tộc lão, cũng đều tàn khốc gia tăng, mũi nhọn đều chỉ Triệu Uyên, rất có bức vua thoái vị tư thế."
+
+Candidate 20 (Keywords: nhượng):
+  - Original: "“Ta nguyện nhượng ra Thiếu chủ vị.”"
+  - Cleaned:  "“Ta nguyện nhượng ra Thiếu chủ vị.”"
+
+Candidate 21 (Keywords: nhượng):
+  - Original: "Một cái Đại trưởng lão, một cái gia chủ, đối chọi gay gắt, nhượng vốn là bầu không khí áp lực, chính muốn ngưng kết."
+  - Cleaned:  "Một cái Đại trưởng lão, một cái gia chủ, đối đầu gay gắt, nhượng vốn là bầu không khí áp lực, chính muốn ngưng kết."
+
+Candidate 22 (Keywords: vẫn là, đốn, ném qua nhân, giết đi qua):
+  - Original: "Thấy chi, trong đám trưởng lão sắc mặt đốn xanh mét, lại nghĩ tới Triệu Gia sỉ nhục, đã bao nhiêu năm, vẫn là chưa bao giờ như vậy ném qua nhân, nếu không phải tình cảnh không đúng lúc, chắc chắn giết đi qua, một chưởng bổ Liễu Như Tâm."
+  - Cleaned:  "Thấy chi, trong đám trưởng lão sắc mặt đốn xanh mét, lại nghĩ tới Triệu Gia sỉ nhục, đã bao nhiêu năm, vẫn là chưa bao giờ như vậy ném qua nhân, nếu không phải tình cảnh không đúng lúc, chắc chắn giết đi qua, một chưởng bổ Liễu Như Tâm."
+
+Candidate 23 (Keywords: chìm vào, cứ thế):
+  - Original: "Triệu Vân không nói, chậm rãi đứng dậy, lôi kéo Liễu Như Tâm ra đại đường, có lẽ đi quá nhanh, cứ thế Liễu Như Tâm không có đuổi theo, mấy lần đều nguy hiểm chìm vào, bàn tay nhỏ bé bị cầm đau nhức, rồi lại sợ hãi không dám ngôn ngữ."
+  - Cleaned:  "Triệu Vân không nói, chậm rãi đứng dậy, lôi kéo Liễu Như Tâm ra đại đường, có lẽ đi quá nhanh, cứ thế Liễu Như Tâm không có đuổi theo, mấy lần đều nguy hiểm chìm vào, bàn tay nhỏ bé bị cầm đau nhức, rồi lại sợ hãi không dám lên tiếng."
+
+Candidate 24 (Keywords: thút thít nỉ non):
+  - Original: "Trong bóng tối, quá gần thút thít nỉ non cầu khẩn, hô tê tâm liệt phế."
+  - Cleaned:  "Trong bóng tối, quá gần thút thít nỉ non cầu khẩn, hô đau đớn xé lòng."
+
+Candidate 25 (Keywords: co rúc ở chân tường):
+  - Original: "Ngoài cửa, Liễu Như Tâm co rúc ở chân tường, ôm hai đầu gối, lạnh run, như nhất tên ăn mày."
+  - Cleaned:  "Ngoài cửa, Liễu Như Tâm co rúc ở chân tường, ôm hai đầu gối, lạnh run, như nhất tên ăn mày."
+
+Candidate 26 (Keywords: vẫn là):
+  - Original: "Nhưng mà, còn là xem thường Liễu Như Nguyệt, không ngừng đùa bỡn âm mưu, vẫn là chọc ghẹo thân tình, dùng cực kỳ dơ bẩn thủ đoạn, đem muội muội của mình, biến thành trận này âm mưu vật hi sinh cùng vật bồi táng."
+  - Cleaned:  "Nhưng mà, còn là xem thường Liễu Như Nguyệt, không ngừng đùa bỡn âm mưu, vẫn là chọc ghẹo thân tình, dùng cực kỳ dơ bẩn thủ đoạn, đem muội muội của mình, biến thành trận này âm mưu vật hi sinh cùng vật bồi táng."
+
+Candidate 27 (Keywords: chìm vào, dò mà đến, sờ đến Triệu Vân thân thể):
+  - Original: "Thật lâu không nghe được tiếng vang, xác định Triệu Vân đã chìm vào giấc ngủ, nàng lúc này mới xuống giường, trong bóng đêm dò mà đến, cái kia mỗi một bước, đều đi cẩn thận từng li từng tí, cho đến sờ đến Triệu Vân thân thể mới dừng lại."
+  - Cleaned:  "Thật lâu không nghe được tiếng vang, xác định Triệu Vân đã chìm vào giấc ngủ, nàng lúc ấy mới xuống giường, trong bóng đêm dò mà đến, cái kia mỗi một bước, đều đi cẩn thận từng li từng tí, cho đến sờ đến Triệu Vân thân thể mới dừng lại."
+
+Candidate 28 (Keywords: lấy xuống cái cổ treo):
+  - Original: "Nói qua, nàng lấy xuống cái cổ treo một cái sợi dây chuyền, hình trăng lưỡi liềm sợi dây chuyền."
+  - Cleaned:  "Nói qua, nàng lấy xuống cái cổ treo một cái sợi dây chuyền, hình trăng lưỡi liềm sợi dây chuyền."
+
+Candidate 29 (Keywords: lập loè vầng sáng):
+  - Original: "Có thể mù nàng, cũng không phát hiện, nguyên nhân nàng cửu thế chúc phúc, cái kia sợi dây chuyền lại lập loè vầng sáng."
+  - Cleaned:  "Có thể mù nàng, cũng không phát hiện, nguyên nhân nàng cửu thế chúc phúc, cái kia sợi dây chuyền lại lập loè vầng sáng."
+
+Candidate 30 (Keywords: tâm thần phiêu hốt):
+  - Original: "Nhìn một chút, hắn chỉ cảm thấy tâm thần phiêu hốt, vốn không vây khốn, rồi lại hỗn loạn đi ngủ."
+  - Cleaned:  "Nhìn một chút, hắn chỉ cảm thấy tâm thần phiêu hốt, vốn không vây khốn, rồi lại hỗn loạn đi ngủ."

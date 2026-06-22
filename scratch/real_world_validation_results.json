@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "totalChapters": 11,
+    "totalSentences": 686,
+    "totalFlagged": 29,
+    "totalEdited": 29,
+    "totalPatched": 29
+  },
+  "remainingErrorsCount": 7,
+  "remainingErrors": [
+    {
+      "file": "chapter_0.json",
+      "sentence": "Siêu Cấp Thần Tướng Chương 1: Thanh khí chủ tật ách\r \r \"Đầu thật là đau, này, đây là đâu ?\"",
+      "matched": [
+        "thanh khí chủ tật ách"
+      ]
+    },
+    {
+      "file": "chapter_0.json",
+      "sentence": "Loại cảm giác này đừng nhắc tới có bao nhiêu khó khăn chịu, hơn nữa những thứ này còn có một thống nhất tên, « Hoàng Cực Kinh Thế » một trăm lẻ tám quyển, mỗi một quyển lại có đơn độc tên.\r \r \"",
+      "matched": [
+        "nhất tên"
+      ]
+    },
+    {
+      "file": "chapter_1.json",
+      "sentence": "Điều này cũng khiến cậu nhận ra rằng, dù có khả năng xem tướng cũng không phải là không gì không thể, ít nhất thì qua gương mặt và tướng tay cũng không nhìn ra được bệnh tình cụ thể.",
+      "matched": [
+        "không nhìn"
+      ]
+    },
+    {
+      "file": "chapter_2.json",
+      "sentence": "Tôn lão bản ngồi thẳng người, đối với Vương Dương gọi cũng có thay đổi, nói rõ hắn ở một mức độ nào đó đã công nhận Vương Dương.\r \r \"",
+      "matched": [
+        "ngồi thẳng"
+      ]
+    },
+    {
+      "file": "chapter_2.json",
+      "sentence": "Tôn lão bản chân mày ngưng kết chặt hơn, nhanh chóng hỏi, trong thanh âm cũng mang theo một tia ác liệt, Vương Dương đối với Tôn lão bản thái độ cũng không hề để ý, tiếp tục nói: \"Độc gì ta cũng không nhìn ra, nhưng Tôn lão bản tuyệt đối đã trúng độc, hơn nữa trúng độc rất nặng, Tôn lão bản ngài là ta ân nhân cứu mạng, ta sẽ không lừa gạt ngài!\"\r \r \"",
+      "matched": [
+        "không nhìn"
+      ]
+    },
+    {
+      "file": "chapter_3.json",
+      "sentence": "Tôn lão bản còn nói cho Vương Dương, Hạ Bình làm một tay tốt canh, mùi vị vô cùng tươi đẹp, cơ bản mỗi ngày đều làm, hắn cũng mỗi ngày đều uống, những thứ kia canh uống sau đó tinh thần hắn sẽ rất được, bởi vì này hắn còn cố ý thưởng cho Hạ Bình một chiếc xe thể thao, tán dương nàng thủ nghệ.",
+      "matched": [
+        " thưởng cho "
+      ]
+    },
+    {
+      "file": "chapter_4.json",
+      "sentence": "Vương Dương lại hỏi câu, phòng bếp tường gạch đều là mới, có thể thấy được không xây bao lâu, nhưng thời gian cụ thể cũng không nhìn ra, biết phòng bếp xây tốt thời gian, Vương Dương mới có thể có tốt hơn phán đoán.\r \r \"",
+      "matched": [
+        "không nhìn"
+      ]
+    }
+  ]
+}

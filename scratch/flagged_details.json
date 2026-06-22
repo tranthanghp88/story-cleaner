@@ -1,0 +1,572 @@
+{
+  "total": 138,
+  "flaggedCount": 11,
+  "preservedCount": 127,
+  "flaggedList": [
+    {
+      "id": 19,
+      "text": "Không phải Triệu Gia Thiếu chủ sao ”",
+      "pattern": "thiếu chủ"
+    },
+    {
+      "id": 26,
+      "text": "Có thể, tại xốc lên hồng khăn cô dâu cái kia phút chốc, hắn liền minh bạch, chỉ không muốn thừa nhận mà thôi.",
+      "pattern": "minh bạch"
+    },
+    {
+      "id": 27,
+      "text": "Hắn, Triệu Vân, Triệu Gia Thiếu chủ, ngày xưa võ đạo kỳ tài, hôm nay tịch đoạn mạch phế thể.",
+      "pattern": "thiếu chủ"
+    },
+    {
+      "id": 41,
+      "text": "Đang khi nói chuyện, hắn đã tới Liễu gia phủ đệ trước.",
+      "pattern": "nói chuyện"
+    },
+    {
+      "id": 52,
+      "text": "Liễu Như Nguyệt nhẹ môi hé mở, thần tình đạm mạc như băng, đứng thẳng cuối bậc thang, như vân đoan Tiên Tử, độc hữu một phần hơi lạnh cùng cao ngạo, “Duyên phận đã hết, cần gì phải cưỡng cầu, ngươi nên minh bạch, ta và ngươi, sớm đã không phải nhất cái thế giới người.”",
+      "pattern": "minh bạch"
+    },
+    {
+      "id": 53,
+      "text": "“Minh bạch, ta sớm nên minh bạch.”",
+      "pattern": "minh bạch"
+    },
+    {
+      "id": 55,
+      "text": "“Gả liền gả cho, hảo hảo đối đãi muội muội ta.”",
+      "pattern": "hảo hảo"
+    },
+    {
+      "id": 57,
+      "text": "“Gả liền gả cho, hảo hảo đối đãi muội muội ta.”",
+      "pattern": "hảo hảo"
+    },
+    {
+      "id": 70,
+      "text": "Liễu gia gia chủ đến thời khắc này đều còn chưa thấy đi ra, rất hiển nhiên, trước đó cũng biết việc này, âm mưu, đây là âm mưu, đóng lại hỏa đùa giỡn Triệu Gia.”",
+      "pattern": "gia chủ"
+    },
+    {
+      "id": 85,
+      "text": "Triệu Gia người đến, cầm đầu chính là Triệu Vân phụ thân, Triệu Gia gia chủ đương thời Triệu Uyên, biết được Triệu Vân chạy đến, mà lại tay cầm sát kiếm, lúc này mới đi phòng tân hôn xem qua, gặp tân nương là Liễu Như Tâm, bừng bừng tức giận.",
+      "pattern": "gia chủ"
+    },
+    {
+      "id": 92,
+      "text": "“Nhưng không biết, Triệu gia tộc trưởng muốn gì bàn giao.”",
+      "pattern": "tộc trưởng"
+    }
+  ],
+  "unflaggedList": [
+    {
+      "id": 1,
+      "text": "Triệu Vân ngây ngốc đứng lặng, kinh ngạc nhìn xem mặc áo cưới Liễu Như Tâm."
+    },
+    {
+      "id": 2,
+      "text": "Động phòng hoa chúc, hắn ngày đại hỉ."
+    },
+    {
+      "id": 3,
+      "text": "Như vậy, cái này bị xốc hồng khăn cô dâu nữ tử, không phải của hắn tân nương."
+    },
+    {
+      "id": 4,
+      "text": "Liễu Như Tâm chui tròng mắt, thân thể lạnh run, nàng con mắt mặc dù thanh tịnh, rồi lại chất phác trống rỗng."
+    },
+    {
+      "id": 5,
+      "text": "Hoặc là nói, nàng là một cái mù lòa, mắt mù tân nương."
+    },
+    {
+      "id": 6,
+      "text": "“Vì sao là ngươi.”"
+    },
+    {
+      "id": 7,
+      "text": "Triệu Vân lạnh lùng nói."
+    },
+    {
+      "id": 8,
+      "text": "“Ngươi là."
+    },
+    {
+      "id": 9,
+      "text": "Triệu Vân ”"
+    },
+    {
+      "id": 10,
+      "text": "“Hồi đáp vấn đề của ta, vì sao là ngươi, chị của ngươi đâu Liễu Như Nguyệt đâu” Triệu Vân tiếng gầm khàn giọng, trong mắt đã thấy tơ máu."
+    },
+    {
+      "id": 11,
+      "text": "“Là tỷ ta, để cho ta thay nàng đến đấy.”"
+    },
+    {
+      "id": 12,
+      "text": "Liễu Như Tâm sợ hãi, trong mắt nước mắt."
+    },
+    {
+      "id": 13,
+      "text": "“Nực cười.”"
+    },
+    {
+      "id": 14,
+      "text": "Triệu Vân lật bàn, rút treo kiếm, giống như nổi điên chạy ra khỏi phòng tân hôn."
+    },
+    {
+      "id": 15,
+      "text": "Vong Cổ Thành đêm, có phần là phồn hoa, đại đèn lồng màu đỏ treo trên cao, kiều diễm như hoa, trên đường người đi đường hối hả, không thiếu giang hồ làm xiếc, thôn dầu thổ hỏa, múa thương chuẩn bị bổng, khen ngợi âm thanh liên tiếp."
+    },
+    {
+      "id": 16,
+      "text": "Như vậy, phần này phồn hoa, rồi lại nguyên nhân một người đi qua, lại thêm một vòng tiếng động lớn náo."
+    },
+    {
+      "id": 17,
+      "text": "Chính là Triệu Vân, thân mặc chú rể quần áo, tay cầm hàn quang kiếm, tại trên đường đặc biệt bắt mắt."
+    },
+    {
+      "id": 18,
+      "text": "“Cái này."
+    },
+    {
+      "id": 20,
+      "text": "“Liễu gia đại tiểu thư hạng gì thiên phú, lại vẫn chịu gả hắn cái này người vô dụng.”"
+    },
+    {
+      "id": 21,
+      "text": "“Thật không biết kiếp trước tu nhiều ít phú đức.”"
+    },
+    {
+      "id": 22,
+      "text": "“Ngày đại hỉ, không ở phòng tân hôn cùng Liễu Như Nguyệt chàng chàng thiếp thiếp, chạy ngoài lên làm chi.”"
+    },
+    {
+      "id": 23,
+      "text": "“Như vậy trọng sát khí, ai chọc hắn.”"
+    },
+    {
+      "id": 24,
+      "text": "Trên đường người đi đường ngươi đẩy ta táng, chỉ trỏ, xì xào bàn tán trong rất nhiều tiếc hận, trào phúng, nghi hoặc."
+    },
+    {
+      "id": 25,
+      "text": "Phía trước, Triệu Vân sát khí quấn thân, khuôn mặt tái nhợt vẫn là mang mấy phần dữ tợn."
+    },
+    {
+      "id": 28,
+      "text": "Nàng, Liễu Như Nguyệt, Liễu gia đại tiểu thư, gia tộc hòn ngọc quý trên tay, Vong Cổ Thành thiên chi kiều nữ."
+    },
+    {
+      "id": 29,
+      "text": "Bọn họ, từ nhỏ thanh mai trúc mã, chính là Vong Cổ Thành công nhận Kim Đồng Ngọc Nữ."
+    },
+    {
+      "id": 30,
+      "text": "Nguyên nhân chính là như thế, môn đăng hộ đối Triệu liễu hai nhà, mới vì hai người đính hôn ước hẹn, làm gì mệnh hắn đồ đa suyễn, rèn luyện lúc bị người ám toán, Triệu Gia hết sức cứu giúp, mặc dù nhặt được tính mạng, rồi lại chặt đứt Linh Mạch."
+    },
+    {
+      "id": 31,
+      "text": "Từ ngày đó, hắn không còn là thiên tài."
+    },
+    {
+      "id": 32,
+      "text": "Không người lại nhìn tốt bọn họ, liền chính hắn đều như vậy cho rằng, ai muốn gả cho một cái phế vật."
+    },
+    {
+      "id": 33,
+      "text": "Ngoài ý muốn chính là, Liễu Như Nguyệt lại thực hiện hôn ước."
+    },
+    {
+      "id": 34,
+      "text": "Nhưng, cho đến tối nay hắn phương mới tỉnh ngộ, cái gọi là hôn ước, chính là một cái thiên đại chê cười."
+    },
+    {
+      "id": 35,
+      "text": "Bị yêu người ghét bỏ, hắn cũng không phẫn nộ."
+    },
+    {
+      "id": 36,
+      "text": "Hắn hận chính là, trên danh nghĩa thực hiện hôn ước Liễu Như Nguyệt, lại lén lút đùa giỡn âm mưu:"
+    },
+    {
+      "id": 37,
+      "text": "Bản thân không lấy chồng, lại đem muội muội đẩy đi tới."
+    },
+    {
+      "id": 38,
+      "text": "Một hồi treo đầu dê bán thịt chó hôn lễ, sẽ để cho Triệu Gia cũng như cái kia giống như, thành Vong Cổ Thành lớn nhất trò cười."
+    },
+    {
+      "id": 39,
+      "text": "Càng nực cười chính là."
+    },
+    {
+      "id": 40,
+      "text": "Từ đầu đến cuối, hắn Triệu Gia đều mơ mơ màng màng, bị nàng một người đùa giỡn xoay quanh."
+    },
+    {
+      "id": 42,
+      "text": "Không chờ đứng lại, chính là một tiếng phát ra từ Linh Hồn gào thét, “Liễu Như Nguyệt, lăn ra đây.”"
+    },
+    {
+      "id": 43,
+      "text": "Nghe vậy, phố người tập thể vò đầu."
+    },
+    {
+      "id": 44,
+      "text": "Ta không nghe lầm chứ!"
+    },
+    {
+      "id": 45,
+      "text": "Liễu Như Nguyệt nàng không phải đã đến Triệu Gia"
+    },
+    {
+      "id": 46,
+      "text": "Kế tiếp một màn, nhượng thế nhân càng kinh ngạc."
+    },
+    {
+      "id": 47,
+      "text": "Nhưng thấy Liễu gia trong phủ đệ, một đạo bóng hình xinh đẹp nhanh nhẹn đi ra, tay áo tung bay, không nhiễm hạt bụi nhỏ."
+    },
+    {
+      "id": 48,
+      "text": "Nàng, chính là Vong Cổ Thành thiên chi kiều nữ, Liễu Như Tâm thân tỷ tỷ: Liễu Như Nguyệt."
+    },
+    {
+      "id": 49,
+      "text": "“Tại Liễu đại tiểu thư trong mắt, phế vật cùng mù lòa, có hay không cực kỳ xứng.”"
+    },
+    {
+      "id": 50,
+      "text": "Triệu Vân một câu bình thản, khàn khàn không chịu nổi."
+    },
+    {
+      "id": 51,
+      "text": "“Ngươi hầm hầm giận dữ, là phẫn nộ, còn là không cam lòng.”"
+    },
+    {
+      "id": 54,
+      "text": "Triệu Vân cầm theo sát kiếm, từng bước một bước lên bậc thang, thâm thúy con mắt, bị từng cái tơ máu, sanh sanh nhuộm thành màu đỏ tươi, “Ta có từng bức ngươi gả ta, không muốn gả có thể nói thẳng, tuyệt không dây dưa, vì sao phải dùng bực này phương pháp, đùa giỡn ta Triệu Gia, chà đạp ta Triệu Gia tôn nghiêm.”"
+    },
+    {
+      "id": 56,
+      "text": "Liễu Như Nguyệt thản nhiên nói."
+    },
+    {
+      "id": 58,
+      "text": "Triệu Vân nở nụ cười, từng bước một bước lên bậc thang, từng chữ tái diễn Liễu Như Nguyệt mà nói, trong tiếng cười không biết là bi thương còn là phẫn, “Tốt một người muội muội, tốt một cái gả liền gả cho, Liễu Như Nguyệt, ngươi chưa phát giác ra lần này từ trong miệng ngươi nói ra, rất đúng nực cười bị ngươi đẩy lên kiệu hoa Liễu Như Tâm, đến hồng khăn cô dâu xốc lên, nàng cũng không biết bản thân gả chính là ai, tại trong mắt ngươi, nàng chỉ là cái đồ chơi, không đem nàng làm muội muội xem, cần gì phải lấy thân phận của tỷ tỷ chỉ điểm giang sơn, nói như thế mây trôi nước chảy, nói như vậy ra vẻ đạo mạo, hôm nay ngươi, quả thực làm người ta lau mắt mà nhìn.”"
+    },
+    {
+      "id": 59,
+      "text": "“Việc đã đến nước này, ngươi muốn như thế nào.”"
+    },
+    {
+      "id": 60,
+      "text": "Liễu Như Nguyệt ngữ khí rất đúng hơi lạnh, ."
+    },
+    {
+      "id": 61,
+      "text": "“Ta muốn giết ngươi rồi.”"
+    },
+    {
+      "id": 62,
+      "text": "Triệu Vân gào thét, một bước bước lên cuối cùng một tầng bậc thang, vung kiếm liền trảm."
+    },
+    {
+      "id": 63,
+      "text": "Liễu Như Nguyệt lông mày hơi tần, rồi lại sừng sững không động, chỉ thấy cái kia bên ngoài thân, phủ một tầng tử sắc vầng sáng."
+    },
+    {
+      "id": 64,
+      "text": "Bang!"
+    },
+    {
+      "id": 65,
+      "text": "Âm vang âm thanh nhất thời, Triệu Vân một kiếm, giống như bổ vào sắt đá trên, lau ra sáng như tuyết tia lửa, không thương tổn được Liễu Như Nguyệt, bị phản đánh bay ra ngoài, chờ rơi xuống đất, kiếm trong tay từng khúc đứt gãy, máu tươi cuồng bắn ra."
+    },
+    {
+      "id": 66,
+      "text": "“Không còn Linh Mạch, Triệu Vân cái này não dưa, cũng không thế nào Linh quang rồi.”"
+    },
+    {
+      "id": 67,
+      "text": "“Liễu Như Nguyệt thế nhưng võ tu, hàng thật giá thật Chân Linh cảnh, một kẻ phế thể có thể không gây thương tổn nàng.”"
+    },
+    {
+      "id": 68,
+      "text": "“Thật làm cho người cảm khái, ngày xưa Kim Đồng Ngọc Nữ, lại rơi vào tình cảnh như vậy.”"
+    },
+    {
+      "id": 69,
+      "text": "“Là hắn Triệu Vân không biết lượng sức, đã thành người vô dụng, vẫn là vọng tưởng con cóc ăn thịt thiên nga, chỉ là, Liễu Như Nguyệt làm được quả thực quá mức, hôn ước là nàng, không muốn gả liền không lấy chồng, đem Liễu Như Tâm gả đi tính chuyện gì xảy ra vậy, rõ ràng khi dễ người cái đó!"
+    },
+    {
+      "id": 71,
+      "text": "“Cái này xứng đôi, phế vật cùng mù lòa, có thể nói trời đất tạo nên.”"
+    },
+    {
+      "id": 72,
+      "text": "Tiếng ồn ào ở bên trong, Triệu Vân lảo đảo đứng dậy, đứng cũng không vững, nhìn qua Liễu Như Nguyệt con mắt đều mơ hồ."
+    },
+    {
+      "id": 73,
+      "text": "Nàng là như vậy cao cao tại thượng."
+    },
+    {
+      "id": 74,
+      "text": "Nàng toàn thân tràn đầy tử sắc vầng sáng, tại dưới ánh trăng lại là bực nào chói mắt."
+    },
+    {
+      "id": 75,
+      "text": "Đó là Chân Nguyên, võ tu hộ thể Chân Nguyên."
+    },
+    {
+      "id": 76,
+      "text": "Đây là một cái kỳ dị thế giới, phàm Tiên Thiên Khai Linh mạch giả, đều tu võ đạo, là võ tu."
+    },
+    {
+      "id": 77,
+      "text": "Võ tu khác hẳn với thường nhân:"
+    },
+    {
+      "id": 78,
+      "text": "Có thể thu thập linh khí của thiên địa, lấy ngày Nguyệt Chi Tinh Hoa, lại phối hợp võ đạo công pháp, là được tôi thành hộ thể Chân Nguyên, thân người chi tất cả xương cốt tứ chi, lục phủ ngũ tạng, kỳ kinh bát mạch, đều chịu cái kia lợi ích."
+    },
+    {
+      "id": 79,
+      "text": "Quanh năm suốt tháng tư dưỡng, sớm đã siêu thoát người bình thường Phạm Trù."
+    },
+    {
+      "id": 80,
+      "text": "Võ đạo Ngũ Cảnh: Ngưng nguyên, Chân Linh, Huyền Dương, Địa Tàng, Thiên Võ, nhất cảnh nhất thiên địa."
+    },
+    {
+      "id": 81,
+      "text": "Mà Liễu Như Nguyệt, liền vị trí Chân Linh, há lại hắn cái này phế thể khả năng thương được."
+    },
+    {
+      "id": 82,
+      "text": "“Liễu gia, khinh người quá đáng.”"
+    },
+    {
+      "id": 83,
+      "text": "Không đợi Triệu Vân nói, liền nghe một tiếng gầm lên từ đầu đường truyền đến."
+    },
+    {
+      "id": 84,
+      "text": "Lời nói chưa dứt, đại đội nhân mã tựa như tật phong tới."
+    },
+    {
+      "id": 86,
+      "text": "Lấy chính là Liễu Như Nguyệt, gả nhưng là Liễu Như Tâm."
+    },
+    {
+      "id": 87,
+      "text": "Nhục nhã, trần trụi trắng trợn nhục nhã."
+    },
+    {
+      "id": 88,
+      "text": "Thấy là Triệu Uyên, Liễu Như Nguyệt tự tin cảm thấy chưa đủ, chung quy, nàng là cái này âm mưu người vạch ra."
+    },
+    {
+      "id": 89,
+      "text": "“Liễu Thương Không, lăn ra đây.”"
+    },
+    {
+      "id": 90,
+      "text": "Triệu Uyên khàn giọng giận dữ mắng mỏ."
+    },
+    {
+      "id": 91,
+      "text": "“Tốt một cái treo đầu dê bán thịt chó, việc này, ngươi Liễu gia cần cho Triệu Gia một cái công đạo.”"
+    },
+    {
+      "id": 93,
+      "text": "Đạm mạc lời nói, đột nhiên vang lên."
+    },
+    {
+      "id": 94,
+      "text": "Liễu gia phủ đệ lại ra người, nhưng cũng không phải là Liễu Thương Không, mà là một cái đạo cô, tay cầm phất trần, tay áo nhẹ nhàng, có như vậy một loại xuất trần khí bao hàm, hồn nhiên thiên thành(tự nhiên hình thành chỉnh thể) , hoảng giống như trong tranh đi ra Tiên Nhân."
+    },
+    {
+      "id": 95,
+      "text": "“Thiên Tông.”"
+    },
+    {
+      "id": 96,
+      "text": "Triệu Uyên hai mắt mãnh liệt híp lại."
+    },
+    {
+      "id": 97,
+      "text": "Hắn không nhận biết đạo cô, lại nhận được đạo cô trên áo khắc hoạ hỏa vân ấn ký, như một đóa thật sự hỏa diễm."
+    },
+    {
+      "id": 98,
+      "text": "Đó là một loại ký hiệu, Thiên Tông ký hiệu."
+    },
+    {
+      "id": 99,
+      "text": "Cái này mảnh thổ địa, là do Đại Hạ Long Triều thống trị, ở đây bất kỳ một cái nào, đều Long Triều con dân."
+    },
+    {
+      "id": 100,
+      "text": "Mà Thiên Tông, chính là bảo hộ Đại Hạ Long Triều mà sinh."
+    },
+    {
+      "id": 101,
+      "text": "Hắn, chính là Long Triều cảnh nội duy nhất môn phái, từng cái thân phận cao quý, vị cùng Hoàng tộc."
+    },
+    {
+      "id": 102,
+      "text": "“Lại."
+    },
+    {
+      "id": 103,
+      "text": "Đúng là Thiên Tông người.”"
+    },
+    {
+      "id": 104,
+      "text": "Bốn phương phố người kinh hô, liền ngữ khí đều là run rẩy đấy."
+    },
+    {
+      "id": 105,
+      "text": "Thiên Tông người rất thần bí, gần như không trên thế gian hành tẩu, nhưng một khi xuất hiện, tất chấn bốn phương."
+    },
+    {
+      "id": 106,
+      "text": "Đến nay nhìn thấy, quả thật vô thượng vinh hạnh."
+    },
+    {
+      "id": 107,
+      "text": "“Từ Liễu gia đi ra, chẳng lẽ lại đạo này cô, là Liễu gia thượng khách ”"
+    },
+    {
+      "id": 108,
+      "text": "Phố người âm thầm phỏng đoán."
+    },
+    {
+      "id": 109,
+      "text": "“Khó trách, khó trách Liễu gia như vậy không kiêng nể gì cả, nguyên là có Thiên Tông chỗ dựa.”"
+    },
+    {
+      "id": 110,
+      "text": "“Gặp qua sư phó.”"
+    },
+    {
+      "id": 111,
+      "text": "Vạn chúng nhìn chăm chú hạ Liễu Như Nguyệt hơi nghiêng thân, đối với đạo cô được rồi lễ, nàng cái này thi lễ, không ngừng lấy bày ra cung kính, còn là làm cho Triệu Gia xem đấy, thi lễ được xong, tự tin có phần đủ, trắng noãn cái cằm giơ lên kỳ cao."
+    },
+    {
+      "id": 112,
+      "text": "Đúng là, nàng cái này âm thanh sư tôn, nhượng người Triệu gia tập thể nhíu mày."
+    },
+    {
+      "id": 113,
+      "text": "Thiên Tông tên tuổi quá lớn, như một tòa tám nghìn trượng cự nhạc, trấn áp tại trong Thiên Địa, Long Triều trăm ngàn năm qua, phàm chọc Thiên Tông giả, không có một cái có kết cục tốt, nhẹ thì mất mạng, nặng thì liên lụy cửu tộc."
+    },
+    {
+      "id": 114,
+      "text": "“Một kẻ phế vật, không xứng với ta đồ nhi.”"
+    },
+    {
+      "id": 115,
+      "text": "Đạo cô nhạt đạo, một câu cô quạnh mà uy nghiêm, nàng thậm chí cũng không nhìn Triệu Vân liếc mắt một cái, đối với Triệu Gia Chúng nhân cũng đồng dạng không nhìn, đứng ở cuối bậc thang, giống như thế gian Chúa Tể, chân chính coi trời bằng vung."
+    },
+    {
+      "id": 116,
+      "text": "Dứt lời, nàng nhẹ phẩy ống tay áo, một phương hộp báu bay ra, treo ở giữa không trung, lời nói sắc Vô Tình cảm giác giống như lãnh đạm, “Đây chính là Luyện Tâm đan, thưởng cùng Triệu Gia rồi, về phần ngươi hai nhà sự tình, đến đây thôi.”"
+    },
+    {
+      "id": 117,
+      "text": "Lần này, cũng không phải là thương lượng, chính là mệnh lệnh."
+    },
+    {
+      "id": 118,
+      "text": "Đan này, thực sự không phải là tiễn đưa, mà là bố thí."
+    },
+    {
+      "id": 119,
+      "text": "Triệu Uyên sắc mặt khó coi lợi hại, trắng bệch đến không có chút máu, cầm kiếm tay cũng nhịn không được run rẩy."
+    },
+    {
+      "id": 120,
+      "text": "Biết rõ là nhục nhã, rồi lại không dám ngôn ngữ."
+    },
+    {
+      "id": 121,
+      "text": "Đó là Thiên Tông, diệt hắn Triệu Gia cần gì nửa nén hương, hắn không sợ chết, có thể Triệu Gia đâu chọc giận tới Thiên Tông, toàn bộ Triệu Gia liền sẽ từ thế gian xoá tên, hắn có gì thể diện, đi gặp dưới cửu tuyền liệt tổ liệt tông."
+    },
+    {
+      "id": 122,
+      "text": "Triệu Vân cũng run rẩy đến không được, quyền chỉ đang lúc tràn đầy chảy tràn máu tươi."
+    },
+    {
+      "id": 123,
+      "text": "Đạo cô mà nói, chữ chữ như cương châm, nhất căn tiếp nhất căn đính tại linh hồn của hắn lên."
+    },
+    {
+      "id": 124,
+      "text": "“Đi.”"
+    },
+    {
+      "id": 125,
+      "text": "Triệu Uyên hất lên ống tay áo, thông suốt vòng thân, về phần cái kia Luyện Tâm đan, tự sẽ không đi cầm, nếu là cầm, hắn Triệu Gia liền cuối cùng một tia tôn nghiêm, cũng sẽ không còn sót lại chút gì, này một ít huyết tính nhất định có."
+    },
+    {
+      "id": 126,
+      "text": "Triệu Vân cũng vòng thân."
+    },
+    {
+      "id": 127,
+      "text": "Trước khi đi, hắn ngoái đầu nhìn lại nhìn một cái Liễu Như Nguyệt, con ngươi vẫn như cũ mang huyết sắc, có thể thần tình không thích cũng không lo, không nộ cũng không hận, như một cái Khôi Lỗi, như một cỗ cái xác không hồn, yên ổn dọa người."
+    },
+    {
+      "id": 128,
+      "text": "Như vậy, bình tĩnh này phía dưới, rồi lại ẩn núp lấy lửa giận ngập trời."
+    },
+    {
+      "id": 129,
+      "text": "Thảng có một ngày, hắn trở lại võ tu, tối nay sỉ nhục, định nhượng Liễu gia gấp trăm lần hoàn lại."
+    },
+    {
+      "id": 130,
+      "text": "“Tốt một hồi vở kịch lớn a!”"
+    },
+    {
+      "id": 131,
+      "text": "“Người cái đó!"
+    },
+    {
+      "id": 132,
+      "text": "Liền có tự mình biết rõ, đoạn mạch còn muốn lấy thiên chi kiều nữ, thực nực cười.”"
+    },
+    {
+      "id": 133,
+      "text": "“Lời tuy nói như vậy, có thể Liễu gia, không khỏi quá phận.”"
+    },
+    {
+      "id": 134,
+      "text": "Tiếng nghị luận lại lên."
+    },
+    {
+      "id": 135,
+      "text": "Phố người đã phân loại hai bên, nên cùng có một loại ăn ý, vì Triệu Gia nhường ra con đường, xì xào bàn tán, chỉ trỏ, như đang nhìn dạo phố phạm nhân, giễu cợt, tiếc hận, trào phúng, đầy đường đều là."
+    },
+    {
+      "id": 136,
+      "text": "Cái này, liền là cường giả vi tôn thế giới, tàn khốc cách sinh tồn."
+    },
+    {
+      "id": 137,
+      "text": "Hắn cường, là được tùy ý chà đạp."
+    },
+    {
+      "id": 138,
+      "text": "Ngươi yếu, liền đáng đời bị khi dễ."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "summary": {
+    "totalSentences": 166,
+    "flaggedSentences": 6,
+    "requestsSent": 1,
+    "responsesReceived": 1,
+    "editedSentences": 1,
+    "patchedSentences": 1,
+    "preservedSentences": 165
+  },
+  "details": [
+    {
+      "sentenceId": 23,
+      "original": "không phải Triệu gia thiếu chủ sao?”",
+      "edited": "không phải Triệu gia thiếu chủ sao?”",
+      "changed": false,
+      "patched": false
+    },
+    {
+      "sentenceId": 31,
+      "original": "Hắn, Triệu Vân, Triệu gia thiếu chủ, ngày xưa là võ đạo kỳ tài, nay lại là phế nhân đoạn mạch.",
+      "edited": "Hắn, Triệu Vân, Triệu gia thiếu chủ, ngày xưa là võ đạo kỳ tài, nay lại là phế nhân đoạn mạch.",
+      "changed": false,
+      "patched": false
+    },
+    {
+      "sentenceId": 46,
+      "original": "Nói chuyện, hắn đã đến phủ Liễu gia.",
+      "edited": "Nói rồi, hắn đã đến phủ Liễu gia.",
+      "changed": true,
+      "patched": true
+    },
+    {
+      "sentenceId": 82,
+      "original": "Liễu gia gia chủ đến giờ vẫn chưa xuất hiện, rõ ràng trước đó cũng biết việc này.",
+      "edited": "Liễu gia gia chủ đến giờ vẫn chưa xuất hiện, rõ ràng trước đó cũng biết việc này.",
+      "changed": false,
+      "patched": false
+    },
+    {
+      "sentenceId": 99,
+      "original": "Triệu gia người đến, dẫn đầu là phụ thân Triệu Vân, đương nhiệm Triệu gia gia chủ Triệu Uyên.",
+      "edited": "Triệu gia người đến, dẫn đầu là phụ thân Triệu Vân, đương nhiệm Triệu gia gia chủ Triệu Uyên.",
+      "changed": false,
+      "patched": false
+    },
+    {
+      "sentenceId": 107,
+      "original": "“Nhưng không biết, tộc trưởng Triệu gia muốn gì bàn giao?”",
+      "edited": "“Nhưng không biết, tộc trưởng Triệu gia muốn gì bàn giao?”",
+      "changed": false,
+      "patched": false
+    }
+  ]
+}

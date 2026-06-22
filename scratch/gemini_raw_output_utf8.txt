@@ -1,0 +1,131 @@
+﻿Trying model: gemini-2.5-flash-lite with key: AIzaSyDPbf...
+Success!
+
+=== GEMINI RESPONSE (Model: gemini-2.5-flash-lite) ===
+[
+  {
+    "sentenceId": 19,
+    "original": "Kh├┤ng phß║úi Triß╗çu Gia Thiß║┐u chß╗º sao ΓÇ¥",
+    "edited": "Kh├┤ng phß║úi Triß╗çu Gia thiß║┐u chß╗º sao?"
+  },
+  {
+    "sentenceId": 26,
+    "original": "C├│ thß╗â, tß║íi xß╗æc l├¬n hß╗ông kh─ân c├┤ d├óu c├íi kia ph├║t chß╗æc, hß║»n liß╗ün minh bß║ích, chß╗ë kh├┤ng muß╗æn thß╗½a nhß║¡n m├á th├┤i.",
+    "edited": "Nh╞░ng v├áo l├║c v├⌐n kh─ân voan c├┤ d├óu kia, hß║»n ─æ├ú hiß╗âu, chß╗ë l├á kh├┤ng muß╗æn thß╗½a nhß║¡n m├á th├┤i."
+  },
+  {
+    "sentenceId": 27,
+    "original": "Hß║»n, Triß╗çu V├ón, Triß╗çu Gia Thiß║┐u chß╗º, ng├áy x╞░a v├╡ ─æß║ío kß╗│ t├ái, h├┤m nay tß╗ïch ─æoß║ín mß║ích phß║┐ thß╗â.",
+    "edited": "Hß║»n, Triß╗çu V├ón, Triß╗çu Gia thiß║┐u chß╗º, tß╗½ng l├á kß╗│ t├ái v├╡ ─æß║ío, nay lß║íi l├á phß║┐ nh├ón ─æoß║ín mß║ích."
+  },
+  {
+    "sentenceId": 41,
+    "original": "─Éang khi n├│i chuyß╗çn, hß║»n ─æ├ú tß╗¢i Liß╗àu gia phß╗º ─æß╗ç tr╞░ß╗¢c.",
+    "edited": "N├│i ─æß║┐n ─æ├óy, hß║»n ─æ├ú ─æi tß╗¢i tr╞░ß╗¢c phß╗º ─æß╗ç Liß╗àu gia."
+  },
+  {
+    "sentenceId": 52,
+    "original": "Liß╗àu Nh╞░ Nguyß╗çt nhß║╣ m├┤i h├⌐ mß╗ƒ, thß║ºn t├¼nh ─æß║ím mß║íc nh╞░ b─âng, ─æß╗⌐ng thß║│ng cuß╗æi bß║¡c thang, nh╞░ v├ón ─æoan Ti├¬n Tß╗¡, ─æß╗Öc hß╗»u mß╗Öt phß║ºn h╞íi lß║ính c├╣ng cao ngß║ío, ΓÇ£Duy├¬n phß║¡n ─æ├ú hß║┐t, cß║ºn g├¼ phß║úi c╞░ß╗íng cß║ºu, ng╞░╞íi n├¬n minh bß║ích, ta v├á ng╞░╞íi, sß╗¢m ─æ├ú kh├┤ng phß║úi nhß║Ñt c├íi thß║┐ giß╗¢i ng╞░ß╗¥i.ΓÇ¥",
+    "edited": "Liß╗àu Nh╞░ Nguyß╗çt khß║╜ mß╗ƒ ─æ├┤i m├┤i, thß║ºn sß║»c nh├án nhß║ít nh╞░ b─âng, ─æß╗⌐ng thß║│ng cuß╗æi bß║¡c thang, tß╗▒a nh╞░ ti├¬n tß╗¡ m├óy vß╗¥n, mang theo ch├║t kh├¡ chß║Ñt lß║ính l├╣ng v├á cao ngß║ío, ΓÇ£Duy├¬n phß║¡n ─æ├ú hß║┐t, h├á tß║Ñt phß║úi c╞░ß╗íng cß║ºu, ch├áng n├¬n hiß╗âu, ta v├á ch├áng, sß╗¢m ─æ├ú kh├┤ng thuß╗Öc vß╗ü c├╣ng mß╗Öt thß║┐ giß╗¢i.ΓÇ¥"
+  },
+  {
+    "sentenceId": 53,
+    "original": "ΓÇ£Minh bß║ích, ta sß╗¢m n├¬n minh bß║ích.ΓÇ¥",
+    "edited": "ΓÇ£Hiß╗âu, ta sß╗¢m n├¬n hiß╗âu.ΓÇ¥"
+  },
+  {
+    "sentenceId": 55,
+    "original": "ΓÇ£Gß║ú liß╗ün gß║ú cho, hß║úo hß║úo ─æß╗æi ─æ├úi muß╗Öi muß╗Öi ta.ΓÇ¥",
+    "edited": "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  },
+  {
+    "sentenceId": 57,
+    "original": "ΓÇ£Gß║ú liß╗ün gß║ú cho, hß║úo hß║úo ─æß╗æi ─æ├úi muß╗Öi muß╗Öi ta.ΓÇ¥",
+    "edited": "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  },
+  {
+    "sentenceId": 70,
+    "original": "Liß╗àu gia gia chß╗º ─æß║┐n thß╗¥i khß║»c n├áy ─æß╗üu c├▓n ch╞░a thß║Ñy ─æi ra, rß║Ñt hiß╗ân nhi├¬n, tr╞░ß╗¢c ─æ├│ c┼⌐ng biß║┐t viß╗çc n├áy, ├óm m╞░u, ─æ├óy l├á ├óm m╞░u, ─æ├│ng lß║íi hß╗Åa ─æ├╣a giß╗ín Triß╗çu Gia.ΓÇ¥",
+    "edited": "─Éß║┐n giß╗¥ n├áy m├á Liß╗àu gia gia chß╗º vß║½n ch╞░a nhß║¡n ra, r├╡ r├áng tr╞░ß╗¢c ─æ├│ ─æ├ú biß║┐t chuyß╗çn n├áy, ─æ├óy l├á mß╗Öt ├óm m╞░u, mß╗Öt ├óm m╞░u nhß║▒m v├áo Triß╗çu Gia.ΓÇ¥"
+  },
+  {
+    "sentenceId": 85,
+    "original": "Triß╗çu Gia ng╞░ß╗¥i ─æß║┐n, cß║ºm ─æß║ºu ch├¡nh l├á Triß╗çu V├ón phß╗Ñ th├ón, Triß╗çu Gia gia chß╗º ─æ╞░╞íng thß╗¥i Triß╗çu Uy├¬n, biß║┐t ─æ╞░ß╗úc Triß╗çu V├ón chß║íy ─æß║┐n, m├á lß║íi tay cß║ºm s├ít kiß║┐m, l├║c n├áy mß╗¢i ─æi ph├▓ng t├ón h├┤n xem qua, gß║╖p t├ón n╞░╞íng l├á Liß╗àu Nh╞░ T├óm, bß╗½ng bß╗½ng tß╗⌐c giß║¡n.",
+    "edited": "Ng╞░ß╗¥i Triß╗çu Gia ─æ├ú ─æß║┐n, dß║½n ─æß║ºu l├á phß╗Ñ th├ón Triß╗çu V├ón, ─æ╞░╞íng kim Triß╗çu Gia gia chß╗º Triß╗çu Uy├¬n, biß║┐t Triß╗çu V├ón ─æ├ú chß║íy ─æß║┐n, lß║íi c├▓n tay cß║ºm s├ít kiß║┐m, l├║c n├áy mß╗¢i ─æß║┐n ph├▓ng t├ón h├┤n xem x├⌐t, thß║Ñy t├ón n╞░╞íng l├á Liß╗àu Nh╞░ T├óm, ├┤ng ta v├┤ c├╣ng tß╗⌐c giß║¡n."
+  },
+  {
+    "sentenceId": 92,
+    "original": "ΓÇ£Nh╞░ng kh├┤ng biß║┐t, Triß╗çu gia tß╗Öc tr╞░ß╗ƒng muß╗æn g├¼ b├án giao.ΓÇ¥",
+    "edited": "ΓÇ£Nh╞░ng kh├┤ng biß║┐t, Triß╗çu gia tß╗Öc tr╞░ß╗ƒng muß╗æn lß╗¥i giß║úi th├¡ch g├¼.ΓÇ¥"
+  }
+]
+
+=== COMPARISON & PATCH ANALYSIS ===
+
+Sentence ID: 19
+  - Original: "Kh├┤ng phß║úi Triß╗çu Gia Thiß║┐u chß╗º sao ΓÇ¥"
+  - Gemini Edited: "Kh├┤ng phß║úi Triß╗çu Gia thiß║┐u chß╗º sao?"
+  - Patched:       "Kh├┤ng phß║úi Triß╗çu Gia thiß║┐u chß╗º sao?"
+  - Did change?     YES
+
+Sentence ID: 26
+  - Original: "C├│ thß╗â, tß║íi xß╗æc l├¬n hß╗ông kh─ân c├┤ d├óu c├íi kia ph├║t chß╗æc, hß║»n liß╗ün minh bß║ích, chß╗ë kh├┤ng muß╗æn thß╗½a nhß║¡n m├á th├┤i."
+  - Gemini Edited: "Nh╞░ng v├áo l├║c v├⌐n kh─ân voan c├┤ d├óu kia, hß║»n ─æ├ú hiß╗âu, chß╗ë l├á kh├┤ng muß╗æn thß╗½a nhß║¡n m├á th├┤i."
+  - Patched:       "Nh╞░ng v├áo l├║c v├⌐n kh─ân voan c├┤ d├óu kia, hß║»n ─æ├ú hiß╗âu, chß╗ë l├á kh├┤ng muß╗æn thß╗½a nhß║¡n m├á th├┤i."
+  - Did change?     YES
+
+Sentence ID: 27
+  - Original: "Hß║»n, Triß╗çu V├ón, Triß╗çu Gia Thiß║┐u chß╗º, ng├áy x╞░a v├╡ ─æß║ío kß╗│ t├ái, h├┤m nay tß╗ïch ─æoß║ín mß║ích phß║┐ thß╗â."
+  - Gemini Edited: "Hß║»n, Triß╗çu V├ón, Triß╗çu Gia thiß║┐u chß╗º, tß╗½ng l├á kß╗│ t├ái v├╡ ─æß║ío, nay lß║íi l├á phß║┐ nh├ón ─æoß║ín mß║ích."
+  - Patched:       "Hß║»n, Triß╗çu V├ón, Triß╗çu Gia thiß║┐u chß╗º, tß╗½ng l├á kß╗│ t├ái v├╡ ─æß║ío, nay lß║íi l├á phß║┐ nh├ón ─æoß║ín mß║ích."
+  - Did change?     YES
+
+Sentence ID: 41
+  - Original: "─Éang khi n├│i chuyß╗çn, hß║»n ─æ├ú tß╗¢i Liß╗àu gia phß╗º ─æß╗ç tr╞░ß╗¢c."
+  - Gemini Edited: "N├│i ─æß║┐n ─æ├óy, hß║»n ─æ├ú ─æi tß╗¢i tr╞░ß╗¢c phß╗º ─æß╗ç Liß╗àu gia."
+  - Patched:       "N├│i ─æß║┐n ─æ├óy, hß║»n ─æ├ú ─æi tß╗¢i tr╞░ß╗¢c phß╗º ─æß╗ç Liß╗àu gia."
+  - Did change?     YES
+
+Sentence ID: 52
+  - Original: "Liß╗àu Nh╞░ Nguyß╗çt nhß║╣ m├┤i h├⌐ mß╗ƒ, thß║ºn t├¼nh ─æß║ím mß║íc nh╞░ b─âng, ─æß╗⌐ng thß║│ng cuß╗æi bß║¡c thang, nh╞░ v├ón ─æoan Ti├¬n Tß╗¡, ─æß╗Öc hß╗»u mß╗Öt phß║ºn h╞íi lß║ính c├╣ng cao ngß║ío, ΓÇ£Duy├¬n phß║¡n ─æ├ú hß║┐t, cß║ºn g├¼ phß║úi c╞░ß╗íng cß║ºu, ng╞░╞íi n├¬n minh bß║ích, ta v├á ng╞░╞íi, sß╗¢m ─æ├ú kh├┤ng phß║úi nhß║Ñt c├íi thß║┐ giß╗¢i ng╞░ß╗¥i.ΓÇ¥"
+  - Gemini Edited: "Liß╗àu Nh╞░ Nguyß╗çt khß║╜ mß╗ƒ ─æ├┤i m├┤i, thß║ºn sß║»c nh├án nhß║ít nh╞░ b─âng, ─æß╗⌐ng thß║│ng cuß╗æi bß║¡c thang, tß╗▒a nh╞░ ti├¬n tß╗¡ m├óy vß╗¥n, mang theo ch├║t kh├¡ chß║Ñt lß║ính l├╣ng v├á cao ngß║ío, ΓÇ£Duy├¬n phß║¡n ─æ├ú hß║┐t, h├á tß║Ñt phß║úi c╞░ß╗íng cß║ºu, ch├áng n├¬n hiß╗âu, ta v├á ch├áng, sß╗¢m ─æ├ú kh├┤ng thuß╗Öc vß╗ü c├╣ng mß╗Öt thß║┐ giß╗¢i.ΓÇ¥"
+  - Patched:       "Liß╗àu Nh╞░ Nguyß╗çt khß║╜ mß╗ƒ ─æ├┤i m├┤i, thß║ºn sß║»c nh├án nhß║ít nh╞░ b─âng, ─æß╗⌐ng thß║│ng cuß╗æi bß║¡c thang, tß╗▒a nh╞░ ti├¬n tß╗¡ m├óy vß╗¥n, mang theo ch├║t kh├¡ chß║Ñt lß║ính l├╣ng v├á cao ngß║ío, ΓÇ£Duy├¬n phß║¡n ─æ├ú hß║┐t, h├á tß║Ñt phß║úi c╞░ß╗íng cß║ºu, ch├áng n├¬n hiß╗âu, ta v├á ch├áng, sß╗¢m ─æ├ú kh├┤ng thuß╗Öc vß╗ü c├╣ng mß╗Öt thß║┐ giß╗¢i.ΓÇ¥"
+  - Did change?     YES
+
+Sentence ID: 53
+  - Original: "ΓÇ£Minh bß║ích, ta sß╗¢m n├¬n minh bß║ích.ΓÇ¥"
+  - Gemini Edited: "ΓÇ£Hiß╗âu, ta sß╗¢m n├¬n hiß╗âu.ΓÇ¥"
+  - Patched:       "ΓÇ£Hiß╗âu, ta sß╗¢m n├¬n hiß╗âu.ΓÇ¥"
+  - Did change?     YES
+
+Sentence ID: 55
+  - Original: "ΓÇ£Gß║ú liß╗ün gß║ú cho, hß║úo hß║úo ─æß╗æi ─æ├úi muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Gemini Edited: "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Patched:       "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Did change?     YES
+
+Sentence ID: 57
+  - Original: "ΓÇ£Gß║ú liß╗ün gß║ú cho, hß║úo hß║úo ─æß╗æi ─æ├úi muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Gemini Edited: "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Patched:       "ΓÇ£Gß║ú th├¼ gß║ú th├┤i, ─æß╗æi xß╗¡ tß╗æt vß╗¢i muß╗Öi muß╗Öi ta.ΓÇ¥"
+  - Did change?     YES
+
+Sentence ID: 70
+  - Original: "Liß╗àu gia gia chß╗º ─æß║┐n thß╗¥i khß║»c n├áy ─æß╗üu c├▓n ch╞░a thß║Ñy ─æi ra, rß║Ñt hiß╗ân nhi├¬n, tr╞░ß╗¢c ─æ├│ c┼⌐ng biß║┐t viß╗çc n├áy, ├óm m╞░u, ─æ├óy l├á ├óm m╞░u, ─æ├│ng lß║íi hß╗Åa ─æ├╣a giß╗ín Triß╗çu Gia.ΓÇ¥"
+  - Gemini Edited: "─Éß║┐n giß╗¥ n├áy m├á Liß╗àu gia gia chß╗º vß║½n ch╞░a nhß║¡n ra, r├╡ r├áng tr╞░ß╗¢c ─æ├│ ─æ├ú biß║┐t chuyß╗çn n├áy, ─æ├óy l├á mß╗Öt ├óm m╞░u, mß╗Öt ├óm m╞░u nhß║▒m v├áo Triß╗çu Gia.ΓÇ¥"
+  - Patched:       "─Éß║┐n giß╗¥ n├áy m├á Liß╗àu gia gia chß╗º vß║½n ch╞░a nhß║¡n ra, r├╡ r├áng tr╞░ß╗¢c ─æ├│ ─æ├ú biß║┐t chuyß╗çn n├áy, ─æ├óy l├á mß╗Öt ├óm m╞░u, mß╗Öt ├óm m╞░u nhß║▒m v├áo Triß╗çu Gia.ΓÇ¥"
+  - Did change?     YES
+
+Sentence ID: 85
+  - Original: "Triß╗çu Gia ng╞░ß╗¥i ─æß║┐n, cß║ºm ─æß║ºu ch├¡nh l├á Triß╗çu V├ón phß╗Ñ th├ón, Triß╗çu Gia gia chß╗º ─æ╞░╞íng thß╗¥i Triß╗çu Uy├¬n, biß║┐t ─æ╞░ß╗úc Triß╗çu V├ón chß║íy ─æß║┐n, m├á lß║íi tay cß║ºm s├ít kiß║┐m, l├║c n├áy mß╗¢i ─æi ph├▓ng t├ón h├┤n xem qua, gß║╖p t├ón n╞░╞íng l├á Liß╗àu Nh╞░ T├óm, bß╗½ng bß╗½ng tß╗⌐c giß║¡n."
+  - Gemini Edited: "Ng╞░ß╗¥i Triß╗çu Gia ─æ├ú ─æß║┐n, dß║½n ─æß║ºu l├á phß╗Ñ th├ón Triß╗çu V├ón, ─æ╞░╞íng kim Triß╗çu Gia gia chß╗º Triß╗çu Uy├¬n, biß║┐t Triß╗çu V├ón ─æ├ú chß║íy ─æß║┐n, lß║íi c├▓n tay cß║ºm s├ít kiß║┐m, l├║c n├áy mß╗¢i ─æß║┐n ph├▓ng t├ón h├┤n xem x├⌐t, thß║Ñy t├ón n╞░╞íng l├á Liß╗àu Nh╞░ T├óm, ├┤ng ta v├┤ c├╣ng tß╗⌐c giß║¡n."
+  - Patched:       "Ng╞░ß╗¥i Triß╗çu Gia ─æ├ú ─æß║┐n, dß║½n ─æß║ºu l├á phß╗Ñ th├ón Triß╗çu V├ón, ─æ╞░╞íng kim Triß╗çu Gia gia chß╗º Triß╗çu Uy├¬n, biß║┐t Triß╗çu V├ón ─æ├ú chß║íy ─æß║┐n, lß║íi c├▓n tay cß║ºm s├ít kiß║┐m, l├║c n├áy mß╗¢i ─æß║┐n ph├▓ng t├ón h├┤n xem x├⌐t, thß║Ñy t├ón n╞░╞íng l├á Liß╗àu Nh╞░ T├óm, ├┤ng ta v├┤ c├╣ng tß╗⌐c giß║¡n."
+  - Did change?     YES
+
+Sentence ID: 92
+  - Original: "ΓÇ£Nh╞░ng kh├┤ng biß║┐t, Triß╗çu gia tß╗Öc tr╞░ß╗ƒng muß╗æn g├¼ b├án giao.ΓÇ¥"
+  - Gemini Edited: "ΓÇ£Nh╞░ng kh├┤ng biß║┐t, Triß╗çu gia tß╗Öc tr╞░ß╗ƒng muß╗æn lß╗¥i giß║úi th├¡ch g├¼.ΓÇ¥"
+  - Patched:       "ΓÇ£Nh╞░ng kh├┤ng biß║┐t, Triß╗çu gia tß╗Öc tr╞░ß╗ƒng muß╗æn lß╗¥i giß║úi th├¡ch g├¼.ΓÇ¥"
+  - Did change?     YES
+
+Total Edited Count: 11
