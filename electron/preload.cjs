@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('storyAPI', {
   fetchChapter: (url, bookTitle) => ipcRenderer.invoke('story:fetch-chapter', url, bookTitle),
   appendTitleDebugLog: (message) => ipcRenderer.invoke('story:append-title-debug-log', message),
-  fetchHtml: (url) => ipcRenderer.invoke('story:fetch-html', url),
+  fetchHtml: (url, options) => ipcRenderer.invoke('story:fetch-html', url, options),
   geminiGenerate: (payload) => ipcRenderer.invoke('story:gemini-generate', payload),
   geminiListModels: (payload) => ipcRenderer.invoke('story:gemini-list-models', payload),
   logError: (msg) => ipcRenderer.invoke('story:log-error', msg),

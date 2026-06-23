@@ -1287,6 +1287,109 @@ async function fetchWithOffscreenBrowser(url) {
   }
 }
 
+function parseNextChapterUrl(html, url, chapterNumber) {
+  if (!html) return '';
+  try {
+    const $ = cheerio.load(html);
+    const candidates = [];
+    const resolveUrl = (relativeOrAbsoluteUrl, baseUrl) => {
+      try {
+        return new URL(relativeOrAbsoluteUrl, baseUrl).href;
+      } catch (e) {
+        return relativeOrAbsoluteUrl;
+      }
+    };
+
+    $('a').each((_, el) => {
+      const $el = $(el);
+      const href = $el.attr('href') || '';
+      if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
+      
+      const text = $el.text().trim();
+      const textLower = text.toLowerCase();
+      const rel = $el.attr('rel') || '';
+      const relLower = rel.toLowerCase();
+      const className = $el.attr('class') || '';
+      const classLower = className.toLowerCase();
+      const id = $el.attr('id') || '';
+      const idLower = id.toLowerCase();
+      
+      let score = 0;
+      
+      if (classLower.includes('next') || idLower.includes('next')) {
+        score += 50;
+      }
+      if (relLower.includes('next')) {
+        score += 40;
+      }
+      if (textLower === 'chương tiếp' || textLower === 'next' || textLower === 'chương tiếp 》' || textLower === 'chương sau' || textLower === 'tiếp') {
+        score += 100;
+      } else if (textLower.includes('chương tiếp') || textLower.includes('next') || textLower.includes('chương sau')) {
+        score += 80;
+      } else if (textLower.includes('tiếp') && !textLower.includes('tiếp tục') && !textLower.includes('trước')) {
+        score += 30;
+      } else if (textLower === '›' || textLower === '»') {
+        score += 60;
+      }
+      
+      if (textLower.includes('trước') || textLower.includes('prev') || textLower.includes('back') || classLower.includes('prev') || classLower.includes('back') || idLower.includes('prev') || idLower.includes('back')) {
+        score -= 150;
+      }
+      
+      if (chapterNumber !== null && chapterNumber !== undefined) {
+        const nextNum = chapterNumber + 1;
+        const targetPattern = new RegExp(`[-_](?:chuong|chapter|chap|vol|tap|c)(?:-|_)?${nextNum}(?:[-_]|$)`, 'i');
+        if (targetPattern.test(href)) {
+          score += 120;
+        }
+      }
+      
+      if (score > 0) {
+        candidates.push({
+          text,
+          href,
+          resolvedUrl: resolveUrl(href, url),
+          class: className,
+          id,
+          rel,
+          score
+        });
+      }
+    });
+
+    candidates.sort((a, b) => b.score - a.score);
+    let nextUrl = '';
+    if (candidates.length > 0 && candidates[0].score >= 20) {
+      nextUrl = candidates[0].resolvedUrl;
+    }
+
+    const selectedNextUrl = nextUrl || '';
+    let parseNextUrlLog = '';
+    if (selectedNextUrl) {
+      parseNextUrlLog = `[PARSE_NEXT_URL]
+candidateCount: ${candidates.length}
+candidates: ${JSON.stringify(candidates.slice(0, 5).map(c => ({ text: c.text, href: c.href, score: c.score })))}
+selectedNextUrl: ${selectedNextUrl}
+status: pass`;
+    } else {
+      parseNextUrlLog = `[PARSE_NEXT_URL]
+candidateCount: ${candidates.length}
+candidates: ${JSON.stringify(candidates.slice(0, 5).map(c => ({ text: c.text, href: c.href, score: c.score })))}
+selectedNextUrl: `;
+    }
+
+    console.log(parseNextUrlLog);
+    if (typeof appendTitleDebugLog === 'function') {
+      appendTitleDebugLog(parseNextUrlLog + '\n--------------------------------------------------');
+    }
+
+    return nextUrl;
+  } catch (err) {
+    console.error('Error in parseNextChapterUrl:', err);
+    return '';
+  }
+}
+
 ipcMain.handle('story:fetch-chapter', async (_, url, bookTitle) => {
   if (!url || !/^https?:\/\//i.test(url)) {
     return { ok: false, error: 'Link không hợp lệ. Link cần bắt đầu bằng http:// hoặc https://.' };
@@ -1404,6 +1507,7 @@ ipcMain.handle('story:fetch-chapter', async (_, url, bookTitle) => {
     }
 
     const metadata = extractChapterMetadata(html, url, bookTitle);
+    const nextUrl = parseNextChapterUrl(html, url, metadata.chapterNumber);
 
     let standardizedTitle = '';
     if (metadata.chapterNumber !== null && metadata.chapterNumber !== undefined) {
@@ -1442,7 +1546,9 @@ ipcMain.handle('story:fetch-chapter', async (_, url, bookTitle) => {
       confidence: metadata.confidence,
       source: metadata.source,
       volume: metadata.volume,
-      rawTitle: metadata.rawTitle
+      rawTitle: metadata.rawTitle,
+      htmlLength: html.length,
+      nextUrl: nextUrl
     };
 
     let ipcSendLog = '\n[IPC Send]\n';
@@ -1461,11 +1567,12 @@ ipcMain.handle('story:append-title-debug-log', async (_, message) => {
   return { ok: true };
 });
 
-ipcMain.handle('story:fetch-html', async (_, url) => {
+ipcMain.handle('story:fetch-html', async (_, url, options = {}) => {
   if (!url || !/^https?:\/\//i.test(url)) {
     return { ok: false, error: 'Link không hợp lệ. Link cần bắt đầu bằng http:// hoặc https://.' };
   }
   try {
+    const customHeaders = options?.headers || {};
     const res = await axios.get(url, {
       timeout: 25000,
       maxRedirects: 5,
@@ -1473,10 +1580,31 @@ ipcMain.handle('story:fetch-html', async (_, url) => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8'
+        'Accept-Language': 'vi,en-US;q=0.9,en;q=0.8',
+        ...customHeaders
       }
     });
-    return { ok: true, html: String(res.data || '') };
+    
+    let dataStr = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+    let html = dataStr;
+    if (dataStr.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(dataStr);
+        if (parsed) {
+          if (parsed.data !== undefined) {
+            html = String(parsed.data);
+          } else if (parsed.html !== undefined) {
+            html = String(parsed.html);
+          } else if (parsed.content !== undefined) {
+            html = String(parsed.content);
+          }
+        }
+      } catch (e) {
+        console.error('Error parsing JSON response in fetchHtml:', e);
+      }
+    }
+    
+    return { ok: true, html };
   } catch (err) {
     return { ok: false, error: err?.message || 'Không lấy được HTML từ link.' };
   }

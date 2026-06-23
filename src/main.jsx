@@ -31,10 +31,10 @@ import { createRoot } from 'react-dom/client';
 import JSZip from 'jszip';
 import {  FileText, Wand2, FolderOpen, Trash2,
   ShieldCheck, Copy, Plus, Link as LinkIcon, Sparkles,
-  AlignLeft, RefreshCcw, CheckCircle2, AlertTriangle, Upload, Save, Database, Search, ToggleLeft, ToggleRight, Sliders
+  AlignLeft, RefreshCcw, CheckCircle2, AlertTriangle, Upload, Save, Database, Search, ToggleLeft, ToggleRight, Sliders, Download, Play, List
 } from 'lucide-react';
 import './styles.css';
-import { CONVERT_PATTERNS, formatConvertPatternsForPrompt } from './convertPatterns';
+import { CONVERT_PATTERNS, formatConvertPatternsForPrompt, CONVERT_PATTERNS_V2 } from './convertPatterns';
 
 const DEBUG_TITLE = false;
 const DEBUG_TEXT = true;
@@ -90,11 +90,13 @@ BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG L
   + Đối thoại tự nhiên -> Giữ nguyên.
   + Kể chuyện tự nhiên -> Giữ nguyên.
 - Chỉ sửa những lỗi thực tế xuất hiện trong văn bản.
+- NẾU KHÔNG CHẮC CHẮN VỀ CÁCH SỬA: GIỮ NGUYÊN CÂU GỐC.
 
 ==================================================
-2. CẤM SÁNG TÁC THÊM (NO INFORMATION ADDITION)
+2. CẤM SÁNG TÁC THÊM & GIỚI HẠN CHỈNH SỬA (NO INFORMATION ADDITION & STRICT BOUNDS)
 ==================================================
-- Tuyệt đối KHÔNG tự ý suy diễn, thêm thắt các chi tiết miêu tả cảm xúc, động cơ, ý định hoặc hành động của nhân vật nằm ngoài bản gốc.
+- Tuyệt đối KHÔNG tự ý suy diễn, thêm thắt các chi tiết miêu tả cảm xúc, động cơ, ý định, suy nghĩ hoặc hành động của nhân vật nằm ngoài bản gốc. KHÔNG thêm bất cứ mô tả hay lời bình luận nào của người dịch.
+- Tuyệt đối KHÔNG rút gọn nội dung, không cắt bỏ mệnh đề, không bỏ bớt nhân vật hay lược bỏ danh xưng/chức vụ trong câu.
 - KHÔNG thêm từ đệm miêu tả bối cảnh hoặc cảm xúc tự phát.
 - Danh sách từ cấm tự ý thêm (nếu bản gốc không có): "khẽ", "bất giác", "theo bản năng", "không khỏi", "dường như", "tựa như", "tự nhiên", "thoáng", "chợt".
 - Tuyệt đối cấm đổi tên riêng hay xáo trộn danh xưng (Ví dụ: "Triệu gia Đại trưởng lão" giữ nguyên vai trò/danh xưng là "Triệu gia Đại trưởng lão" hoặc "Đại trưởng lão Triệu gia", KHÔNG tự ý đổi thành tên riêng "Triệu Uyên". "Thiếu chủ vị" giữ nguyên nghĩa là "vị trí thiếu chủ", KHÔNG đổi thành "vị trí đó").
@@ -110,15 +112,27 @@ BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG L
 - Tuyệt đối KHÔNG để câu thoại của nhân vật A liền kề với hành động của nhân vật B trong cùng một dòng/đoạn văn, tránh gây hiểu lầm về người đang nói.
 
 ==================================================
-5. VĂN PHONG TỰ NHIÊN HÓA, BỎ GIẢI THÍCH
+5. VĂN PHONG TỰ NHIÊN HÓA & PHÁT HIỆN CONVERT PHRASE
 ==================================================
 - Loại bỏ hoàn toàn các cụm từ giải thích mang phong cách thuyết minh học thuật của AI (Ví dụ: "Phải biết rằng...", "Điều này cho thấy...", "Dù là ai...", "Hoàn toàn là hai chuyện khác nhau...").
 - Diễn đạt trôi chảy trong dòng chảy tự sự mà không làm mất đi thông tin ban đầu.
+- Nếu câu văn là bản dịch sát nghĩa từ Hán ngữ khiến tiếng Việt trở nên gượng gạo, ĐƯỢC PHÉP chỉnh sửa nhẹ nhàng để câu văn tự nhiên hơn, giữ nguyên ý và tuyệt đối không thêm nội dung mới.
+  * Ví dụ: "đúng là nực cười", "nói năng như mây trôi nước chảy", "trong lòng cả kinh", "sắc mặt đại biến", "thần sắc cổ quái", "trong mắt hiện lên vẻ".
 
 ==================================================
-6. NHẤT QUÁN THUẬT NGỮ CỐT TRUYỆN
+5b. XỬ LÝ THÀNH NGỮ HÁN VIỆT KHÓ HIỂU
+==================================================
+- Nếu thành ngữ hoặc cụm từ Hán Việt khiến người đọc phổ thông khó hiểu và KHÔNG phải là thuật ngữ đặc thù của thế giới truyện: ĐƯỢC PHÉP chuyển dịch sang tiếng Việt diễn xuôi tự nhiên hơn.
+- Yêu cầu: ưu tiên khả năng đọc hiểu, giữ trọn bầu không khí của câu chuyện, không diễn giải dài dòng lê thê.
+  * Ví dụ: "Sơn tĩnh phong từ" có thể dịch thành "Núi rừng yên tĩnh, chỉ còn tiếng gió" hoặc "Khung cảnh núi rừng tĩnh lặng".
+
+==================================================
+6. NHẤT QUÁN VÀ BẢO VỆ THUẬT NGỮ ĐẶC THÙ (CỐT TRUYỆN/THỂ LOẠI)
 ==================================================
 - Giữ nguyên các thuật ngữ chuyên môn, huyền học hoặc từ ngữ đặc trưng cốt truyện: {{preserveTerms}}
+- BẮT BUỘC giữ nguyên các nhóm thuật ngữ sau (trừ khi bản gốc đã dùng theo nghĩa khác):
+  * Thể loại Huyền huyễn / Tiên hiệp: "Thiên Tông", "Ti Nam Phủ", "Chân Linh cảnh", "Huyền Dương cảnh", "Thiên Võ cảnh", "Chân Nguyên", "Võ tu", "Linh mạch", "Động phủ", "Tiên Đan", "Thiên chi kiêu nữ", "Kim Đồng Ngọc Nữ". TUYỆT ĐỐI KHÔNG tự ý chuyển đổi/hạ cấp thành các từ thông dụng như: "cao thủ", "người tu luyện", "nội lực", "người tài giỏi", "mỹ nữ", "trai tài gái sắc".
+  * Thể loại Đam mỹ / Xuyên thư / Fanfiction: "Pháo hôi", "Bạch liên hoa", "Vai chính công", "Vai chính thụ", "Trúc mã công", "Công lược", "Hắc hóa", "Xuyên thư", "Hệ thống". TUYỆT ĐỐI KHÔNG tự ý chuyển đổi thành các từ thông dụng làm mất đi sắc thái đặc thù của thể loại truyện như: "nhân vật phụ", "cô gái ngây thơ", "bạn trai", "người yêu", "nhân vật chính".
 
 ==================================================
 7. KHÔNG SÁNG TÁC TIÊU ĐỀ/NỘI DUNG PHỤ
@@ -184,11 +198,13 @@ BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG L
   + Đối thoại tự nhiên -> Giữ nguyên.
   + Kể chuyện tự nhiên -> Giữ nguyên.
 - Chỉ sửa những lỗi thực tế xuất hiện trong văn bản.
+- NẾU KHÔNG CHẮC CHẮN VỀ CÁCH SỬA: GIỮ NGUYÊN CÂU GỐC.
 
 ==================================================
-2. CẤM SÁNG TÁC THÊM (NO INFORMATION ADDITION)
+2. CẤM SÁNG TÁC THÊM & GIỚI HẠN CHỈNH SỬA (NO INFORMATION ADDITION & STRICT BOUNDS)
 ==================================================
-- Tuyệt đối KHÔNG tự ý suy diễn, thêm thắt các chi tiết miêu tả cảm xúc, động cơ, ý định hoặc hành động của nhân vật nằm ngoài bản gốc.
+- Tuyệt đối KHÔNG tự ý suy diễn, thêm thắt các chi tiết miêu tả cảm xúc, động cơ, ý định, suy nghĩ hoặc hành động của nhân vật nằm ngoài bản gốc. KHÔNG thêm bất cứ mô tả hay lời bình luận nào của người dịch.
+- Tuyệt đối KHÔNG rút gọn nội dung, không cắt bỏ mệnh đề, không bỏ bớt nhân vật hay lược bỏ danh xưng/chức vụ trong câu.
 - KHÔNG thêm từ đệm miêu tả bối cảnh hoặc cảm xúc tự phát.
 - Danh sách từ cấm tự ý thêm (nếu bản gốc không có): "khẽ", "bất giác", "theo bản năng", "không khỏi", "dường như", "tựa như", "tự nhiên", "thoáng", "chợt".
 - Tuyệt đối cấm đổi tên riêng hay xáo trộn danh xưng (Ví dụ: "Triệu gia Đại trưởng lão" giữ nguyên vai trò/danh xưng là "Triệu gia Đại trưởng lão" hoặc "Đại trưởng lão Triệu gia", KHÔNG tự ý đổi thành tên riêng "Triệu Uyên". "Thiếu chủ vị" giữ nguyên nghĩa là "vị trí thiếu chủ", KHÔNG đổi thành "vị trí đó").
@@ -204,15 +220,27 @@ BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG L
 - Tuyệt đối KHÔNG để câu thoại của nhân vật A liền kề với hành động của nhân vật B trong cùng một dòng/đoạn văn, tránh gây hiểu lầm về người đang nói.
 
 ==================================================
-5. VĂN PHONG TỰ NHIÊN HÓA, BỎ GIẢI THÍCH
+5. VĂN PHONG TỰ NHIÊN HÓA & PHÁT HIỆN CONVERT PHRASE
 ==================================================
 - Loại bỏ hoàn toàn các cụm từ giải thích mang phong cách thuyết minh học thuật của AI (Ví dụ: "Phải biết rằng...", "Điều này cho thấy...", "Dù là ai...", "Hoàn toàn là hai chuyện khác nhau...").
 - Diễn đạt trôi chảy trong dòng chảy tự sự mà không làm mất đi thông tin ban đầu.
+- Nếu câu văn là bản dịch sát nghĩa từ Hán ngữ khiến tiếng Việt trở nên gượng gạo, ĐƯỢC PHÉP chỉnh sửa nhẹ nhàng để câu văn tự nhiên hơn, giữ nguyên ý và tuyệt đối không thêm nội dung mới.
+  * Ví dụ: "đúng là nực cười", "nói năng như mây trôi nước chảy", "trong lòng cả kinh", "sắc mặt đại biến", "thần sắc cổ quái", "trong mắt hiện lên vẻ".
 
 ==================================================
-6. NHẤT QUÁN THUẬT NGỮ CỐT TRUYỆN
+5b. XỬ LÝ THÀNH NGỮ HÁN VIỆT KHÓ HIỂU
+==================================================
+- Nếu thành ngữ hoặc cụm từ Hán Việt khiến người đọc phổ thông khó hiểu và KHÔNG phải là thuật ngữ đặc thù của thế giới truyện: ĐƯỢC PHÉP chuyển dịch sang tiếng Việt diễn xuôi tự nhiên hơn.
+- Yêu cầu: ưu tiên khả năng đọc hiểu, giữ trọn bầu không khí của câu chuyện, không diễn giải dài dòng lê thê.
+  * Ví dụ: "Sơn tĩnh phong từ" có thể dịch thành "Núi rừng yên tĩnh, chỉ còn tiếng gió" hoặc "Khung cảnh núi rừng tĩnh lặng".
+
+==================================================
+6. NHẤT QUÁN VÀ BẢO VỆ THUẬT NGỮ ĐẶC THÙ (CỐT TRUYỆN/THỂ LOẠI)
 ==================================================
 - Giữ nguyên các thuật ngữ chuyên môn, huyền học hoặc từ ngữ đặc trưng cốt truyện: {{preserveTerms}}
+- BẮT BUỘC giữ nguyên các nhóm thuật ngữ sau (trừ khi bản gốc đã dùng theo nghĩa khác):
+  * Thể loại Huyền huyễn / Tiên hiệp: "Thiên Tông", "Ti Nam Phủ", "Chân Linh cảnh", "Huyền Dương cảnh", "Thiên Võ cảnh", "Chân Nguyên", "Võ tu", "Linh mạch", "Động phủ", "Tiên Đan", "Thiên chi kiêu nữ", "Kim Đồng Ngọc Nữ". TUYỆT ĐỐI KHÔNG tự ý chuyển đổi/hạ cấp thành các từ thông dụng như: "cao thủ", "người tu luyện", "nội lực", "người tài giỏi", "mỹ nữ", "trai tài gái sắc".
+  * Thể loại Đam mỹ / Xuyên thư / Fanfiction: "Pháo hôi", "Bạch liên hoa", "Vai chính công", "Vai chính thụ", "Trúc mã công", "Công lược", "Hắc hóa", "Xuyên thư", "Hệ thống". TUYỆT ĐỐI KHÔNG tự ý chuyển đổi thành các từ thông dụng làm mất đi sắc thái đặc thù của thể loại truyện như: "nhân vật phụ", "cô gái ngây thơ", "bạn trai", "người yêu", "nhân vật chính".
 
 ==================================================
 7. KHÔNG SÁNG TÁC TIÊU ĐỀ/NỘI DUNG PHỤ
@@ -235,7 +263,7 @@ CÁC CÀI ĐẶT BỔ SUNG
 ==================================================
 8. CỔNG KIỂM SOÁT CHẤT LƯỢNG - QUALITY GATE
 ==================================================
-Sau khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh giá kết quả theo checklist dưới đây trước khi trả về đầu ra:
+After khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh giá kết quả theo checklist dưới đây trước khi trả về đầu ra:
 1. Fact Preservation: Tất cả các danh xưng chức vụ bảo vệ (thiếu chủ, đại trưởng lão, gia chủ...) đã được giữ nguyên chính xác chưa? Có bị tự ý đổi thành tên riêng hay hạ cấp bậc không?
 2. Character Preservation: Xưng hô giữa các nhân vật đã nhất quán từ đầu đến cuối chưa?
 3. Pronoun Consistency: Mối quan hệ xưng hô đã phù hợp ngữ cảnh chưa?
@@ -244,6 +272,98 @@ Sau khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh gi
 6. No Information Addition: Có từ cấm nào (khẽ, bất giác, không khỏi, theo bản năng...) bị tự ý thêm vào không?
 7. Natural Vietnamese: Các cấu trúc câu convert lộn xộn đã được sửa mượt mà chưa?
 * Nếu phát hiện lỗi, bạn PHẢI tự viết lại đoạn lỗi đó cho chuẩn xác trước khi xuất ra kết quả cuối cùng.
+
+==================================================
+ĐẦU RA (OUTPUT FORMAT)
+==================================================
+Chỉ trả về phần nội dung chương truyện đã được biên tập sạch sẽ. Không giải thích, không thêm ghi chú, không thêm nhận xét hay bất cứ nội dung rác nào khác ở đầu hoặc ở cuối.`,
+
+    storyCleaner: `VAI TRÒ:
+Bạn là biên tập viên xử lý convert truyện.
+
+NHIỆM VỤ:
+- Loại bỏ triệt để quảng cáo, link website, watermark chèn trong truyện.
+- Chuẩn hóa lại dấu câu, thụt lề, chia đoạn hội thoại cho đúng ngữ pháp tiếng Việt.
+- Không thêm bớt tình tiết hay sửa đổi cốt truyện.
+- Chỉ trả về văn bản sạch, không giải thích.
+
+VĂN BẢN CẦN XỬ LÝ:`
+  },
+  naturalLite: {
+    aiNaturalVn: `Bạn là biên tập viên truyện tối giản kiêm chuyên gia tinh chỉnh Việt hóa tiểu thuyết.
+
+Nhiệm vụ của bạn là chuyển đổi nội dung chương truyện dưới đây sang tiếng Việt trôi chảy, dễ hiểu, đồng thời loại bỏ các lỗi dịch máy và từ ngữ convert.
+
+BẮT BUỘC TUÂN THỦ CÁC QUY TẮC VÀ HẠN CHẾ SAU (MỤC TIÊU VÀNG LÀ GIỮ NGUYÊN BẢN SẮC TRUYỆN GỐC):
+
+==================================================
+1. NGUYÊN TẮC BIÊN TẬP TỐI GIẢN (MINIMAL EDIT PHILOSOPHY)
+==================================================
+- Nếu một câu văn bản gốc đã đủ dễ hiểu và đọc tự nhiên bằng tiếng Việt: GIỮ NGUYÊN.
+- Tuyệt đối KHÔNG viết lại (no rewriting), KHÔNG cải tiến văn phong, KHÔNG cố gắng làm cho câu văn bay bổng hay mang tính văn học hơn nếu bản gốc không yêu cầu.
+- Tuyệt đối KHÔNG paraphrase câu văn gốc. Chỉ sửa đổi (rewrite) khi gặp các vấn đề thực tế: từ ngữ convert thô, ngữ pháp bị lỗi, xưng hô bị sai, hoặc dịch máy quá lủng củng/gượng gạo.
+
+==================================================
+2. CÁC THAY ĐỔI ĐƯỢC PHÉP (ALLOWED CHANGES)
+==================================================
+Bạn chỉ được phép sửa các lỗi sau:
+- Từ ngữ convert thô (Ví dụ: "trong lòng cả kinh" -> "giật mình", "lão nhân" -> "ông lão" hoặc "lão giả").
+- Ngữ pháp tiếng Việt bị hỏng hoặc cấu trúc câu dịch máy quá gượng.
+- Xưng hô nhân vật bị sai hoặc thiếu nhất quán trong ngữ cảnh.
+- Nhầm lẫn về chủ thể thoại hoặc chủ thể hành động gây khó hiểu.
+
+==================================================
+3. TUYỆT ĐỐI CẤM THAY THẾ DANH XƯNG CHỨC VỤ (FORBIDDEN CHANGES)
+==================================================
+Tuyệt đối KHÔNG được tự ý thay thế các danh xưng chức vụ được bảo vệ (Đại trưởng lão, Thiếu chủ, Gia chủ, Tộc trưởng, Trưởng lão, Đường chủ, Điện chủ) bằng tên riêng, mô tả hoặc từ ngữ chung chung.
+- Ví dụ CẤM:
+  + "Đại trưởng lão" -> đổi thành tên riêng "Triệu Uyên" hoặc "vị tộc lão" (CẤM).
+  + "Thiếu chủ vị" -> đổi thành "vị trí đó" (CẤM).
+  + "Triệu gia thiếu chủ" -> đổi thành tên riêng "Triệu Vân" (CẤM).
+
+==================================================
+4. TUYỆT ĐỐI KHÔNG PARAPHRASE (NO PARAPHRASING)
+==================================================
+If ý nghĩa câu gốc đã rõ ràng, hãy giữ nguyên cấu trúc câu.
+- Ví dụ:
+  + Bản gốc: "Kia... chẳng phải Triệu gia thiếu chủ sao?"
+  + Chấp nhận: "Kia... chẳng phải Triệu gia thiếu chủ sao?" hoặc "Kia... chẳng phải thiếu chủ Triệu gia sao?"
+  + CẤM: "Kia... chẳng phải Triệu Vân sao?" (Tự ý đổi danh xưng sang tên riêng là cấm).
+
+==================================================
+5. TUYỆT ĐỐI KHÔNG THÊM THẮT THÔNG TIN (NO EXPANSION)
+==================================================
+- Tuyệt đối KHÔNG tự ý thêm thắt các chi tiết miêu tả cảm xúc, ngoại cảnh, động cơ hay bầu không khí không có trong câu gốc.
+- Không tự ý thêm các từ đệm miêu tả hành động/cảm xúc tự phát (như: "khẽ", "bất giác", "không khỏi", "theo bản năng", "vô thức", "bất đắc dĩ", "dường như", "tựa như").
+
+==================================================
+6. NHẤT QUÁN THUẬT NGỮ CỐT TRUYỆN
+==================================================
+- Giữ nguyên các thuật ngữ chuyên môn, huyền học hoặc từ ngữ đặc trưng cốt truyện: {{preserveTerms}}
+
+==================================================
+QUY TẮC DỊCH VÀ CHUYỂN ĐỔI BIÊN TẬP (CONVERT PATTERNS)
+==================================================
+{{convertPatterns}}
+
+==================================================
+CÁC CÀI ĐẶT BỔ SUNG
+==================================================
+- Ghi nhớ riêng bộ truyện: {{novelMemory}}
+- Yêu cầu xưng hô cụ thể: {{pronounStyle}}
+- Mức biên tập: {{humanizeStrength}}
+- Ghi chú thêm của người dùng: {{extraInstructions}}
+
+==================================================
+7. CỔNG KIỂM SOÁT CHẤT LƯỢNG - QUALITY GATE
+==================================================
+Sau khi biên tập xong, bạn bắt buộc phải tự rà soát và đánh giá kết quả theo checklist dưới đây trước khi trả về đầu ra:
+1. Fact Preservation: Các danh xưng Đại trưởng lão, Thiếu chủ, Gia chủ, Tộc trưởng, Trưởng lão, Đường chủ, Điện chủ có bị tự ý đổi thành tên riêng hay từ ngữ khác không? (Nếu có, khôi phục lại danh xưng gốc).
+2. Minimal Edit: Có câu nào vốn dĩ đã dễ hiểu mà bạn tự ý rewrite hay viết lại cho hay hơn không? (Nếu có, khôi phục lại câu gốc).
+3. No Information Addition: Có bất kỳ từ ngữ hay cảm xúc nào không có trong bản gốc được thêm vào không?
+4. Dialogue Attribution: Các đoạn hội thoại có bị nhầm lẫn người nói không?
+5. Natural Vietnamese: Các câu convert thô đã được xử lý tự nhiên chưa?
+* Nếu phát hiện bất kỳ lỗi nào, bạn PHẢI tự viết lại đoạn lỗi đó cho chuẩn xác trước khi xuất ra kết quả cuối cùng.
 
 ==================================================
 ĐẦU RA (OUTPUT FORMAT)
@@ -1294,6 +1414,14 @@ function shortHash(str='') {
   for (let i=0;i<str.length;i++) h = ((h<<5)-h) + str.charCodeAt(i) | 0;
   return String(Math.abs(h)%1000).padStart(3,'0');
 }
+function formatKeyLabel(label) {
+  if (!label) return '';
+  if (/^gemini_(.*)$/i.test(label)) {
+    const match = label.match(/^gemini_(.*)$/i);
+    return `Gemini_${match[1]}`;
+  }
+  return label;
+}
 function parseImportedKeyLines(text='', startIndex=0) {
   return text.split(/\r?\n|,/).map(x=>x.trim()).filter(Boolean).map((line, i)=>{
     let label='', key=line;
@@ -1302,7 +1430,8 @@ function parseImportedKeyLines(text='', startIndex=0) {
       label=parts.shift().trim();
       key=parts.join('=').trim();
     }
-    if (!label) label = `GEMINI_${String(startIndex+i+1).padStart(3,'0')}`;
+    if (!label) label = `Gemini_${String(startIndex+i+1).padStart(3,'0')}`;
+    else label = formatKeyLabel(label);
     return { id:`${Date.now()}_${i}_${shortHash(key)}`, label, key, enabled:true, lastStatus:'unknown', totalSuccess:0, totalFail:0, totalChars:0, lastUsedAt:null, lastError:'' };
   }).filter(k=>k.key);
 }
@@ -1316,7 +1445,7 @@ function uniqueKeyPool(pool) {
   }
   return out;
 }
-function activeKeysFromPool(pool=[]) { return pool.filter(k=>k.enabled && k.key).map(k=>k.key); }
+function activeKeysFromPool(pool=[]) { return pool.filter(k=>k.enabled !== false && k.key).map(k=>k.key); }
 function downloadJson(filename, data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
@@ -1530,8 +1659,28 @@ function extractSuspectSentences(text, chapterIndex, chapterTitle) {
   return suspectList;
 }
 
+function convertToUnicodeBoundary(patternStr) {
+  let cleanPattern = patternStr.replace(/^\\b|\\b$/g, '').replace(/^\b|\b$/g, '');
+  return `(?<![a-zA-Zà-ỹÀ-Ỹ0-9_])${cleanPattern}(?![a-zA-Zà-ỹÀ-Ỹ0-9_])`;
+}
+
 function enforceRulesPostAI(text) {
   let processed = text || '';
+
+  // Apply CONVERT_PATTERNS_V2 replacements
+  if (Array.isArray(CONVERT_PATTERNS_V2)) {
+    CONVERT_PATTERNS_V2.forEach(item => {
+      if (item.pattern && item.replacement !== undefined) {
+        try {
+          const unicodePattern = convertToUnicodeBoundary(item.pattern);
+          const regex = new RegExp(unicodePattern, 'gi');
+          processed = processed.replace(regex, item.replacement);
+        } catch (e) {
+          console.error(`Error processing pattern ${item.pattern}:`, e);
+        }
+      }
+    });
+  }
 
   // Convert vocabulary - safe deterministic replacements
   processed = processed.replace(/trọng sát khí/gi, 'sát khí nặng nề');
@@ -1589,6 +1738,75 @@ function enforceRulesPostAI(text) {
   processed = processed.replace(/đối xử tốt với muội muội ta([.!?。！？…\s]*)(["”']?)/gi, 'đối xử tốt với muội muội ta là được$1$2');
 
   return processed;
+}
+
+function splitIntoSentences(text) {
+  const segments = [];
+  let current = "";
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    current += char;
+    if (char === '\n') {
+      segments.push(current);
+      current = "";
+    } else if (['.', '!', '?', '…', '。', '！', '？'].includes(char)) {
+      while (i + 1 < text.length && ["\"", "'", "”", "』", " ", "\r"].includes(text[i + 1])) {
+        i++;
+        current += text[i];
+      }
+      segments.push(current);
+      current = "";
+    }
+  }
+  if (current) {
+    segments.push(current);
+  }
+  return segments;
+}
+
+function getConvertFlaggingPatterns() {
+  const patterns = new Set();
+  const staticTerms = [
+    "minh bạch", "lên vị", "bị bỏ", "nói chuyện", "gặp sư phụ", "bị bỏ rồi",
+    "thiếu chủ vị", "tộc lão", "đại trưởng lão", "thiếu chủ", "gia chủ", "trưởng lão", "tộc trưởng", "điện chủ", "đường chủ"
+  ];
+  staticTerms.forEach(t => patterns.add(t.toLowerCase()));
+
+  if (typeof CONVERT_PATTERNS === 'object' && CONVERT_PATTERNS !== null) {
+    const categories = ['emotion', 'action', 'sentence', 'vocabulary'];
+    categories.forEach(cat => {
+      const list = CONVERT_PATTERNS[cat];
+      if (Array.isArray(list)) {
+        list.forEach(item => {
+          if (item.pattern) {
+            const parts = item.pattern.split('/');
+            parts.forEach(p => {
+              const clean = p.replace(/\.+/g, '').trim().toLowerCase();
+              if (clean) patterns.add(clean);
+            });
+          }
+        });
+      }
+    });
+    if (Array.isArray(CONVERT_PATTERNS.protectedTitles)) {
+      CONVERT_PATTERNS.protectedTitles.forEach(item => {
+        if (item.key) {
+          patterns.add(item.key.trim().toLowerCase());
+        }
+      });
+    }
+  }
+  return Array.from(patterns);
+}
+
+function shouldFlagSentence(text, patterns) {
+  const lower = text.toLowerCase();
+  for (const pattern of patterns) {
+    if (lower.includes(pattern)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function validateChunkFactIssues(origChunkText, rawAiChunkText, finalChunkText, chunkIndex, flowLabel) {
@@ -1780,9 +1998,100 @@ function createEmptyBook(index=1) {
     title: index === 1 ? 'Truyện đã dọn' : `Truyện ${index}`,
     author: '',
     chapters: [{title:'',number:1,url:'',raw:'',cleaned:''}],
+    storyContext: {
+      characters: [],
+      titles: [],
+      relationships: [],
+      terms: [],
+      updatedAt: new Date().toISOString()
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
+}
+
+function buildStoryContextPrompt(context) {
+  if (!context) return '';
+  let parts = [];
+  
+  // Characters
+  if (Array.isArray(context.characters) && context.characters.length > 0) {
+    context.characters.forEach(char => {
+      if (!char.name) return;
+      let lines = [];
+      let relationStr = '';
+      if (char.title) {
+        relationStr = ` = ${char.title}`;
+      }
+      lines.push(`${char.name}${relationStr}`);
+      
+      let instructions = [];
+      if (char.title) {
+        instructions.push(`Giữ nguyên danh xưng này.`);
+      }
+      if (char.preferredPronoun) {
+        instructions.push(`Ưu tiên nhân xưng: ${char.preferredPronoun}.`);
+      }
+      if (char.gender) {
+        instructions.push(`Giới tính: ${char.gender}.`);
+      }
+      if (Array.isArray(char.aliases) && char.aliases.length > 0) {
+        instructions.push(`Tên gọi khác: ${char.aliases.join(', ')}.`);
+      }
+      
+      if (instructions.length > 0) {
+        lines.push(instructions.join(' '));
+      }
+      parts.push(lines.join('\n'));
+    });
+  }
+  
+  // Titles
+  if (Array.isArray(context.titles) && context.titles.length > 0) {
+    let titleLines = ['BẢO VỆ CHỨC VỤ / DANH XƯNG CHƯƠNG GỐC:'];
+    context.titles.forEach(title => {
+      if (typeof title === 'string' && title.trim()) {
+        titleLines.push(`- Giữ nguyên danh xưng/chức vụ: ${title.trim()}`);
+      } else if (title && typeof title === 'object' && title.name) {
+        titleLines.push(`- Giữ nguyên danh xưng/chức vụ: ${title.name}`);
+      }
+    });
+    if (titleLines.length > 1) {
+      parts.push(titleLines.join('\n'));
+    }
+  }
+
+  // Relationships
+  if (Array.isArray(context.relationships) && context.relationships.length > 0) {
+    let relLines = ['QUAN HỆ NHÂN VẬT:'];
+    context.relationships.forEach(rel => {
+      if (typeof rel === 'string' && rel.trim()) {
+        relLines.push(`- ${rel.trim()}`);
+      } else if (rel && typeof rel === 'object' && rel.from && rel.to && rel.type) {
+        relLines.push(`- ${rel.from} và ${rel.to} là ${rel.type}`);
+      }
+    });
+    if (relLines.length > 1) {
+      parts.push(relLines.join('\n'));
+    }
+  }
+
+  // Terms
+  if (Array.isArray(context.terms) && context.terms.length > 0) {
+    let termLines = ['THUẬT NGỮ ĐẶC BIỆT CẦN GIỮ NGUYÊN:'];
+    context.terms.forEach(term => {
+      if (typeof term === 'string' && term.trim()) {
+        termLines.push(`- ${term.trim()}`);
+      } else if (term && typeof term === 'object' && term.from && term.to) {
+        termLines.push(`- ${term.from} => ${term.to}`);
+      }
+    });
+    if (termLines.length > 1) {
+      parts.push(termLines.join('\n'));
+    }
+  }
+  
+  return parts.join('\n\n');
 }
 
 function classifyAiError(errOrString) {
@@ -1820,6 +2129,17 @@ function getChapterRawContent(ch) {
 function getChapterRawLength(ch) {
   return getChapterRawContent(ch).length;
 }
+
+const isRandomHash = (suffix) => {
+  if (!suffix) return false;
+  const clean = suffix.replace(/^[-_]+/, '').trim();
+  if (!clean) return false;
+  if (/[A-Z]/.test(clean)) return true;
+  if (!/[-_]/.test(clean) && clean.length >= 6 && /[0-9]/.test(clean) && /[a-z]/.test(clean)) {
+    return true;
+  }
+  return false;
+};
 
 function App() {
   const appendTitleDebugLog = (message) => {
@@ -1905,6 +2225,12 @@ function App() {
   const [keyCooldowns,setKeyCooldowns]=useState({});
   const [modelOptions,setModelOptions]=useState(DEFAULT_MODEL_OPTIONS);
   const [aiSubTab, setAiSubTab] = useState('settings');
+  const [showContextModal, setShowContextModal] = useState(false);
+  const [contextActiveTab, setContextActiveTab] = useState('characters');
+  const [newChar, setNewChar] = useState({ name: '', title: '', preferredPronoun: '', gender: 'Nam', aliases: '', description: '' });
+  const [newTitle, setNewTitle] = useState({ name: '', description: '' });
+  const [newRel, setNewRel] = useState({ from: '', to: '', type: '', description: '' });
+  const [newTerm, setNewTerm] = useState({ from: '', to: '', description: '' });
   const [activeReportTab, setActiveReportTab] = useState('success');
   const [expandedIssues, setExpandedIssues] = useState({});
   const [chapterFilter, setChapterFilter] = useState('all');
@@ -1922,6 +2248,13 @@ function App() {
   const [editingPromptText, setEditingPromptText] = useState(PROMPT_PRESETS.naturalVn.aiNaturalVn);
   const [selectedPresetKey, setSelectedPresetKey] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
+  const [showQueueModal, setShowQueueModal] = useState(false);
+  const [aiQueue, setAiQueue] = useState([]);
+  const [queueRunning, setQueueRunning] = useState(false);
+  const [queuePaused, setQueuePaused] = useState(false);
+  const [reportAllBooks, setReportAllBooks] = useState(false);
+  const queuePausedRef = useRef(false);
+  const runAiQueue = () => { console.log('runAiQueue placeholder'); };
 
   useEffect(() => {
     setEditingPromptText(promptTemplates[editingPromptKey] || '');
@@ -1939,6 +2272,21 @@ function App() {
   const bookTitle = currentBook.title || 'Truyện đã dọn';
   const author = currentBook.author || '';
   const chapters = currentBook.chapters?.length ? currentBook.chapters : [{title:'',number:1,url:'',raw:'',cleaned:''}];
+  const chaptersRef = useRef([]);
+  const selectedRef = useRef(0);
+  const bookIndexRef = useRef(0);
+
+  useEffect(() => {
+    chaptersRef.current = chapters;
+  }, [chapters]);
+
+  useEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
+
+  useEffect(() => {
+    bookIndexRef.current = bookIndex;
+  }, [bookIndex]);
   const updateBook = (patchOrFn)=>setBooks(prev=>prev.map((book,idx)=>{
     if(idx!==bookIndex) return book;
     const patch = typeof patchOrFn === 'function' ? patchOrFn(book) : patchOrFn;
@@ -1980,11 +2328,43 @@ function App() {
     updateBook(book => {
       const oldChs = book.chapters || [];
       const newChsTemp = typeof next === 'function' ? next(oldChs) : next;
+      
+      for (let idx = 0; idx < newChsTemp.length; idx++) {
+        const oldCh = oldChs[idx];
+        const newCh = newChsTemp[idx];
+        if (newCh && (oldCh?.url !== newCh.url || oldCh?.nextUrl !== newCh.nextUrl)) {
+          const beforeLog = `[SINGLE_CHAPTER_STATE_SAVE_BEFORE]
+bookIndex: ${bookIndex}
+chapterIndex: ${idx}
+oldChapterUrl: ${oldCh ? (oldCh.url || '') : ''}
+oldChapterNextUrl: ${oldCh ? (oldCh.nextUrl || '') : ''}`;
+          console.log(beforeLog);
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(beforeLog + '\n--------------------------------------------------');
+          }
+
+          const savedNextUrlToState = !!(newCh.nextUrl && newCh.nextUrl.trim());
+          const afterLog = `[SINGLE_CHAPTER_STATE_SAVE_AFTER]
+bookIndex: ${bookIndex}
+chapterIndex: ${idx}
+newChapterUrl: ${newCh.url || ''}
+newChapterNextUrl: ${newCh.nextUrl || ''}
+savedNextUrlToState: ${savedNextUrlToState}`;
+          console.log(afterLog);
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(afterLog + '\n--------------------------------------------------');
+          }
+        }
+      }
+
       const newChs = newChsTemp.map((ch, idx) => {
         if (!ch) return ch;
         const oldCh = oldChs[idx];
+        const stableId = ch.id || (oldCh ? oldCh.id : null) || `ch_${idx}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const updatedCh = { ...ch, id: stableId };
+
         const oldTitle = oldCh ? oldCh.title : undefined;
-        const newTitle = ch.title;
+        const newTitle = updatedCh.title;
         if (oldTitle !== newTitle) {
           let reason = 'unknown';
           if (syncStack.includes('loadChapterList')) reason = 'loadChapterList';
@@ -2020,14 +2400,14 @@ function App() {
           let writeLog = '\n[Title Write]\n';
           writeLog += `before: ${oldTitle !== undefined ? oldTitle : ''}\n`;
           writeLog += `after: ${newTitle !== undefined ? newTitle : ''}\n`;
-          writeLog += `chapterId: ${ch.id || idx}\n`;
+          writeLog += `chapterId: ${updatedCh.id}\n`;
           writeLog += `source: ${reason}\n`;
           writeLog += `stack:\n${syncStack}\n`;
           console.log(writeLog);
           appendTitleDebugLog(writeLog);
-          return { ...ch, _lastWriter: reason };
+          return { ...updatedCh, _lastWriter: reason };
         }
-        return ch;
+        return updatedCh;
       });
       return { chapters: newChs };
     });
@@ -2111,11 +2491,18 @@ function App() {
       const saved = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
       if (saved) {
         if (Array.isArray(saved.books) && saved.books.length) {
-          setBooks(saved.books.map((b,idx)=>({
-            ...createEmptyBook(idx+1),
-            ...b,
-            chapters: Array.isArray(b.chapters) && b.chapters.length ? b.chapters : [{title:'',number:1,url:'',raw:'',cleaned:''}]
-          })));
+          setBooks(saved.books.map((b,idx)=>{
+            const empty = createEmptyBook(idx+1);
+            return {
+              ...empty,
+              ...b,
+              storyContext: {
+                ...empty.storyContext,
+                ...(b.storyContext || {})
+              },
+              chapters: Array.isArray(b.chapters) && b.chapters.length ? b.chapters : [{title:'',number:1,url:'',raw:'',cleaned:''}]
+            };
+          }));
           if (Number.isInteger(saved.bookIndex)) setBookIndex(Math.max(0, Math.min(saved.bookIndex, saved.books.length-1)));
         } else {
           setBooks([{...createEmptyBook(1), title:saved.bookTitle || 'Truyện đã dọn', author:typeof saved.author === 'string' ? saved.author : '', chapters:Array.isArray(saved.chapters) && saved.chapters.length ? saved.chapters : [{title:'',number:1,url:'',raw:'',cleaned:''}]}]);
@@ -2173,22 +2560,247 @@ function App() {
   const [batchSizeInput, setBatchSizeInput] = useState(10);
   const [copiedClean, setCopiedClean] = useState(false);
 
-  function getNextChapterUrl(url) {
-    if (!url) return '';
-    const [base, query] = url.split('?');
-    const numberRegex = /\d+/g;
-    const matches = base.match(numberRegex);
-    if (matches && matches.length > 0) {
-      const lastNumStr = matches[matches.length - 1];
-      const lastNum = parseInt(lastNumStr, 10);
-      const nextNum = lastNum + 1;
-      const lastIdx = base.lastIndexOf(lastNumStr);
-      if (lastIdx !== -1) {
-        const nextBase = base.substring(0, lastIdx) + nextNum + base.substring(lastIdx + lastNumStr.length);
-        return query ? `${nextBase}?${query}` : nextBase;
-      }
+  function getNextChapterUrl(url, storedNextUrl = '', nextChapterInListUrl = '', nextChapterByIndexUrl = '') {
+    if (!url) {
+      return {
+        url: '',
+        strategy: 'None',
+        detectedHashSuffix: false,
+        createdBlankChapter: false,
+        warning: ''
+      };
     }
-    return '';
+    // Check if suffix contains random hash
+
+    try {
+      const [base, query] = url.split('?');
+      
+      // A. nextByNumber nếu có list
+      if (nextChapterInListUrl && nextChapterInListUrl.trim()) {
+        const genUrl = nextChapterInListUrl.trim();
+        const res = {
+          url: genUrl,
+          strategy: 'existingChapterListNext',
+          detectedHashSuffix: false,
+          createdBlankChapter: false,
+          warning: ''
+        };
+        const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl}
+detectedHashSuffix: false
+strategy: existingChapterListNext
+generatedUrl: ${genUrl}
+createdBlankChapter: false
+warning: `;
+        console.log(logMsg);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+        }
+        return res;
+      }
+
+      // B. nextByIndex nếu có list
+      if (nextChapterByIndexUrl && nextChapterByIndexUrl.trim()) {
+        const genUrl = nextChapterByIndexUrl.trim();
+        const res = {
+          url: genUrl,
+          strategy: 'nextByIndex',
+          detectedHashSuffix: false,
+          createdBlankChapter: false,
+          warning: ''
+        };
+        const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: false
+strategy: nextByIndex
+generatedUrl: ${genUrl}
+createdBlankChapter: false
+warning: `;
+        console.log(logMsg);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+        }
+        return res;
+      }
+
+      // C. currentChapter.nextUrl (storedNextUrl)
+      if (storedNextUrl && storedNextUrl.trim()) {
+        const genUrl = storedNextUrl.trim();
+        const res = {
+          url: genUrl,
+          strategy: 'storedNextUrl',
+          detectedHashSuffix: false,
+          createdBlankChapter: false,
+          warning: ''
+        };
+        const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${genUrl}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: false
+strategy: storedNextUrl
+generatedUrl: ${genUrl}
+createdBlankChapter: false
+warning: `;
+        console.log(logMsg);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+        }
+        return res;
+      }
+      
+      // Check if URL has a random hash suffix after the chapter number.
+      const regex = /(?:^|[-/_])(chuong|chapter|chap|vol|tap|c)(?:-|_)?(\d+)(.*)$/i;
+      const hashMatch = base.match(regex);
+      let detectedHashSuffix = false;
+      
+      if (hashMatch) {
+        const numStr = hashMatch[2];
+        const suffixStr = hashMatch[3]; // e.g. "-JGCEbq1QA5AU"
+        if (suffixStr && isRandomHash(suffixStr)) {
+          detectedHashSuffix = true;
+          const warnMsg = "Website này dùng mã chương riêng. Vui lòng dán link chương tiếp thủ công.";
+          const res = {
+            url: '',
+            strategy: 'blockedRandomHash',
+            detectedHashSuffix: true,
+            createdBlankChapter: true,
+            warning: warnMsg
+          };
+          const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: true
+strategy: blockedRandomHash
+generatedUrl: 
+createdBlankChapter: true
+warning: ${warnMsg}`;
+          console.log(logMsg);
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+          }
+          return res;
+        }
+      }
+      
+      // Fallback strategy A: Find last occurrence of a chapter keyword prefix followed by numbers
+      const searchPattern = /(?:^|[-/_])(chuong|chapter|chap|vol|tap|c)(?:-|_)?(\d+)/gi;
+      let match;
+      let lastMatch = null;
+      while ((match = searchPattern.exec(base)) !== null) {
+        lastMatch = match;
+      }
+      
+      if (lastMatch) {
+        const numStr = lastMatch[2];
+        const lastNum = parseInt(numStr, 10);
+        const nextNum = lastNum + 1;
+        const nextNumStr = String(nextNum).padStart(numStr.length, '0');
+        const matchIndex = lastMatch.index;
+        const offsetInMatch = lastMatch[0].lastIndexOf(numStr);
+        const numIndex = matchIndex + offsetInMatch;
+        
+        const nextBase = base.substring(0, numIndex) + nextNumStr + base.substring(numIndex + numStr.length);
+        const generatedUrl = query ? `${nextBase}?${query}` : nextBase;
+        
+        const res = {
+          url: generatedUrl,
+          strategy: 'Keyword prefix',
+          detectedHashSuffix: detectedHashSuffix,
+          createdBlankChapter: false,
+          warning: ''
+        };
+        const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: ${detectedHashSuffix}
+strategy: Keyword prefix
+generatedUrl: ${generatedUrl}
+createdBlankChapter: false
+warning: `;
+        console.log(logMsg);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+        }
+        return res;
+      }
+      
+      // Fallback strategy B: last sequence of digits in base path
+      const numberRegex = /\d+/g;
+      const matches = base.match(numberRegex);
+      if (matches && matches.length > 0) {
+        const lastNumStr = matches[matches.length - 1];
+        const lastNum = parseInt(lastNumStr, 10);
+        const nextNum = lastNum + 1;
+        const nextNumStr = String(nextNum).padStart(lastNumStr.length, '0');
+        const lastIdx = base.lastIndexOf(lastNumStr);
+        if (lastIdx !== -1) {
+          const nextBase = base.substring(0, lastIdx) + nextNumStr + base.substring(lastIdx + lastNumStr.length);
+          const generatedUrl = query ? `${nextBase}?${query}` : nextBase;
+          
+          const res = {
+            url: generatedUrl,
+            strategy: 'Last number sequence',
+            detectedHashSuffix: detectedHashSuffix,
+            createdBlankChapter: false,
+            warning: ''
+          };
+          const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: ${detectedHashSuffix}
+strategy: Last number sequence
+generatedUrl: ${generatedUrl}
+createdBlankChapter: false
+warning: `;
+          console.log(logMsg);
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+          }
+          return res;
+        }
+      }
+      
+      // Failed to recognize
+      const res = {
+        url: '',
+        strategy: 'None',
+        detectedHashSuffix: detectedHashSuffix,
+        createdBlankChapter: false,
+        warning: ''
+      };
+      const logMsg = `[NEXT_CHAPTER_URL]
+sourceUrl: ${url}
+storedNextUrl: ${storedNextUrl || ''}
+nextChapterInListUrl: ${nextChapterInListUrl || ''}
+detectedHashSuffix: ${detectedHashSuffix}
+strategy: None
+generatedUrl: 
+createdBlankChapter: false
+warning: `;
+      console.log(logMsg);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(logMsg + '\n--------------------------------------------------');
+      }
+      return res;
+    } catch (err) {
+      console.error('[NEXT_CHAPTER_URL] Error generating next chapter URL:', err);
+      const res = {
+        url: '',
+        strategy: 'None',
+        detectedHashSuffix: false,
+        createdBlankChapter: false,
+        warning: ''
+      };
+      return res;
+    }
   }
 
   const removeVietnameseTones = (str) => {
@@ -2370,6 +2982,8 @@ function App() {
   }
 
   const continueChapter = (bIdx) => {
+    console.log('[REAL_PLUS_BUTTON_HANDLER]', 'continueChapter');
+    console.trace('[REAL_PLUS_BUTTON_TRACE]');
     const targetBookIndex = bIdx !== undefined ? bIdx : bookIndex;
     if (targetBookIndex === bookIndex) {
       addChapter();
@@ -2410,6 +3024,8 @@ function App() {
       return;
     }
 
+    const isMetruyenchu = /metruyenchuvn/i.test(new URL(url, 'http://dummy.com').hostname);
+
     setFetching(true);
     setStatus({type: '', message: 'Đang tải danh sách chương từ Link tổng...'});
 
@@ -2417,9 +3033,109 @@ function App() {
     const visitedPages = new Set();
     const chapterLinks = [];
     const seenChapterUrls = new Set();
+    let rawChapterLinksCount = 0;
+    let pageUrls = [];
+    let detectedTotalChapters = 0;
+
+    let totalParsedCount = 0;
+    let removedNavigationLinksCount = 0;
+    let removedInvalidChapterUrlsCount = 0;
+    const sampleInvalidUrls = [];
 
     let pageCount = 0;
     const MAX_PAGES = 100;
+
+    const paginationSet = new Set();
+    const uiFlow = {
+      bookUrl: url,
+      initialChaptersCount: 0,
+      paginationUrlsDetected: 0,
+      ajaxFetchStarted: [],
+      ajaxFetchSucceeded: [],
+      ajaxFetchedChapterCounts: [],
+      mergedChapterCount: 0,
+      setChaptersCount: 0
+    };
+
+    const getPageNumber = (urlStr) => {
+      try {
+        const u = new URL(urlStr);
+        const p = u.searchParams.get('page') || u.searchParams.get('p') || u.searchParams.get('trang');
+        if (p && /^\d+$/.test(p)) {
+          return parseInt(p, 10);
+        }
+        const segments = u.pathname.split('/');
+        for (const segment of segments) {
+          const match = segment.match(/(?:trang|page|p|t)-(\d+)/i) || segment.match(/^(\d+)$/);
+          if (match) {
+            return parseInt(match[1], 10);
+          }
+        }
+      } catch {}
+      return 1;
+    };
+
+    const findChapterListContainer = (doc) => {
+      const selectors = [
+        '#chapter-list', '.list-chapter', '.chapter-list', '#list-chapter',
+        '.mucluc', '#mucluc', '.list-chuong', '#list-chuong',
+        '.chapters', '.chapters-list', '.list-chap', '#list-chap',
+        '.volume-chapters', '.volume-list', '.table-chapters', '.list-group'
+      ];
+      for (const sel of selectors) {
+        const el = doc.querySelector(sel);
+        if (el && el.querySelectorAll('a').length >= 3) {
+          return el;
+        }
+      }
+      const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6, div, span, tab, button, a'));
+      const headingKeywords = ['danh sách chương', 'chapter list', 'mục lục', 'list chapter', 'danh sach chuong'];
+      for (const h of headings) {
+        const txt = h.textContent.trim().toLowerCase();
+        if (headingKeywords.some(kw => txt === kw || txt.includes(kw))) {
+          let parent = h.parentElement;
+          while (parent && parent.tagName !== 'BODY') {
+            if (parent.querySelectorAll('a').length >= 3) {
+              return parent;
+            }
+            parent = parent.parentElement;
+          }
+        }
+      }
+      return null;
+    };
+
+    const cleanDocument = (rootEl, hasMainList) => {
+      const blacklist = [
+        '.breadcrumb', '#breadcrumb', '.breadcrumbs',
+        'header', '#header', '.header',
+        'footer', '#footer', '.footer',
+        'aside', '.sidebar', '#sidebar', '.widget',
+        '.truyen-hot', '.truyen-de-cu', '.truyen-cung-loai',
+        '.hot-truyen', '.de-cu', '.comment', '.feedback', '#comments', '.binhluan',
+        '.ads', '.adsbygoogle', '.quangcao', '.qc',
+        '.nav', '.menu', '.category-menu'
+      ];
+      blacklist.forEach(sel => {
+        rootEl.querySelectorAll(sel).forEach(el => el.remove());
+      });
+      if (hasMainList) {
+        const latest = ['.latest-chapters', '.chuong-moi', '.new-chapters', '#chuong-moi', '.latest-chap', '.chap-new', '.new-chap'];
+        latest.forEach(sel => {
+          rootEl.querySelectorAll(sel).forEach(el => el.remove());
+        });
+        const headings = Array.from(rootEl.querySelectorAll('h1, h2, h3, h4, h5, h6, div, span'));
+        headings.forEach(h => {
+          const text = h.textContent.trim().toLowerCase();
+          if (text.includes('chương mới nhất') || text.includes('chương mới cập nhật') || text.includes('chuong moi nhat')) {
+            let parent = h.parentElement;
+            if (parent && parent.tagName !== 'BODY') {
+              parent.remove();
+            }
+          }
+        });
+      }
+    };
 
     try {
       while (pagesToCrawl.length > 0 && pageCount < MAX_PAGES) {
@@ -2437,8 +3153,27 @@ function App() {
           message: `Đang quét trang ${pageCount}... Tìm thấy ${chapterLinks.length} chương.`
         });
 
-        const res = await window.storyAPI.fetchHtml(currentUrl);
+        let fetchOpts = {};
+        if (currentUrl.includes('/get/listchap/')) {
+          fetchOpts = {
+            headers: {
+              'Accept': 'application/json, text/javascript, */*; q=0.01',
+              'X-Requested-With': 'XMLHttpRequest',
+              'Referer': url
+            }
+          };
+        }
+
+        if (pageCount > 1) {
+          uiFlow.ajaxFetchStarted.push(true);
+        }
+
+        const res = await window.storyAPI.fetchHtml(currentUrl, fetchOpts);
         if (!res.ok) {
+          if (pageCount > 1) {
+            uiFlow.ajaxFetchSucceeded.push(false);
+            uiFlow.ajaxFetchedChapterCounts.push(0);
+          }
           if (pageCount === 1) {
             setStatus({type: 'error', message: res.error || 'Lỗi khi tải trang đầu tiên.'});
             setFetching(false);
@@ -2446,87 +3181,236 @@ function App() {
           }
           console.warn(`Lỗi khi tải trang ${currentUrl}:`, res.error);
           continue;
+        } else {
+          if (pageCount > 1) {
+            uiFlow.ajaxFetchSucceeded.push(true);
+          }
         }
 
         const parser = new DOMParser();
         const doc = parser.parseFromString(res.html, 'text/html');
-        const links = Array.from(doc.querySelectorAll('a'));
 
-        links.forEach(a => {
+        // Print raw page log
+        const rawAnchors = Array.from(doc.querySelectorAll('a')).map(a => ({
+          text: a.textContent.trim(),
+          href: a.getAttribute('href') || ''
+        }));
+        
+        const rawPageLog = `[BOOK_CHAPTER_PAGE_RAW]
+pageUrl: ${currentUrl}
+htmlLength: ${res.html ? res.html.length : 0}
+anchorCount: ${rawAnchors.length}
+sampleAnchors: ${JSON.stringify(rawAnchors.slice(0, 5), null, 2)}`;
+
+        console.log(rawPageLog);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(rawPageLog + '\n--------------------------------------------------');
+        }
+
+        if (pageCount === 1) {
+          const textContent = doc.body.textContent;
+          const totalMatch = textContent.match(/(?:Số chương|Số chap|Tổng số chương|Tổng số chap|Chapters|Số chương truyện|Số chương:)\s*:\s*(\d+)/i) ||
+                             textContent.match(/(\d+)\s+(?:chương|chapters|chaps)/i) ||
+                             textContent.match(/(?:chương|chapters|chaps)\s*[:\s-]\s*(\d+)/i);
+          if (totalMatch) {
+            detectedTotalChapters = parseInt(totalMatch[1], 10);
+          }
+        }
+
+        const container = findChapterListContainer(doc);
+        const hasMainList = !!container;
+        const rootEl = container || doc;
+
+        cleanDocument(rootEl, hasMainList);
+
+        const containerAnchors = Array.from(rootEl.querySelectorAll('a'));
+        const afterContainerFilter = containerAnchors.length;
+        const removedByNavigation = [];
+        const afterNavigation = [];
+
+        containerAnchors.forEach(a => {
+          const text = a.textContent.trim();
+          const hrefAttr = a.getAttribute('href');
+          if (!hrefAttr) return;
+
+          let absUrl = hrefAttr;
+          try {
+            absUrl = new URL(hrefAttr, currentUrl).toString().split('#')[0];
+          } catch {}
+
+          const lowerText = text.toLowerCase();
+          const cleanUrl = absUrl.split('?')[0].split('#')[0];
+          
+          let lastSegment = '';
+          try {
+            const urlObj = new URL(cleanUrl);
+            lastSegment = urlObj.pathname.split('/').filter(Boolean).pop() || '';
+          } catch {
+            lastSegment = cleanUrl.split('/').filter(Boolean).pop() || '';
+          }
+
+          const isNavUrl = /^(next|trang|page)/i.test(lastSegment) ||
+                           /next/i.test(cleanUrl) || 
+                           /trang-/i.test(cleanUrl) || 
+                           /page-/i.test(cleanUrl) ||
+                           lowerText.includes('chương tiếp') ||
+                           lowerText.includes('chương sau') ||
+                           lowerText === 'next';
+
+          if (isNavUrl) {
+            removedByNavigation.push({ text, href: absUrl });
+          } else {
+            afterNavigation.push({ anchor: a, text, url: absUrl, lastSegment });
+          }
+        });
+
+        const removedByRegex = [];
+        const accepted = [];
+
+        afterNavigation.forEach(item => {
+          const isChapterPattern = /^(?:chuong|chapter|chap|vol|tap|c)(?:-chuong)?-(?:\d+|-)[a-zA-Z0-9_-]*$/i.test(item.lastSegment);
+
+          if (isChapterPattern) {
+            accepted.push(item);
+          } else {
+            removedByRegex.push({ text: item.text, href: item.url });
+          }
+        });
+
+        // Update counts and samples
+        totalParsedCount += containerAnchors.length;
+        removedNavigationLinksCount += removedByNavigation.length;
+        removedInvalidChapterUrlsCount += removedByRegex.length;
+        rawChapterLinksCount += accepted.length;
+
+        removedByRegex.forEach(x => {
+          if (sampleInvalidUrls.length < 10) {
+            sampleInvalidUrls.push(x.href);
+          }
+        });
+
+        // Print filter step log
+        const filterStepLog = `[BOOK_CHAPTER_FILTER_STEP]
+pageUrl: ${currentUrl}
+totalAnchors: ${rawAnchors.length}
+afterContainerFilter: ${afterContainerFilter}
+afterNavigationFilter: ${afterNavigation.length}
+afterRealChapterRegex: ${accepted.length}
+removedByRegexSample: ${JSON.stringify(removedByRegex.slice(0, 5))}
+removedByNavigationSample: ${JSON.stringify(removedByNavigation.slice(0, 5))}
+acceptedSample: ${JSON.stringify(accepted.slice(0, 5).map(x => ({ text: x.text, href: x.url })))}`;
+
+        console.log(filterStepLog);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(filterStepLog + '\n--------------------------------------------------');
+        }
+
+        if (pageCount === 1) {
+          uiFlow.initialChaptersCount = accepted.length;
+        } else {
+          uiFlow.ajaxFetchedChapterCounts.push(accepted.length);
+        }
+
+        const currentPageNum = getPageNumber(currentUrl);
+
+        // Add accepted chapters
+        accepted.forEach((item, idx) => {
+          let hash = '';
+          if (isMetruyenchu) {
+            try {
+              const urlObj = new URL(item.url);
+              const segment = urlObj.pathname.split('/').filter(Boolean).pop() || '';
+              const hashMatch = segment.match(/-([a-zA-Z0-9_]+)$/);
+              if (hashMatch) {
+                if (!/^\d+$/.test(hashMatch[1])) {
+                  hash = hashMatch[1];
+                }
+              }
+            } catch {}
+          }
+
+          const isDuplicate = hash ? seenChapterUrls.has(hash) : seenChapterUrls.has(item.url);
+
+          if (!isDuplicate) {
+            if (hash) {
+              seenChapterUrls.add(hash);
+            } else {
+              seenChapterUrls.add(item.url);
+            }
+
+            chapterLinks.push({
+              text: item.text,
+              url: item.url,
+              pageNumber: currentPageNum,
+              indexOnPage: idx,
+              hash: hash
+            });
+          }
+        });
+
+        // Find page links and AJAX page links
+        const allDocLinks = Array.from(rootEl.querySelectorAll('a'));
+        allDocLinks.forEach(a => {
           const text = a.textContent.trim();
           const hrefAttr = a.getAttribute('href');
           if (!hrefAttr) return;
           try {
             const absUrl = new URL(hrefAttr, currentUrl).toString().split('#')[0];
-            const lowerText = text.toLowerCase();
-            const lowerHref = absUrl.toLowerCase();
+            const startObj = new URL(url);
+            const urlObj = new URL(absUrl);
+            if (urlObj.hostname === startObj.hostname && !visitedPages.has(absUrl) && !pagesToCrawl.includes(absUrl)) {
+              const lowerTextTrim = text.toLowerCase().trim();
+              const hasPageParam = urlObj.searchParams.has('page') ||
+                                   urlObj.searchParams.has('p') ||
+                                   urlObj.searchParams.has('trang') ||
+                                   /[?&](page|p|trang)=\d+/i.test(urlObj.search);
 
-            const isChapter = (
-              lowerText.includes('chương') ||
-              lowerText.includes('chapter') ||
-              /ch[ươ]ng\s+\d+/i.test(lowerText) ||
-              /chapter\s+\d+/i.test(lowerText) ||
-              lowerHref.includes('chuong-') ||
-              lowerHref.includes('chapter-')
-            ) && !lowerHref.includes('comment') && !lowerHref.includes('feedback');
+              const hasPagePath = /\/(trang|page|p|t)-\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
+                                  /\/page\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
+                                  /\/p\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
+                                  /\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname);
 
-            if (isChapter) {
-              if (!seenChapterUrls.has(absUrl)) {
-                seenChapterUrls.add(absUrl);
-                const chapNum = extractChapterNumber({ title: text, url: absUrl }) !== 999999 ? extractChapterNumber({ title: text, url: absUrl }) : (chapterLinks.length + 1);
-                const normTitle = normalizeChapterTitle(text || `Chương ${chapterLinks.length + 1}`, chapNum);
-                if (normTitle !== text) {
-                  const err = new Error();
-                  const stack = err.stack || '';
-                  let writeLog = '\n[Title Write]\n';
-                  writeLog += `before: ${text || ''}\n`;
-                  writeLog += `after: ${normTitle || ''}\n`;
-                  writeLog += `source: loadChapterList\n`;
-                  writeLog += `stack:\n${stack}\n`;
-                  console.log(writeLog);
-                  appendTitleDebugLog(writeLog);
+              const isNextOrPageText = /^(next|trang|sau|cuối|last|trang\s+\d+|\d+|»|>|>>)$/i.test(lowerTextTrim) ||
+                                       lowerTextTrim.includes('trang tiếp') ||
+                                       lowerTextTrim.includes('trang sau') ||
+                                       lowerTextTrim.includes('tiếp theo');
+
+              if (isSameNovelPage(url, absUrl) && (hasPageParam || hasPagePath || isNextOrPageText)) {
+                pagesToCrawl.push(absUrl);
+                if (pageCount === 1) {
+                  paginationSet.add(absUrl);
                 }
-                console.log('[Title Source]');
-                console.log('stage: chapter-list');
-                console.log(`number: ${chapNum}`);
-                console.log(`title: ${normTitle}`);
-                chapterLinks.push({
-                  title: normTitle,
-                  number: chapNum,
-                  url: absUrl,
-                  raw: '',
-                  cleaned: '',
-                  selectedForExport: false
-                });
-              }
-            } else {
-              const startObj = new URL(url);
-              const urlObj = new URL(absUrl);
-              if (urlObj.hostname === startObj.hostname && !visitedPages.has(absUrl) && !pagesToCrawl.includes(absUrl)) {
-                const lowerTextTrim = text.toLowerCase().trim();
-                const hasPageParam = urlObj.searchParams.has('page') ||
-                                     urlObj.searchParams.has('p') ||
-                                     urlObj.searchParams.has('trang') ||
-                                     /[?&](page|p|trang)=\d+/i.test(urlObj.search);
-
-                const hasPagePath = /\/(trang|page|p|t)-\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
-                                    /\/page\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
-                                    /\/p\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname) ||
-                                    /\/\d+(\.html|\.htm)?\/?$/i.test(urlObj.pathname);
-
-                const isNextOrPageText = /^(next|trang|sau|cuối|last|trang\s+\d+|\d+|»|>|>>)$/i.test(lowerTextTrim) ||
-                                         lowerTextTrim.includes('trang tiếp') ||
-                                         lowerTextTrim.includes('trang sau') ||
-                                         lowerTextTrim.includes('tiếp theo');
-
-                if (isSameNovelPage(url, absUrl) && (hasPageParam || hasPagePath || isNextOrPageText)) {
-                  pagesToCrawl.push(absUrl);
+                if (!pageUrls.includes(absUrl)) {
+                  pageUrls.push(absUrl);
                 }
               }
             }
           } catch {}
         });
 
+        // AJAX onclick listchap pagination
+        const onclickLinks = Array.from(rootEl.querySelectorAll('a[onclick*="page("]'));
+        onclickLinks.forEach(a => {
+          const onclick = a.getAttribute('onclick');
+          const match = onclick.match(/page\((\d+),\s*(\d+)\)/);
+          if (match) {
+            const bookId = match[1];
+            const pageNum = parseInt(match[2], 10);
+            const origin = new URL(url).origin;
+            const apiPageUrl = `${origin}/get/listchap/${bookId}?page=${pageNum}`;
+            if (!visitedPages.has(apiPageUrl) && !pagesToCrawl.includes(apiPageUrl)) {
+              pagesToCrawl.push(apiPageUrl);
+              if (pageCount === 1) {
+                paginationSet.add(apiPageUrl);
+              }
+              if (!pageUrls.includes(apiPageUrl)) {
+                pageUrls.push(apiPageUrl);
+              }
+            }
+          }
+        });
+
+        pagesToCrawl.sort((a, b) => getPageNumber(a) - getPageNumber(b));
         await sleep(300);
       }
 
@@ -2539,18 +3423,220 @@ function App() {
 
       const sortedChapters = chapterLinks.map((ch, idx) => ({ ...ch, originalIdx: idx }));
       sortedChapters.sort((a, b) => {
-        const numA = extractChapterNumber(a);
-        const numB = extractChapterNumber(b);
-        if (numA !== numB) {
-          return numA - numB;
+        if (isMetruyenchu) {
+          if (a.pageNumber !== b.pageNumber) {
+            return a.pageNumber - b.pageNumber;
+          }
+          return a.indexOnPage - b.indexOnPage;
+        } else {
+          const numA = extractChapterNumber({ title: a.text, url: a.url });
+          const numB = extractChapterNumber({ title: b.text, url: b.url });
+          if (numA !== numB) {
+            return numA - numB;
+          }
+          return a.originalIdx - b.originalIdx;
         }
-        return a.originalIdx - b.originalIdx;
       });
 
-      const finalChapters = sortedChapters.map(({ originalIdx, ...rest }) => rest);
+      const finalChapters = sortedChapters.map((ch, idx) => {
+        const chapNum = idx + 1;
+        let finalUrl = ch.url;
+        
+        if (isMetruyenchu) {
+          try {
+            const urlObj = new URL(ch.url);
+            const pathname = urlObj.pathname;
+            const segment = pathname.split('/').filter(Boolean).pop() || '';
+            const hashMatch = segment.match(/-([a-zA-Z0-9_]+)$/);
+            if (hashMatch) {
+              const hashVal = hashMatch[1];
+              if (/^\d+$/.test(hashVal)) {
+                urlObj.pathname = pathname.replace(segment, `chuong-${chapNum}`);
+              } else {
+                urlObj.pathname = pathname.replace(segment, `chuong-${chapNum}-${hashVal}`);
+              }
+              finalUrl = urlObj.toString();
+            }
+          } catch (e) {
+            console.error('Error standardizing URL:', e);
+          }
+        }
+
+        const rawTitle = ch.text || '';
+        let finalTitle = '';
+        let reason = 'valid';
+
+        const isPaginationText = /^(?:trang|page)?\s*\d+(?:\s+\d+)*$/i.test(rawTitle.trim());
+        if (!rawTitle.trim()) {
+          finalTitle = `Chương ${chapNum}`;
+          reason = 'empty raw title';
+        } else if (isPaginationText) {
+          finalTitle = `Chương ${chapNum}`;
+          reason = 'unreliable pagination text';
+        } else {
+          finalTitle = normalizeChapterTitle(rawTitle, chapNum);
+          if (finalTitle === `Chương ${chapNum}`) {
+            reason = 'cleaned empty title fallback';
+          }
+        }
+
+        const titleValidateLog = `[CHAPTER_TITLE_VALIDATE]
+chapterNumber: ${chapNum}
+url: ${finalUrl}
+rawTitle: ${rawTitle}
+finalTitle: ${finalTitle}
+reason: ${reason}`;
+
+        console.log(titleValidateLog);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(titleValidateLog + '\n--------------------------------------------------');
+        }
+
+        if (finalTitle !== ch.text) {
+          const err = new Error();
+          const stack = err.stack || '';
+          let writeLog = '\n[Title Write]\n';
+          writeLog += `before: ${ch.text || ''}\n`;
+          writeLog += `after: ${finalTitle || ''}\n`;
+          writeLog += `source: loadChapterList\n`;
+          writeLog += `stack:\n${stack}\n`;
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(writeLog);
+          }
+        }
+
+        return {
+          title: finalTitle,
+          number: chapNum,
+          url: finalUrl,
+          raw: '',
+          cleaned: '',
+          selectedForExport: false
+        };
+      });
+
+      // Check duplicates & continuity
+      const actualTotal = finalChapters.length;
+      const firstNumber = finalChapters[0]?.number || 0;
+      const lastNumber = finalChapters[finalChapters.length - 1]?.number || 0;
+
+      const missingNumbers = [];
+      const presentNumbers = new Set(finalChapters.map(ch => ch.number));
+      const maxNumToCheck = Math.max(lastNumber, detectedTotalChapters || 0);
+      for (let i = 1; i <= maxNumToCheck; i++) {
+        if (!presentNumbers.has(i)) {
+          missingNumbers.push(i);
+        }
+      }
+
+      const duplicateNumbers = [];
+      const numCounts = {};
+      finalChapters.forEach(ch => {
+        numCounts[ch.number] = (numCounts[ch.number] || 0) + 1;
+      });
+      for (const num in numCounts) {
+        if (numCounts[num] > 1) {
+          duplicateNumbers.push(parseInt(num, 10));
+        }
+      }
+
+      const isContinuous = missingNumbers.length === 0;
+
+      // Print BOOK_CHAPTER_CONTINUITY log
+      const continuityLog = `[BOOK_CHAPTER_CONTINUITY]
+expectedTotal: ${detectedTotalChapters}
+actualTotal: ${actualTotal}
+missingNumbers: ${JSON.stringify(missingNumbers)}
+duplicateNumbers: ${JSON.stringify(duplicateNumbers)}
+firstNumber: ${firstNumber}
+lastNumber: ${lastNumber}
+isContinuous: ${isContinuous}`;
+
+      console.log(continuityLog);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(continuityLog + '\n--------------------------------------------------');
+      }
+
+      let warnings = '';
+      if (!isContinuous || (detectedTotalChapters > 0 && actualTotal < detectedTotalChapters)) {
+        const missingStr = missingNumbers.length > 0 ? missingNumbers.join(',') : 'không';
+        warnings = `Danh sách chương chưa đầy đủ. Đã lấy ${actualTotal}/${detectedTotalChapters || actualTotal} chương. Thiếu: ${missingStr}`;
+      } else {
+        // Check if titles match bookTitle for multiple chapters
+        let bookTitleMatchCount = 0;
+        finalChapters.forEach(ch => {
+          if (ch.title && bookTitle && ch.title.trim().toLowerCase() === bookTitle.trim().toLowerCase()) {
+            bookTitleMatchCount++;
+          }
+        });
+        if (bookTitleMatchCount >= 3) {
+          warnings = `Cảnh báo: Có ${bookTitleMatchCount} chương có tiêu đề trùng với tên truyện. Bộ phân tích có thể đang lấy sai vùng dữ liệu.`;
+        }
+      }
+
       setChapters(finalChapters);
       setSelected(0);
-      setStatus({type: 'ok', message: `Đã tự động tải danh sách gồm ${finalChapters.length} chương.`});
+
+      const firstChapter = finalChapters[0]?.title || '';
+      const lastChapter = finalChapters[finalChapters.length - 1]?.title || '';
+      const strategy = pageUrls.length > 0 ? 'paginatedChapterList' : 'singlePageList';
+
+      const validateLog = `[BOOK_CHAPTER_LIST_VALIDATE]
+totalParsed: ${totalParsedCount}
+removedNavigationLinks: ${removedNavigationLinksCount}
+removedInvalidChapterUrls: ${removedInvalidChapterUrlsCount}
+duplicateNumbers: ${JSON.stringify(duplicateNumbers)}
+sampleInvalidUrls: ${JSON.stringify(sampleInvalidUrls.slice(0, 5))}
+firstValidChapter: ${firstChapter}
+lastValidChapter: ${lastChapter}`;
+
+      console.log(validateLog);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(validateLog + '\n--------------------------------------------------');
+      }
+
+      const bookLog = `[BOOK_CHAPTER_LIST]
+bookUrl: ${url}
+detectedTotalChapters: ${detectedTotalChapters}
+pageCount: ${pageCount}
+pageUrls: ${JSON.stringify(pageUrls)}
+rawChapterLinksCount: ${rawChapterLinksCount}
+dedupedChapterCount: ${finalChapters.length}
+firstChapter: ${firstChapter}
+lastChapter: ${lastChapter}
+strategy: ${strategy}
+warnings: ${warnings}`;
+
+      console.log(bookLog);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(bookLog + '\n--------------------------------------------------');
+      }
+
+      uiFlow.paginationUrlsDetected = paginationSet.size;
+      uiFlow.mergedChapterCount = chapterLinks.length;
+      uiFlow.setChaptersCount = finalChapters.length;
+
+      const uiFlowLog = `[BOOK_LOAD_UI_FLOW]
+bookUrl: ${uiFlow.bookUrl}
+initialChaptersCount: ${uiFlow.initialChaptersCount}
+paginationUrlsDetected: ${uiFlow.paginationUrlsDetected}
+ajaxFetchStarted: ${JSON.stringify(uiFlow.ajaxFetchStarted)}
+ajaxFetchSucceeded: ${JSON.stringify(uiFlow.ajaxFetchSucceeded)}
+ajaxFetchedChapterCounts: ${JSON.stringify(uiFlow.ajaxFetchedChapterCounts)}
+mergedChapterCount: ${uiFlow.mergedChapterCount}
+setChaptersCount: ${uiFlow.setChaptersCount}`;
+
+      console.log(uiFlowLog);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(uiFlowLog + '\n--------------------------------------------------');
+      }
+
+      if (warnings) {
+        setStatus({ type: 'warn', message: warnings });
+      } else {
+        setStatus({ type: 'ok', message: `Đã tự động tải danh sách gồm ${finalChapters.length} chương.` });
+      }
+
     } catch (err) {
       setFetching(false);
       setStatus({type: 'error', message: err.message || 'Lỗi khi parse danh sách chương.'});
@@ -2638,14 +3724,27 @@ function App() {
             appendTitleDebugLog(writeLog);
           }
 
-          updateChapter(idx, {
-            title: crawledTitle,
-            number: chapNum,
-            volume: res.volume || '',
-            volumeSource: res.volume ? 'metadata' : '',
-            raw: strippedText,
-            cleaned: cleanStoryText(strippedText, options, filters, bookTitle)
-          });
+           updateChapter(idx, {
+             title: crawledTitle,
+             number: chapNum,
+             volume: res.volume || '',
+             volumeSource: res.volume ? 'metadata' : '',
+             raw: strippedText,
+             cleaned: cleanStoryText(strippedText, options, filters, bookTitle),
+             nextUrl: res.nextUrl || ''
+           });
+
+           // Log [PARSE_NEXT_URL_SAVE]
+           const savedToState = !!(res.nextUrl && res.nextUrl.trim());
+           let saveLog = '[PARSE_NEXT_URL_SAVE]\n';
+           saveLog += `chapterNumber: ${chapNum}\n`;
+           saveLog += `chapterUrl: ${ch.url}\n`;
+           saveLog += `parsedNextUrl: ${res.nextUrl || ''}\n`;
+           saveLog += `savedToState: ${savedToState}`;
+           console.log(saveLog);
+           if (window.storyAPI?.appendTitleDebugLog) {
+             window.storyAPI.appendTitleDebugLog(saveLog + '\n--------------------------------------------------');
+           }
         } else {
           failCount++;
         }
@@ -2782,8 +3881,21 @@ function App() {
             volume: res.volume || '',
             volumeSource: res.volume ? 'metadata' : '',
             raw: strippedText,
-            cleaned: cleanedText
+            cleaned: cleanedText,
+            nextUrl: res.nextUrl || ''
           });
+
+          // Log [PARSE_NEXT_URL_SAVE]
+          const savedToState = !!(res.nextUrl && res.nextUrl.trim());
+          let saveLog = '[PARSE_NEXT_URL_SAVE]\n';
+          saveLog += `chapterNumber: ${chapNum}\n`;
+          saveLog += `chapterUrl: ${ch.url}\n`;
+          saveLog += `parsedNextUrl: ${res.nextUrl || ''}\n`;
+          saveLog += `savedToState: ${savedToState}`;
+          console.log(saveLog);
+          if (window.storyAPI?.appendTitleDebugLog) {
+            window.storyAPI.appendTitleDebugLog(saveLog + '\n--------------------------------------------------');
+          }
         } else {
           failCount++;
         }
@@ -2825,6 +3937,10 @@ function App() {
 
   const humanizeSelectedChapters = async () => {
     if (aiRunning || fetching) return;
+    if (aiMode === 'selective') {
+      alert("Chế độ Selective chỉ hỗ trợ AI chương hiện tại.");
+      return;
+    }
     const targets = chapters.map((ch, idx) => ({ ch, idx })).filter(({ ch }) => ch.selectedForExport === true);
     if (!targets.length) {
       return setStatus({type: 'warn', message: 'Bạn chưa chọn chương nào (check ✓ ở cột trái).'});
@@ -2855,6 +3971,10 @@ function App() {
 
   const humanizeBatch = async (startCh, endCh) => {
     if (aiRunning || fetching) return;
+    if (aiMode === 'selective') {
+      alert("Chế độ Selective chỉ hỗ trợ AI chương hiện tại.");
+      return;
+    }
     const startIndex = Math.max(0, parseInt(startCh) - 1);
     const endIndex = Math.min(chapters.length, parseInt(endCh));
     
@@ -2964,8 +4084,21 @@ function App() {
     return [];
   };
   const updateChapter=(i,patch)=>{
+    let targetId = null;
+    let targetUrl = null;
+    let targetIdx = null;
+    if (typeof i === 'object' && i !== null) {
+      targetId = i.id;
+      targetUrl = i.url;
+      targetIdx = i.index;
+    } else {
+      targetIdx = i;
+    }
+
+    const logIdx = (targetIdx !== null && targetIdx !== undefined) ? targetIdx : 0;
+
     if (patch.title !== undefined) {
-      const before = chapters[i] ? chapters[i].title : '';
+      const before = chapters[logIdx] ? chapters[logIdx].title : '';
       const after = patch.title;
       const err = new Error();
       const stack = err.stack || '';
@@ -2977,12 +4110,27 @@ function App() {
       console.log(writeLog);
       appendTitleDebugLog(writeLog);
     }
-    console.log(`[Pipeline Trace][State Update] Chapter ${i+1}:`, {
-      title: patch.title !== undefined ? patch.title : (chapters[i] ? chapters[i].title : undefined),
-      rawContent: patch.raw !== undefined ? patch.raw.slice(0, 300) : (chapters[i] ? chapters[i].raw?.slice(0, 300) : undefined),
-      cleanedContent: patch.cleaned !== undefined ? patch.cleaned.slice(0, 300) : (chapters[i] ? chapters[i].cleaned?.slice(0, 300) : undefined)
+    console.log(`[Pipeline Trace][State Update] Chapter ${logIdx+1}:`, {
+      title: patch.title !== undefined ? patch.title : (chapters[logIdx] ? chapters[logIdx].title : undefined),
+      rawContent: patch.raw !== undefined ? patch.raw.slice(0, 300) : (chapters[logIdx] ? chapters[logIdx].raw?.slice(0, 300) : undefined),
+      cleanedContent: patch.cleaned !== undefined ? patch.cleaned.slice(0, 300) : (chapters[logIdx] ? chapters[logIdx].cleaned?.slice(0, 300) : undefined)
     });
-    setChapters(prev=>prev.map((ch,idx)=>idx===i?{...ch,...patch}:ch));
+
+    setChapters(prev=>{
+      let finalIdx = targetIdx;
+      if (targetId) {
+        const found = prev.findIndex(ch => ch.id === targetId);
+        if (found !== -1) finalIdx = found;
+      }
+      if ((finalIdx === -1 || finalIdx === undefined || finalIdx === null) && targetUrl) {
+        const found = prev.findIndex(ch => ch.url === targetUrl);
+        if (found !== -1) finalIdx = found;
+      }
+      if (finalIdx === -1 || finalIdx === undefined || finalIdx === null) {
+        return prev;
+      }
+      return prev.map((ch,idx)=>idx===finalIdx?{id: ch.id || `ch_${idx}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,...ch,...patch}:ch);
+    });
   };
   const cleanOne=(i)=>{
     const rawContent = getChapterRawContent(chapters[i]);
@@ -3021,8 +4169,66 @@ function App() {
     setStatus({type:'ok',message: generateCleanLog(loggedTargets)});
   };
   const addChapter = () => {
-    const currentCh = chapters[selected];
-    let nextNum = chapters.length + 1;
+    console.log('[REAL_PLUS_BUTTON_HANDLER]', 'addChapter');
+    console.trace('[REAL_PLUS_BUTTON_TRACE]');
+    // Read directly from the latest source (books[bookIndex].chapters) to avoid stale closures
+    const latestBook = books[bookIndex] || books[0] || createEmptyBook(1);
+    const latestChapters = latestBook.chapters?.length ? latestBook.chapters : chapters;
+    const currentCh = latestChapters[selected];
+
+    if (currentCh) {
+      if (currentCh.isFetching) {
+        const blockedLog = `[PLUS_NEXT_BLOCKED_PENDING_FETCH]
+chapterIndex: ${selected}
+chapterUrl: ${currentCh.url || ''}
+reason: pending fetch for current chapter`;
+        console.log(blockedLog);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(blockedLog + '\n--------------------------------------------------');
+        }
+        setStatus({ type: 'warn', message: 'Cần bấm Lấy nội dung và đợi hoàn tất trước khi tạo chương tiếp.' });
+        return;
+      }
+
+      let hasRandomHash = false;
+      if (currentCh.url) {
+        const [base] = currentCh.url.split('?');
+        const regex = /(?:^|[-/_])(chuong|chapter|chap|vol|tap|c)(?:-|_)?(\d+)(.*)$/i;
+        const hashMatch = base.match(regex);
+        if (hashMatch) {
+          const suffixStr = hashMatch[3];
+          if (suffixStr && isRandomHash(suffixStr)) {
+            hasRandomHash = true;
+          }
+        }
+      }
+
+      if (hasRandomHash && !currentCh.nextUrl) {
+        const blockedLog = `[PLUS_NEXT_BLOCKED_PENDING_FETCH]
+chapterIndex: ${selected}
+chapterUrl: ${currentCh.url || ''}
+reason: random hash URL with empty nextUrl`;
+        console.log(blockedLog);
+        if (window.storyAPI?.appendTitleDebugLog) {
+          window.storyAPI.appendTitleDebugLog(blockedLog + '\n--------------------------------------------------');
+        }
+        setStatus({ type: 'warn', message: 'Cần bấm Lấy nội dung và đợi hoàn tất trước khi tạo chương tiếp.' });
+        return;
+      }
+    }
+
+    const plusNextLog = `[PLUS_NEXT_CLICK_REAL]
+bookIndex: ${bookIndex}
+chapterIndex: ${selected}
+currentChapterUrl: ${currentCh ? (currentCh.url || '') : ''}
+currentChapterNextUrl: ${currentCh ? (currentCh.nextUrl || '') : ''}
+chaptersLength: ${latestChapters.length}`;
+    console.log(plusNextLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(plusNextLog + '\n--------------------------------------------------');
+    }
+
+    let nextNum = latestChapters.length + 1;
     if (currentCh) {
       if (currentCh.number !== undefined && currentCh.number !== null) {
         nextNum = currentCh.number + 1;
@@ -3030,19 +4236,73 @@ function App() {
         nextNum = selected + 2;
       }
     }
+
+    const currentChapterNumber = currentCh ? currentCh.number : undefined;
+    const currentChapterTitle = currentCh ? currentCh.title : '';
+    const currentChapterUrl = currentCh ? currentCh.url : '';
+    const currentChapterNextUrl = currentCh ? currentCh.nextUrl : '';
+    const chaptersLength = latestChapters.length;
+    const nextCh = currentChapterNumber !== undefined && currentChapterNumber !== null
+      ? latestChapters.find(ch => ch.number === currentChapterNumber + 1)
+      : null;
+    const nextChapterInListUrl = nextCh ? (nextCh.url || '') : '';
+    const nextChapterByIndexUrl = (selected + 1 < latestChapters.length) ? (latestChapters[selected + 1].url || '') : '';
+
+    const addChapterLog = `[ADD_CHAPTER_CURRENT]
+bookIndex: ${bookIndex}
+chapterIndex: ${selected}
+currentChapterNumber: ${currentChapterNumber !== undefined ? currentChapterNumber : ''}
+currentChapterTitle: ${currentChapterTitle}
+currentChapterUrl: ${currentChapterUrl}
+currentChapterNextUrl: ${currentChapterNextUrl}
+chaptersLength: ${chaptersLength}
+nextChapterInListUrl: ${nextChapterInListUrl}`;
+
+    console.log(addChapterLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(addChapterLog + '\n--------------------------------------------------');
+    }
+    
+    let nextUrl = '';
+    let hasWarning = false;
+    let warningMsg = '';
+    let unrecognized = false;
+
+    if (currentCh) {
+      if (currentCh.url) {
+        const res = getNextChapterUrl(currentCh.url, currentCh.nextUrl, nextChapterInListUrl, nextChapterByIndexUrl);
+        nextUrl = res.url;
+        if (res.warning) {
+          hasWarning = true;
+          warningMsg = res.warning;
+        } else if (!nextUrl) {
+          unrecognized = true;
+        }
+      }
+    }
+    
     const newCh = {
+      id: `ch_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       title: '',
       number: nextNum,
-      url: currentCh ? getNextChapterUrl(currentCh.url) : '',
+      url: nextUrl,
       raw: '',
       cleaned: '',
       selectedForExport: false
     };
-    const nextChapters = [...chapters];
+    
+    const nextChapters = [...latestChapters];
     nextChapters.splice(selected + 1, 0, newCh);
     setChapters(nextChapters);
     setSelected(selected + 1);
-    setStatus({type:'ok',message:`Đã tạo chương mới: Chương ${nextNum}`});
+    
+    if (hasWarning) {
+      setStatus({ type: 'warn', message: warningMsg });
+    } else if (unrecognized) {
+      setStatus({ type: 'warn', message: 'Không xác định được chương kế tiếp. Vui lòng nhập thủ công.' });
+    } else {
+      setStatus({ type: 'ok', message: `Đã tạo chương mới: Chương ${nextNum}` });
+    }
   };
   const removeChapter=(i)=>{const next=chapters.filter((_,idx)=>idx!==i);setChapters(next.length?next:[{title:'',number:1,url:'',raw:'',cleaned:''}]);setSelected(Math.max(0,i-1));};
   const moveChapter=(i,dir)=>{const j=i+dir;if(j<0||j>=chapters.length)return;const next=[...chapters];[next[i],next[j]]=[next[j],next[i]];setChapters(next);setSelected(j);};
@@ -3095,14 +4355,69 @@ function App() {
       return;
     }
 
+    const targetBookIndex = bookIndex;
+    const targetChapterIndexAtStart = selected;
+    const targetChObj = chapters[selected];
+    const targetChapterId = targetChObj.id || `ch_${selected}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    
+    const targetUrl = url;
+    // Save id and isFetching status to target chapter in React state using stable targeting
+    updateChapter({ id: targetChapterId, url: targetUrl, index: selected }, { id: targetChapterId, isFetching: true });
+
+    const captureLog = `[FETCH_TARGET_CAPTURED]
+targetBookIndex: ${targetBookIndex}
+targetChapterId: ${targetChapterId}
+targetChapterIndexAtStart: ${targetChapterIndexAtStart}
+targetUrl: ${targetUrl}`;
+    console.log(captureLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(captureLog + '\n--------------------------------------------------');
+    }
+
     setFetching(true); setStatus({type:'',message:''});
     const res = await window.storyAPI.fetchChapter(url, bookTitle);
     setFetching(false);
-    let ipcRecvLog = '\n[IPC Receive]\n';
-    ipcRecvLog += `chapterTitle: ${res.chapterTitle || ''}\n`;
-    console.log(ipcRecvLog);
-    appendTitleDebugLog(ipcRecvLog);
-    if(!res.ok) return setStatus({type:'error',message:res.error || 'Không lấy được chương.'});
+
+    // Resolve target chapter index based on stable targetChapterId/targetUrl in latest state using ref to avoid stale closures
+    const latestChapters = chaptersRef.current;
+    let resolvedIndex = latestChapters.findIndex(ch => ch.id === targetChapterId);
+    if (resolvedIndex === -1) {
+      resolvedIndex = latestChapters.findIndex(ch => ch.url === targetUrl);
+    }
+    if (resolvedIndex === -1) {
+      resolvedIndex = targetChapterIndexAtStart;
+    }
+
+    const resolvedCh = latestChapters[resolvedIndex] || targetChObj;
+    const currentSelectedIndex = selectedRef.current;
+
+    const saveResolvedLog = `[FETCH_SAVE_RESOLVED_TARGET]
+targetChapterId: ${targetChapterId}
+targetUrl: ${targetUrl}
+resolvedIndex: ${resolvedIndex}
+resolvedChapterUrl: ${resolvedCh ? (resolvedCh.url || '') : ''}
+currentSelectedIndex: ${currentSelectedIndex}`;
+    console.log(saveResolvedLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(saveResolvedLog + '\n--------------------------------------------------');
+    }
+
+    if(!res.ok) {
+      updateChapter({ id: targetChapterId, url: targetUrl, index: resolvedIndex }, { isFetching: false });
+      return setStatus({type:'error',message:res.error || 'Không lấy được chương.'});
+    }
+
+    const payloadLog = `[SINGLE_CHAPTER_PAYLOAD_UI]
+chapterIndex: ${resolvedIndex}
+bookIndex: ${targetBookIndex}
+url: ${url}
+payloadTitle: ${res.title || ''}
+payloadNextUrl: ${res.nextUrl || ''}
+payloadHtmlLength: ${res.htmlLength || 0}`;
+    console.log(payloadLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(payloadLog + '\n--------------------------------------------------');
+    }
     
     if (res.bookTitle && (!bookTitle || bookTitle === 'Truyện đã dọn')) {
       setBookTitle(res.bookTitle);
@@ -3110,18 +4425,18 @@ function App() {
     if (res.author && (!author || author.trim() === '')) {
       setAuthor(res.author);
     }
-    const chapNum = res.chapterNumber !== undefined && res.chapterNumber !== null ? res.chapterNumber : (selected + 1);
+    const chapNum = res.chapterNumber !== undefined && res.chapterNumber !== null ? res.chapterNumber : (resolvedIndex + 1);
     
     let crawledTitle = '';
     if (res.chapterTitle && !isInvalidChapterTitle(res.chapterTitle, bookTitle || res.bookTitle, author || res.author)) {
       crawledTitle = res.chapterTitle;
     } else {
-      crawledTitle = normalizeChapterTitle(res.title || current.title, chapNum);
+      crawledTitle = normalizeChapterTitle(res.title || resolvedCh.title, chapNum);
     }
     if (isInvalidChapterTitle(crawledTitle, bookTitle || res.bookTitle, author || res.author)) {
       crawledTitle = '';
     }
-    const existingTitle = current.title || '';
+    const existingTitle = resolvedCh.title || '';
     if (existingTitle && !isInvalidChapterTitle(existingTitle, bookTitle, author)) {
       if (!crawledTitle || isInvalidChapterTitle(crawledTitle, bookTitle, author)) {
         crawledTitle = existingTitle;
@@ -3141,13 +4456,13 @@ function App() {
     console.log('stage: fetch-current');
     console.log(`res.title: ${res.title}`);
     console.log(`res.chapterTitle: ${res.chapterTitle}`);
-    console.log(`current.title: ${current.title}`);
+    console.log(`resolvedCh.title: ${resolvedCh.title}`);
 
-    if (current.title !== crawledTitle) {
+    if (resolvedCh.title !== crawledTitle) {
       const err = new Error();
       const stack = err.stack || '';
       let writeLog = '\n[Title Write]\n';
-      writeLog += `before: ${current.title || ''}\n`;
+      writeLog += `before: ${resolvedCh.title || ''}\n`;
       writeLog += `after: ${crawledTitle || ''}\n`;
       writeLog += `source: fetchCurrentUrl\n`;
       writeLog += `stack:\n${stack}\n`;
@@ -3158,14 +4473,57 @@ function App() {
     const cleanedText = cleanStoryText(strippedText, options, filters, bookTitle);
     logVietnameseTextPipeline(res.rawHtmlSnippet, strippedText, cleanedText);
 
-    updateChapter(selected,{
+    updateChapter({ id: targetChapterId, url: targetUrl, index: resolvedIndex }, {
       title: crawledTitle,
       number: chapNum,
       volume: res.volume || '',
       volumeSource: res.volume ? 'metadata' : '',
       raw: strippedText,
-      cleaned: cleanedText
+      cleaned: cleanedText,
+      nextUrl: res.nextUrl || '',
+      isFetching: false
     });
+
+    // Log [PARSE_NEXT_URL_SAVE]
+    const savedToState = !!(res.nextUrl && res.nextUrl.trim());
+    let saveLog = '[PARSE_NEXT_URL_SAVE]\n';
+    saveLog += `chapterNumber: ${chapNum}\n`;
+    saveLog += `chapterUrl: ${url}\n`;
+    saveLog += `parsedNextUrl: ${res.nextUrl || ''}\n`;
+    saveLog += `savedToState: ${savedToState}`;
+    console.log(saveLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(saveLog + '\n--------------------------------------------------');
+    }
+
+    const currentChapterNextUrlAfterSave = res.nextUrl || '';
+    const singleChapterFetchLog = `[SINGLE_CHAPTER_FETCH]
+chapterUrl: ${url}
+htmlLength: ${res.htmlLength || 0}
+title: ${crawledTitle}
+parsedNextUrl: ${res.nextUrl || ''}
+savedNextUrlToState: ${savedToState}
+currentChapterNextUrlAfterSave: ${currentChapterNextUrlAfterSave}`;
+
+    console.log(singleChapterFetchLog);
+    if (window.storyAPI?.appendTitleDebugLog) {
+      window.storyAPI.appendTitleDebugLog(singleChapterFetchLog + '\n--------------------------------------------------');
+    }
+
+    setTimeout(() => {
+      const latestChaptersArray = chaptersRef.current;
+      const latestCh = latestChaptersArray.find(ch => ch.id === targetChapterId) || latestChaptersArray[targetChapterIndexAtStart];
+      const logAfterSave = `[SINGLE_CHAPTER_SELECTED_AFTER_SAVE]
+bookIndex: ${bookIndexRef.current}
+chapterIndex: ${selectedRef.current}
+selectedChapterUrl: ${latestCh ? (latestCh.url || '') : ''}
+selectedChapterNextUrl: ${latestCh ? (latestCh.nextUrl || '') : ''}`;
+      console.log(logAfterSave);
+      if (window.storyAPI?.appendTitleDebugLog) {
+        window.storyAPI.appendTitleDebugLog(logAfterSave + '\n--------------------------------------------------');
+      }
+    }, 100);
+
     setStatus({type:'ok',message:`Đã lấy nội dung chương. Bộ nhận diện: ${res.selector || 'auto'}.`});
   };
   const exportTxt=()=>{
@@ -3227,6 +4585,32 @@ function App() {
       setStatus({ type: 'error', message: 'Tính năng này chỉ hỗ trợ trên ứng dụng Desktop.' });
     }
   };
+  const handleOpenBatchExport = (isTts) => {
+    try {
+      setShowDocxDropdown(false);
+      
+      const chs = Array.isArray(chapters) ? chapters : [];
+      if (chs.length === 0) {
+        console.error('[DOCX_VOLUME_DIALOG_OPEN_ERROR] chapters list is empty or invalid.');
+        setStatus({ type: 'warn', message: 'Không tìm thấy danh sách chương để chia tập.' });
+        return;
+      }
+      
+      // Defaults and fallbacks
+      const startChapter = 1;
+      const endChapter = chs.length;
+      const volumeSize = Math.min(10, chs.length) || 10;
+      
+      setExportIsTTS(isTts);
+      setExportStartCh(startChapter);
+      setExportEndCh(volumeSize);
+      updateDefaultFilename(startChapter, volumeSize);
+      setShowBatchExportModal(true);
+    } catch (err) {
+      console.error('[DOCX_VOLUME_DIALOG_OPEN_ERROR] Failed to open volume export dialog:', err);
+      setStatus({ type: 'error', message: 'Không thể mở hộp thoại xuất tập: ' + err.message });
+    }
+  };
   const makePrompt=()=>{const text=(current.cleaned||current.raw||'').trim(); if(!text) return alert('Chưa có nội dung chương.'); setAiPrompt(buildCustomPrompt(aiMode,text,filters,1,1,'',promptSettings,promptTemplates)); setTab('ai'); setAiSubTab('prompts');};
   const copyPrompt=async()=>{await navigator.clipboard.writeText(aiPrompt); setStatus({type:'ok',message:'Đã copy prompt.'});};
 
@@ -3244,7 +4628,7 @@ function App() {
     setKeyCooldowns(prev=>({...prev,[key]:until}));
     return until;
   };
-  const callGeminiWithPool=async(prompt, chunkLabel, startIndex=0)=>{
+  const callGeminiWithPool=async(prompt, chunkLabel, startIndex=0, callOptions={})=>{
     const keys = activeKeysFromPool(apiPool);
     if (!keys.length) throw new Error('Chưa nhập Gemini API key.');
     if (!window.storyAPI?.geminiGenerate) throw new Error('Gemini API chỉ chạy trong app desktop Electron.');
@@ -3261,7 +4645,7 @@ function App() {
       }
       const key = keys[idx];
       setAiProgress(p=>({...p,message:`${chunkLabel} — dùng key #${idx+1}`}));
-      const res = await window.storyAPI.geminiGenerate({apiKey:key, model:apiSettings.model, prompt});
+      const res = await window.storyAPI.geminiGenerate({apiKey:key, model:apiSettings.model, prompt, ...callOptions});
       if (res.ok) {
         setApiPool(prev=>prev.map(k=>k.key===key?{...k,lastStatus:'active',totalSuccess:(k.totalSuccess||0)+1,totalChars:(k.totalChars||0)+prompt.length,lastUsedAt:new Date().toISOString(),lastError:''}:k));
         return { text: res.text, nextIndex: (idx+1)%keys.length };
@@ -3303,6 +4687,282 @@ function App() {
     if (!localCleaned.trim()) {
       localCleaned = source;
     }
+
+    if (aiMode === 'selective') {
+      if (flowParam !== 'current_chapter') {
+        alert("Chế độ Selective Edit (Experimental) chỉ hỗ trợ xử lý từng chương đơn lẻ.");
+        return false;
+      }
+      if (aiRunning) return false;
+      setAiRunning(true);
+      setAiProgress({ done: 0, total: 1, message: `Selective AI: Đang phân tích câu...` });
+      try {
+        const rawSegments = splitIntoSentences(localCleaned);
+        const segments = [];
+        let sentenceCounter = 0;
+        const flaggingPatterns = getConvertFlaggingPatterns();
+        
+        for (const seg of rawSegments) {
+          const isSentence = /[a-zA-Zà-ỹÀ-Ỹ0-9]/.test(seg);
+          if (isSentence) {
+            sentenceCounter++;
+            segments.push({
+              id: sentenceCounter,
+              type: 'sentence',
+              text: seg,
+              flagged: shouldFlagSentence(seg, flaggingPatterns)
+            });
+          } else {
+            segments.push({
+              type: 'separator',
+              text: seg
+            });
+          }
+        }
+        
+        const sentenceSegments = segments.filter(s => s.type === 'sentence');
+        const flaggedSentences = sentenceSegments.filter(s => s.flagged);
+        const totalCount = sentenceSegments.length;
+        const flaggedCount = flaggedSentences.length;
+        
+        console.log(`[Selective AI Debug] Total sentences: ${totalCount}, Flagged: ${flaggedCount}`);
+        
+        if (flaggedCount === 0) {
+          setAiProgress({ done: 1, total: 1, message: `Selective AI hoàn thành (0 câu nghi ngờ)` });
+          const finalCleaned = enforceRulesPostAI(localCleaned);
+          updateChapter(i, {
+            cleaned: finalCleaned,
+            aiNaturalAt: new Date().toISOString(),
+            aiProcessed: true,
+            aiError: null,
+            aiErrorType: null,
+            aiErrorAt: null,
+            aiFactIssues: [],
+            aiSelectiveStats: {
+              total: totalCount,
+              flagged: 0,
+              totalSentences: totalCount,
+              flaggedSentences: 0,
+              requestsSent: 0,
+              responsesReceived: 0,
+              editedSentences: 0,
+              patchedSentences: 0,
+              preservedSentences: totalCount,
+              edited: 0,
+              preserved: totalCount
+            },
+            aiSelectiveDetails: []
+          });
+          setStatus({
+            type: 'ok',
+            message: `AI Selective đã xử lý xong chương ${i+1}. Kết quả: ${totalCount} câu, 0 nghi ngờ, 0 được sửa, ${totalCount} giữ nguyên.`
+          });
+          return true;
+        }
+        
+        // Build prompt with flagged sentences and context
+        const flaggedItems = flaggedSentences.map(item => {
+          const idx = sentenceSegments.findIndex(s => s.id === item.id);
+          return {
+            sentenceId: item.id,
+            original: item.text.trim(),
+            context: {
+              prev_2: idx >= 2 ? sentenceSegments[idx - 2].text.trim() : "",
+              prev_1: idx >= 1 ? sentenceSegments[idx - 1].text.trim() : "",
+              next_1: idx + 1 < sentenceSegments.length ? sentenceSegments[idx + 1].text.trim() : "",
+              next_2: idx + 2 < sentenceSegments.length ? sentenceSegments[idx + 2].text.trim() : ""
+            }
+          };
+        });
+        
+        const formattedPatterns = formatConvertPatternsForPrompt(CONVERT_PATTERNS);
+        const preserve = splitTerms(filters.preserveTerms).join(', ');
+        const pronoun = PRONOUN_PRESETS[promptSettings.pronounStyle] || PRONOUN_PRESETS.balanced;
+        const memory = (promptSettings.novelMemory || '').trim();
+        const extra = (promptSettings.additionalInstructions || '').trim();
+        
+        const selectivePrompt = `Bạn không phải dịch lại câu. Bạn là một biên tập viên văn học xuất sắc.
+Mục tiêu duy nhất của bạn là biên tập các câu chứa từ ngữ convert hoặc dịch thô trong danh sách dưới đây thành câu tiếng Việt tự nhiên, mượt mà, đậm chất văn học Việt Nam.
+
+NGUYÊN TẮC BIÊN TẬP:
+1. ƯU TIÊN HÀNG ĐẦU:
+   - Giữ nguyên ý nghĩa gốc của câu.
+   - Giữ nguyên tất cả danh xưng bảo vệ (ví dụ: thiếu chủ, đại trưởng lão, gia chủ, trưởng lão, tộc trưởng, điện chủ, đường chủ...). KHÔNG lược bỏ, thay đổi hay hạ thấp các danh xưng này.
+   - Giữ nguyên nhân vật, dữ kiện và bối cảnh.
+   - CHỈ sửa đổi cách diễn đạt để câu văn trôi chảy và tự nhiên nhất.
+2. CẤM TUYỆT ĐỐI:
+   - KHÔNG được thêm bớt tình tiết hay tự bịa thêm hành động/cảm xúc.
+   - KHÔNG được tự ý thay đổi nhân vật hoặc mối quan hệ giữa các nhân vật.
+3. HƯỚNG DẪN XỬ LÝ VĂN PHONG (Tránh Hán Việt nặng, tránh dịch sát nghĩa từng chữ):
+   - KHÔNG viết: "tịch đoạn mạch phế thể" -> "phế nhân mạch đoạn". NÊN viết: "kinh mạch đứt đoạn, trở thành phế nhân" hoặc tương đương.
+   - KHÔNG viết: "hảo hảo đối đãi" -> "chiếu cố tốt". NÊN viết: "hãy đối xử tốt với" hoặc tương đương.
+   - KHÔNG viết: "ngươi nên minh bạch" -> "ngươi nên hiểu". NÊN viết: "ngươi hẳn phải hiểu" hoặc tương đương.
+4. NGỮ CẢNH:
+   - Sử dụng 2 câu trước (prev_2, prev_1) và 2 câu sau (next_1, next_2) trong trường 'context' làm ngữ cảnh để xác định xưng hô và ý nghĩa chính xác nhất. Tuyệt đối KHÔNG sửa đổi các câu ngữ cảnh này và KHÔNG trả chúng về trong kết quả.
+5. ĐẦU RA (OUTPUT):
+   - Định dạng đầu ra bắt buộc là một JSON array gồm các object chứa:
+     + "sentenceId": số ID của câu.
+     + "original": câu gốc ban đầu.
+     + "edited": chỉ chứa câu đã được sửa đổi tự nhiên (hoặc giữ nguyên nếu câu gốc đã hoàn hảo). Không thêm bất kỳ giải thích, chú thích, hay ghi chú nào bên ngoài câu dịch.
+
+Các quy tắc dịch convert tham khảo:
+${formattedPatterns}
+
+Cài đặt bổ sung:
+- Từ ngữ cần bảo toàn: ${preserve || 'Không có'}
+- Xưng hô ưu tiên: ${pronoun}
+- Ghi nhớ riêng bộ truyện: ${memory || 'Không có'}
+- Yêu cầu khác: ${extra || 'Không có'}
+
+Dưới đây là danh sách các câu cần biên tập dưới dạng JSON:
+${JSON.stringify(flaggedItems, null, 2)}`;
+
+        setAiProgress({ done: 0, total: 1, message: `Selective AI: Đang gọi Gemini...` });
+        
+        const result = await callGeminiWithPool(
+          selectivePrompt, 
+          `Chương ${i+1} Selective AI`, 
+          0, 
+          {
+            responseMimeType: 'application/json',
+            responseSchema: {
+              type: "ARRAY",
+              description: "Danh sách các câu đã được sửa đổi",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  sentenceId: { type: "INTEGER", description: "ID của câu được sửa đổi" },
+                  original: { type: "STRING", description: "Bản gốc của câu mục tiêu" },
+                  edited: { type: "STRING", description: "Bản đã sửa đổi tự nhiên của câu mục tiêu. Nếu câu đã tự nhiên sẵn, giữ nguyên giá trị gốc." }
+                },
+                required: ["sentenceId", "original", "edited"]
+              }
+            }
+          }
+        );
+        
+        let editedList = [];
+        const resText = (result.text || '').trim();
+        try {
+          editedList = JSON.parse(resText);
+        } catch (e) {
+          const match = resText.match(/\[[\s\S]*\]/);
+          if (match) {
+            try {
+              editedList = JSON.parse(match[0]);
+            } catch(e2) {
+              throw new Error("Không thể parse kết quả JSON từ Gemini.");
+            }
+          } else {
+            throw new Error("Gemini không trả về định dạng JSON hợp lệ.");
+          }
+        }
+        
+        let editedSentences = 0;
+        let patchedSentences = 0;
+        const details = [];
+
+        for (const item of editedList) {
+          const sId = Number(item.sentenceId);
+          const originalText = item.original || '';
+          const editedText = item.edited || '';
+          
+          const isChanged = editedText.trim() !== originalText.trim();
+          if (isChanged) {
+            editedSentences++;
+          }
+          
+          let isPatched = false;
+          if (sId > 0 && editedText !== undefined && editedText !== null) {
+            const seg = segments.find(s => s.type === 'sentence' && s.id === sId);
+            if (seg) {
+              const trimmedOrig = originalText.trim();
+              const trimmedEdit = editedText.trim();
+              if (trimmedEdit && trimmedEdit !== trimmedOrig) {
+                const matchWhitespace = seg.text.match(/\s*$/);
+                const trailingWhitespace = matchWhitespace ? matchWhitespace[0] : "";
+                seg.text = editedText.trim() + trailingWhitespace;
+                patchedSentences++;
+                isPatched = true;
+              }
+            }
+          }
+          
+          details.push({
+            sentenceId: sId,
+            original: originalText,
+            edited: editedText,
+            changed: isChanged,
+            patched: isPatched
+          });
+        }
+
+        const matchedCount = editedList.filter(item => {
+          const sId = Number(item.sentenceId);
+          return segments.some(s => s.type === 'sentence' && s.id === sId);
+        }).length;
+        const skippedCount = editedList.length - patchedSentences;
+
+        console.log(`[Selective AI Debug] Received: ${editedList.length}`);
+        console.log(`[Selective AI Debug] Matched: ${matchedCount}`);
+        console.log(`[Selective AI Debug] Patched: ${patchedSentences}`);
+        console.log(`[Selective AI Debug] Skipped: ${skippedCount}`);
+        
+        const mergedText = segments.map(s => s.text).join('');
+        const finalCleaned = enforceRulesPostAI(mergedText);
+        
+        // Validate whole-chapter fact issues
+        const wholeIssues = validateChunkFactIssues(localCleaned, mergedText, finalCleaned, 1, 'selective AI');
+        if (wholeIssues.length > 0) {
+          const err = new Error(`Protected Title Lost: Thiếu danh xưng/chức vụ bảo vệ sau khi xử lý (${wholeIssues.map(x => x.term).join(', ')})`);
+          err.factIssues = wholeIssues;
+          throw err;
+        }
+        
+        updateChapter(i, {
+          cleaned: finalCleaned,
+          aiNaturalAt: new Date().toISOString(),
+          aiProcessed: true,
+          aiError: null,
+          aiErrorType: null,
+          aiErrorAt: null,
+          aiFactIssues: [],
+          aiSelectiveStats: {
+            total: totalCount,
+            flagged: flaggedCount,
+            totalSentences: totalCount,
+            flaggedSentences: flaggedCount,
+            requestsSent: 1,
+            responsesReceived: 1,
+            editedSentences: editedSentences,
+            patchedSentences: patchedSentences,
+            preservedSentences: totalCount - patchedSentences,
+            edited: patchedSentences,
+            preserved: totalCount - patchedSentences
+          },
+          aiSelectiveDetails: details
+        });
+        
+        setStatus({
+          type: 'ok',
+          message: `AI Selective đã xử lý xong chương ${i+1}. Kết quả: ${totalCount} câu, ${flaggedCount} nghi ngờ, ${patchedSentences} được sửa, ${totalCount - patchedSentences} giữ nguyên.`
+        });
+        
+        return true;
+      } catch (err) {
+        updateChapter(i, {
+          aiError: err?.message || 'AI Selective xử lý thất bại.',
+          aiErrorType: err?.name || 'Error',
+          aiErrorAt: new Date().toISOString(),
+          aiFactIssues: err?.factIssues || []
+        });
+        setStatus({ type: 'error', message: `Chương ${i+1} lỗi: ${err?.message || 'AI Selective xử lý thất bại.'}` });
+        return false;
+      } finally {
+        setAiRunning(false);
+      }
+    }
+
     const protector = protectTerms(localCleaned, filters.preserveTerms || '');
     const chunks = splitTextIntoChunks(protector.text, Number(apiSettings.chunkSize || 6000));
     if(!chunks.length) return false;
@@ -3356,27 +5016,64 @@ ${prompt.slice(-1500)}
 
         const result = await callGeminiWithPool(prompt, `Chương ${i+1} Chunk ${c+1}/${chunks.length}`, keyIndex);
         keyIndex = result.nextIndex;
-        const fixed = (result.text || '').trim();
+        let fixed = (result.text || '').trim();
+        
+        if (hasSevereRepetitions(fixed)) {
+          throw new Error('Kết quả AI chứa lỗi lặp từ hoặc lặp cụm từ nghiêm trọng.');
+        }
         
         console.log(`[Pipeline Trace][AI Cleaner Output] Chapter ${i+1} Chunk ${c+1}/${chunks.length} response:`, {
           title: chapters[i].title,
           cleanedContent: fixed.slice(0, 300)
         });
 
-        outputs.push(fixed);
-        previousTail = fixed.slice(-700);
-
         // Run fact warnings validation strictly within the current chunk
-        const origChunkText = protector.restore(chunks[c]);
-        const rawAiChunkText = fixed;
-        const finalChunkText = enforceRulesPostAI(protector.restore(fixed));
+        let origChunkText = protector.restore(chunks[c]);
+        let rawAiChunkText = fixed;
+        let finalChunkText = enforceRulesPostAI(protector.restore(fixed));
         let flowLabel = 'current chapter AI';
         if (currentFlow === 'selected_chapters' || currentFlow === 'selected') {
           flowLabel = 'selected chapter AI';
         } else if (currentFlow === 'batch_ai' || currentFlow === 'batch' || currentFlow === 'all_chapters') {
           flowLabel = 'batch AI';
         }
-        const chunkIssues = validateChunkFactIssues(origChunkText, rawAiChunkText, finalChunkText, c + 1, flowLabel);
+        let chunkIssues = validateChunkFactIssues(origChunkText, rawAiChunkText, finalChunkText, c + 1, flowLabel);
+
+        if (chunkIssues.length > 0) {
+          console.log(`[Fact Enforcement] Chunk ${c+1} has fact violations:`, chunkIssues);
+          
+          // Build retry prompt
+          const retryPrompt = `${prompt}\n\n==================================================\n⚠️ CẢNH BÁO BẢO TOÀN DỮ KIỆN (FACT PRESERVATION RETRY):\nBạn đã tự ý xóa hoặc thay đổi các danh xưng/chức vụ được bảo vệ từ văn bản gốc.\nDanh xưng bị mất: ${chunkIssues.map(issue => issue.term).join(', ')}\n\nYêu cầu: Hãy giữ nguyên tất cả các danh xưng/chức vụ được bảo vệ đó không thay đổi. Tuyệt đối không tự ý thay thế chúng bằng tên riêng hay mô tả khác. Hãy biên tập lại và tạo kết quả chính xác.\n==================================================`;
+          
+          console.log(`[Fact Enforcement] Retrying Chunk ${c+1} with prompt length: ${retryPrompt.length}`);
+          await sleep(Number(apiSettings.delayMs || 4500));
+          
+          const retryResult = await callGeminiWithPool(retryPrompt, `Chương ${i+1} Chunk ${c+1}/${chunks.length} (Retry)`, keyIndex);
+          keyIndex = retryResult.nextIndex;
+          const retryFixed = (retryResult.text || '').trim();
+          
+          if (hasSevereRepetitions(retryFixed)) {
+            throw new Error('Kết quả AI chứa lỗi lặp từ hoặc lặp cụm từ nghiêm trọng.');
+          }
+          
+          const retryRawAi = retryFixed;
+          const retryFinal = enforceRulesPostAI(protector.restore(retryFixed));
+          const retryIssues = validateChunkFactIssues(origChunkText, retryRawAi, retryFinal, c + 1, flowLabel);
+          
+          if (retryIssues.length > 0) {
+            const err = new Error(`Protected Title Lost: Thiếu danh xưng/chức vụ bảo vệ sau khi đã retry (${retryIssues.map(x => x.term).join(', ')})`);
+            err.factIssues = retryIssues;
+            throw err;
+          } else {
+            fixed = retryFixed;
+            rawAiChunkText = retryRawAi;
+            finalChunkText = retryFinal;
+            chunkIssues = [];
+          }
+        }
+
+        outputs.push(fixed);
+        previousTail = fixed.slice(-700);
         factIssues = factIssues.concat(chunkIssues);
 
         setAiProgress({done:c+1,total:chunks.length,message:`Chương ${i+1}: Đã xong ${c+1}/${chunks.length} chunk`});
@@ -3402,7 +5099,12 @@ ${prompt.slice(-1500)}
       setStatus({type:'ok',message:`AI đã xử lý Natural VN xong chương ${i+1}.${factIssues.length > 0 ? ' (Có cảnh báo dữ kiện)' : ''}`});
       return true;
     } catch(err) {
-      updateChapter(i,{aiError: err?.message || 'AI xử lý thất bại.', aiErrorType: err?.name || 'Error', aiErrorAt: new Date().toISOString()});
+      updateChapter(i, {
+        aiError: err?.message || 'AI xử lý thất bại.',
+        aiErrorType: err?.name || 'Error',
+        aiErrorAt: new Date().toISOString(),
+        aiFactIssues: err?.factIssues || []
+      });
       setStatus({type:'error',message:`Chương ${i+1} lỗi: ${err?.message || 'AI xử lý thất bại.'}`});
       return false;
     } finally {
@@ -3414,6 +5116,10 @@ ${prompt.slice(-1500)}
 
   const humanizeAll = async()=>{
     if(aiRunning) return;
+    if (aiMode === 'selective') {
+      alert("Chế độ Selective chỉ hỗ trợ AI chương hiện tại.");
+      return;
+    }
     for (let i=0;i<chapters.length;i++) {
       const hasText = (chapters[i].cleaned || chapters[i].raw || '').trim();
       if(!hasText) continue;
@@ -3446,48 +5152,51 @@ ${prompt.slice(-1500)}
   };
 
   const testGeminiKey=async()=>{
-    const keys = activeKeysFromPool(apiPool);
-    if(!keys.length) return setStatus({type:'warn',message:'Bạn chưa nhập API key.'});
+    const candidates = apiPool.filter(k => k.enabled !== false && k.key);
+    if(!candidates.length) return setStatus({type:'warn',message:'Bạn chưa nhập API key.'});
     if(!window.storyAPI?.geminiGenerate) return setStatus({type:'warn',message:'Test API chỉ chạy trong app desktop Electron.'});
     setAiRunning(true);
     try{
-      const res = await window.storyAPI.geminiGenerate({apiKey:keys[0], model:apiSettings.model, prompt:'Trả lời đúng 1 từ: OK'});
-      if(res.ok) setStatus({type:'ok',message:`Key #1 OK với model ${apiSettings.model}.`});
+      const candidate = candidates[0];
+      const keyLabel = formatKeyLabel(candidate.label);
+      const res = await window.storyAPI.geminiGenerate({apiKey:candidate.key, model:apiSettings.model, prompt:'Trả lời đúng 1 từ: OK'});
+      if(res.ok) setStatus({type:'ok',message:`Key ${keyLabel} OK với model ${apiSettings.model}.`});
       else setStatus({type:'error',message:friendlyGeminiError(res, apiSettings.model)});
     } finally { setAiRunning(false); }
   };
   
   const testAllGeminiKeys=async()=>{
-    const keys = activeKeysFromPool(apiPool);
-    if(!keys.length) return setStatus({type:'warn',message:'Bạn chưa nhập API key.'});
+    const candidates = apiPool.filter(k => k.enabled !== false && k.key);
+    if(!candidates.length) return setStatus({type:'warn',message:'Bạn chưa nhập API key.'});
     if(!window.storyAPI?.geminiGenerate) return setStatus({type:'warn',message:'Test API chỉ chạy trong app desktop Electron.'});
     cancelRef.current = false;
     setCancelRequested(false);
     setAiRunning(true);
     let ok=0, fail=0;
     try{
-      for(let i=0;i<keys.length;i++){
+      for(let i=0;i<candidates.length;i++){
         if (cancelRef.current) {
           throw new Error('USER_CANCELLED');
         }
-        setAiProgress({done:i,total:keys.length,message:`Đang test key #${i+1}/${keys.length} với ${apiSettings.model}...`});
-        const res = await window.storyAPI.geminiGenerate({apiKey:keys[i], model:apiSettings.model, prompt:'Trả lời đúng 1 từ: OK'});
+        const candidate = candidates[i];
+        const keyLabel = formatKeyLabel(candidate.label);
+        setAiProgress({done:i,total:candidates.length,message:`Đang test ${keyLabel} với ${apiSettings.model}...`});
+        const res = await window.storyAPI.geminiGenerate({apiKey:candidate.key, model:apiSettings.model, prompt:'Trả lời đúng 1 từ: OK'});
         if (cancelRef.current) {
           throw new Error('USER_CANCELLED');
         }
-        const keyValue = keys[i];
+        const keyValue = candidate.key;
         if(res.ok) {
           ok++;
           setApiPool(prev=>prev.map(k=>k.key===keyValue?{...k,lastStatus:'active',totalSuccess:(k.totalSuccess||0)+1,lastUsedAt:new Date().toISOString(),lastError:''}:k));
         } else {
           fail++;
-          const label = isRateLimitError(res) ? 'Rate-limit/quota' : 'Lỗi';
           setApiPool(prev=>prev.map(k=>k.key===keyValue?{...k,lastStatus:isRateLimitError(res)?'limited':'error',totalFail:(k.totalFail||0)+1,lastUsedAt:new Date().toISOString(),lastError:friendlyGeminiError(res, apiSettings.model).slice(0,180)}:k));
           if(isRateLimitError(res)) markKeyCooldown(keyValue);
         }
-        if(i<keys.length-1) await sleep(Math.max(1500, Number(apiSettings.delayMs || 6500)));
+        if(i<candidates.length-1) await sleep(Math.max(1500, Number(apiSettings.delayMs || 6500)));
       }
-      setAiProgress({done:keys.length,total:keys.length,message:'Test key hoàn tất'});
+      setAiProgress({done:candidates.length,total:candidates.length,message:'Test key hoàn tất'});
       setStatus({type: ok ? 'ok' : 'error', message:`Test xong model ${apiSettings.model}: ${ok} key OK, ${fail} key lỗi. Nếu model not found/quota = 0, bấm “Lấy model từ key” hoặc dùng key/project khác.`});
     } finally { setAiRunning(false); }
   };
@@ -3551,7 +5260,14 @@ ${prompt.slice(-1500)}
 
   const handleApplyPreset = (presetKey) => {
     if (!presetKey) return;
-    if (confirm(`Bạn muốn tải preset "${presetKey === 'default' ? 'Default' : presetKey === 'naturalVn' ? 'Natural VN' : 'Strict Original'}"? Các prompt hiện tại chưa lưu sẽ bị ghi đè.`)) {
+    const nameMap = {
+      default: 'Default',
+      naturalVn: 'Natural VN',
+      naturalLite: 'AI Natural Lite',
+      strictOriginal: 'Strict Original'
+    };
+    const displayName = nameMap[presetKey] || presetKey;
+    if (confirm(`Bạn muốn tải preset "${displayName}"? Các prompt hiện tại chưa lưu sẽ bị ghi đè.`)) {
       const selectedPreset = PROMPT_PRESETS[presetKey];
       setPromptTemplates(selectedPreset);
       setEditingPromptText(selectedPreset[editingPromptKey]);
@@ -3568,6 +5284,7 @@ ${prompt.slice(-1500)}
     const total = Array.isArray(chapters) ? chapters.length : 0;
     const successList = [];
     const errorList = [];
+    const violationsList = [];
     const emptyList = [];
     const skippedList = [];
     const pendingList = [];
@@ -3621,7 +5338,11 @@ ${prompt.slice(-1500)}
             }
             processedList.push(item);
           } else if (isAiError(ch)) {
-            errorList.push(item);
+            if (ch.aiFactIssues && ch.aiFactIssues.length > 0) {
+              violationsList.push(item);
+            } else {
+              errorList.push(item);
+            }
             processedList.push(item);
           } else {
             pendingList.push(item);
@@ -3644,6 +5365,7 @@ ${prompt.slice(-1500)}
       total,
       successList,
       errorList,
+      violationsList,
       emptyList,
       skippedList,
       pendingList,
@@ -3664,7 +5386,8 @@ ${prompt.slice(-1500)}
       output += `*   **Tổng số chương:** ${data.total}\n`;
       output += `*   **AI Success:** ${data.successList.length}\n`;
       output += `*   **AI Success With Warning:** ${data.warningList.length}\n`;
-      output += `*   **AI Failed:** ${data.errorList.length}\n`;
+      output += `*   **Protected Title Violations (Vi phạm danh xưng):** ${data.violationsList.length}\n`;
+      output += `*   **AI Failed (Lỗi khác):** ${data.errorList.length}\n`;
       output += `*   **Chương chưa AI:** ${data.pendingList.length}\n`;
       output += `*   **Cảnh báo dữ kiện:** ${data.factWarningList.length}\n`;
       Object.keys(data.factTermCounts).forEach(term => {
@@ -3698,7 +5421,19 @@ ${prompt.slice(-1500)}
         });
       }
       
-      output += `\n## DANH SÁCH CHƯƠNG LỖI AI\n\n`;
+      output += `\n## DANH SÁCH CHƯƠNG VI PHẠM DANH XƯNG BẢO VỆ\n\n`;
+      if (data.violationsList.length === 0) {
+        output += `*(Không có chương nào vi phạm)*\n`;
+      } else {
+        output += `| Số thứ tự | Tên chương | Chi tiết vi phạm |\n`;
+        output += `| --- | --- | --- |\n`;
+        data.violationsList.forEach((item) => {
+          const issuesStr = item.aiFactIssues.map(x => x.term).join(', ');
+          output += `| ${item.idx + 1} | ${item.title || `Chương ${item.idx + 1}`} | Thiếu danh xưng: ${issuesStr} |\n`;
+        });
+      }
+
+      output += `\n## DANH SÁCH CHƯƠNG LỖI AI KHÁC\n\n`;
       if (data.errorList.length === 0) {
         output += `*(Không có chương nào bị lỗi)*\n`;
       } else {
@@ -3709,22 +5444,20 @@ ${prompt.slice(-1500)}
         });
       }
 
-      output += `\n## CẢNH BÁO DỮ KIỆN\n\n`;
-      if (data.factWarningList.length === 0) {
-        output += `*(Không có chương nào cảnh báo)*\n`;
+      output += `\n## CHI TIẾT VI PHẠM DANH XƯNG BẢO VỆ (PROTECTED TITLE VIOLATIONS)\n\n`;
+      if (data.violationsList.length === 0) {
+        output += `*(Không có chương nào vi phạm)*\n`;
       } else {
-        data.factWarningList.forEach((item) => {
+        data.violationsList.forEach((item) => {
           const ch = chapters[item.idx];
-          output += `### Chương ${item.idx + 1}: ${item.title || `Chương ${item.idx + 1}`} (Cảnh báo: ${ch.aiFactIssues?.length || 0})\n\n`;
+          output += `### Chương ${item.idx + 1}: ${item.title || `Chương ${item.idx + 1}`} (Số vi phạm: ${ch.aiFactIssues?.length || 0})\n\n`;
           if (ch.aiFactIssues && ch.aiFactIssues.length > 0) {
             ch.aiFactIssues.forEach((issue) => {
               output += `⚠️ **Thiếu danh xưng/chức vụ:** ${issue.term}\n\n`;
-              output += `**Original:**\n`;
+              output += `**Original sentence:**\n`;
               output += `> ${issue.origSnippet || '(Không tìm thấy)'}\n\n`;
-              output += `**AI raw:**\n`;
-              output += `> ${issue.rawSnippet || '(Không có)'}\n\n`;
-              output += `**Final saved:**\n`;
-              output += `> ${issue.finalSnippet || '(Không có)'}\n\n`;
+              output += `**AI output sentence (violating):**\n`;
+              output += `> ${issue.rawSnippet || issue.finalSnippet || '(Không có)'}\n\n`;
               output += `**Error source:**\n`;
               output += `\`${issue.errorSource}\`\n\n`;
               output += `---\n\n`;
@@ -3738,7 +5471,8 @@ ${prompt.slice(-1500)}
       output += `Tổng số chương: ${data.total}\n`;
       output += `AI Success: ${data.successList.length}\n`;
       output += `AI Success With Warning: ${data.warningList.length}\n`;
-      output += `AI Failed: ${data.errorList.length}\n`;
+      output += `Protected Title Violations (Vi phạm danh xưng): ${data.violationsList.length}\n`;
+      output += `AI Failed (Lỗi khác): ${data.errorList.length}\n`;
       output += `Chương chưa AI: ${data.pendingList.length}\n`;
       output += `Cảnh báo dữ kiện: ${data.factWarningList.length}\n`;
       Object.keys(data.factTermCounts).forEach(term => {
@@ -3767,8 +5501,18 @@ ${prompt.slice(-1500)}
           output += `- Chương ${item.idx + 1}: ${item.title || `Chương ${item.idx + 1}`} (${hasFact ? `Cảnh báo dữ kiện: ${item.aiFactIssues.length}` : 'Cảnh báo định dạng'}, ${item.aiLen} ký tự)\n`;
         });
       }
+
+      output += `\nDANH SÁCH CHƯƠNG VI PHẠM DANH XƯNG BẢO VỆ:\n`;
+      if (data.violationsList.length === 0) {
+        output += `(Không có chương nào vi phạm)\n`;
+      } else {
+        data.violationsList.forEach((item) => {
+          const issuesStr = item.aiFactIssues.map(x => x.term).join(', ');
+          output += `- Chương ${item.idx + 1}: ${item.title || `Chương ${item.idx + 1}`} - Thiếu danh xưng: ${issuesStr}\n`;
+        });
+      }
       
-      output += `\nDANH SÁCH CHƯƠNG LỖI AI:\n`;
+      output += `\nDANH SÁCH CHƯƠNG LỖI AI KHÁC:\n`;
       if (data.errorList.length === 0) {
         output += `(Không có chương nào bị lỗi)\n`;
       } else {
@@ -3777,24 +5521,21 @@ ${prompt.slice(-1500)}
         });
       }
 
-      output += `\nCẢNH BÁO DỮ KIỆN:\n`;
+      output += `\nCHI TIẾT VI PHẠM DANH XƯNG BẢO VỆ (PROTECTED TITLE VIOLATIONS):\n`;
       output += `=========================================\n\n`;
-      if (data.factWarningList.length === 0) {
-        output += `(Không có chương nào cảnh báo)\n`;
+      if (data.violationsList.length === 0) {
+        output += `(Không có chương nào vi phạm)\n`;
       } else {
-        data.factWarningList.forEach((item) => {
+        data.violationsList.forEach((item) => {
           const ch = chapters[item.idx];
           output += `Chương ${item.idx + 1}: ${item.title || `Chương ${item.idx + 1}`}\n`;
           if (ch.aiFactIssues && ch.aiFactIssues.length > 0) {
             ch.aiFactIssues.forEach((issue) => {
               output += `⚠️ Thiếu danh xưng/chức vụ: ${issue.term}\n\n`;
-              output += `Original:\n`;
+              output += `Original sentence:\n`;
               output += `“${issue.origSnippet || '(Không tìm thấy)'}”\n\n`;
-              output += `AI raw:\n`;
-              output += `“${issue.rawSnippet || '(Không có)'}”\n\n`;
-              output += `Final saved:\n`;
-              output += `“${issue.finalSnippet || '(Không có)'}”\n\n`;
-              output += `Error source:\n`;
+              output += `AI output sentence (violating):\n`;
+              output += `“${issue.rawSnippet || issue.finalSnippet || '(Không có)'}”\n\n`;
               output += `${issue.errorSource}\n\n`;
               output += `-----------------------------------------\n`;
             });
@@ -3809,7 +5550,22 @@ ${prompt.slice(-1500)}
     if(!file) return;
     const data=JSON.parse(await file.text());
     if(data.bookTitle) setBookTitle(data.bookTitle);
-    if(Array.isArray(data.books) && data.books.length){ setBooks(data.books); setBookIndex(Number.isInteger(data.bookIndex)?data.bookIndex:0); } else { if(typeof data.author==='string') setAuthor(data.author); if(Array.isArray(data.chapters) && data.chapters.length) setChapters(data.chapters); }
+    if(Array.isArray(data.books) && data.books.length){
+      setBooks(data.books.map(b => ({
+        ...b,
+        storyContext: b.storyContext || {
+          characters: [],
+          titles: [],
+          relationships: [],
+          terms: [],
+          updatedAt: new Date().toISOString()
+        }
+      })));
+      setBookIndex(Number.isInteger(data.bookIndex)?data.bookIndex:0);
+    } else {
+      if(typeof data.author==='string') setAuthor(data.author);
+      if(Array.isArray(data.chapters) && data.chapters.length) setChapters(data.chapters);
+    }
     if(data.filters) setFilters({...DEFAULT_FILTERS, ...data.filters});
     if(data.options) setOptions(prev=>({...prev, ...data.options}));
     if(data.apiSettings) setApiSettings(prev=>({...prev, ...data.apiSettings, apiKeys:undefined}));
@@ -3835,7 +5591,7 @@ ${prompt.slice(-1500)}
   const cooledCount = apiKeys.filter(k => keyCooldowns[k] && keyCooldowns[k] > Date.now()).length;
   const keySummary = useMemo(()=>{
     const totalKeys = apiPool.length;
-    const activeKeys = apiPool.filter(k=>k.enabled!==false).length;
+    const activeKeys = apiPool.filter(k=>k.enabled!==false && k.key).length;
     const limitedKeys = apiPool.filter(k=>k.lastStatus==='limited').length;
     const errorKeys = apiPool.filter(k=>['error','invalid'].includes(k.lastStatus)).length;
     const totalSuccess = apiPool.reduce((a,k)=>a+(k.totalSuccess||0),0);
@@ -3866,12 +5622,14 @@ ${prompt.slice(-1500)}
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         console.log('[Pipeline Trace][keydown Escape] Dismissing active modals');
-        if (showBulkDeleteModal) setShowBulkDeleteModal(false);
+        if (showQueueModal) setShowQueueModal(false);
+        else if (showBulkDeleteModal) setShowBulkDeleteModal(false);
         else if (showBatchFetchModal) closeBatchFetchModal('escape');
         else if (showBatchAiModal) closeBatchAiModal('escape');
         else if (overwriteModal.show) setOverwriteModal({ show: false });
         else if (batchOverwriteModal.show) setBatchOverwriteModal({ show: false, cleanedChapters: [] });
         else if (showBatchExportModal) setShowBatchExportModal(false);
+        else if (showContextModal) setShowContextModal(false);
         else if (showOptionsPopup) setShowOptionsPopup(false);
         else if (showDocxDropdown) setShowDocxDropdown(false);
         else if (showCacheDropdown) setShowCacheDropdown(false);
@@ -3879,7 +5637,7 @@ ${prompt.slice(-1500)}
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, batchOverwriteModal, showBatchExportModal, showOptionsPopup, showDocxDropdown, showCacheDropdown]);
+  }, [showQueueModal, showBulkDeleteModal, showBatchFetchModal, showBatchAiModal, overwriteModal, batchOverwriteModal, showBatchExportModal, showContextModal, showOptionsPopup, showDocxDropdown, showCacheDropdown]);
 
 
   const paginatedKeys = useMemo(() => {
@@ -3992,77 +5750,149 @@ ${prompt.slice(-1500)}
               return true;
             });
 
+            const isActiveBook = bIdx === bookIndex;
             return (
-              <div key={book.id || bIdx} className={`bookNode open ${bIdx === bookIndex ? 'activeBook' : ''}`}>
-                <div className="bookNodeHeader" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-                  <button className="bookTitleBtn" onClick={() => toggleBookCollapsed(bIdx)} title={book.title || `Truyện ${bIdx + 1}`} style={{ fontWeight: 'bold', width: '100%', textAlign: 'left', padding: '4px 6px' }}>
+              <div key={book.id || bIdx} className={`bookNode open ${isActiveBook ? 'activeBook' : ''}`}>
+                <div 
+                  className={isActiveBook ? 'activeBookHeader sticky' : 'bookNodeHeader'} 
+                  style={isActiveBook ? {
+                    position: 'sticky',
+                    top: '-9px',
+                    marginTop: '-9px',
+                    paddingTop: '9px',
+                    paddingBottom: '8px',
+                    background: '#ffffff',
+                    zIndex: 10,
+                    borderBottom: '1px solid #e2e8f0',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                    borderRadius: '17px 17px 0 0'
+                  } : {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'stretch'
+                  }}
+                >
+                  <button className="bookTitleBtn" onClick={() => toggleBookCollapsed(bIdx)} title={book.title || `Truyện ${bIdx + 1}`} style={{ fontWeight: 'bold', width: '100%', textAlign: 'left', padding: '4px 6px', margin: 0 }}>
                     <span className="bookTitleText">{book.title || `Truyện ${bIdx + 1}`} ({chs.length} chương)</span>
                   </button>
-                  <div className="bookNodeActions" style={{ display: 'none' }}>
-                    <button 
-                      onClick={addChapter} 
-                      style={{ 
-                        padding: '4px 8px', 
-                        fontSize: '11.5px', 
-                        whiteSpace: 'nowrap', 
-                        borderRadius: '6px', 
-                        height: '28px', 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        border: '1px solid #cbd5e1', 
-                        backgroundColor: '#ffffff',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        margin: 0
-                      }}
-                    >
-                      + Chương tiếp
-                    </button>
-                    <label style={{ 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      gap: '4px', 
-                      cursor: 'pointer', 
-                      fontSize: '11.5px', 
-                      userSelect: 'none', 
-                      border: '1px solid #cbd5e1', 
-                      borderRadius: '6px', 
-                      padding: '4px 6px', 
-                      backgroundColor: '#f8fafc', 
-                      fontWeight: 'bold', 
-                      margin: 0, 
-                      whiteSpace: 'nowrap', 
-                      flexShrink: 0, 
-                      height: '28px',
-                      flexWrap: 'nowrap'
-                    }}>
-                      <input 
-                        type="checkbox" 
-                        style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, display: 'inline-block', cursor: 'pointer' }} 
-                        checked={filteredChapters.length > 0 && filteredChapters.every(({ ch }) => ch.selectedForExport === true)} 
-                        onChange={() => {
-                          const allSelected = filteredChapters.every(({ ch }) => ch.selectedForExport === true);
-                          const filteredIndices = filteredChapters.map(({ originalIdx }) => originalIdx);
-                          setBooks(prev => prev.map((x, bookI) => {
-                            if (bookI === bIdx) {
-                              return {
-                                ...x,
-                                chapters: x.chapters.map((c, chI) => 
-                                  filteredIndices.includes(chI) ? { ...c, selectedForExport: !allSelected } : c
-                                )
-                              };
-                            }
-                            return x;
-                          }));
+
+                  {isActiveBook && (
+                    <div className="activeBookActionsRow" style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-start', flexWrap: 'nowrap', overflow: 'hidden', padding: '2px 4px', boxSizing: 'border-box', width: '100%' }}>
+                      {/* Chương tiếp */}
+                      <button 
+                        onClick={addChapter} 
+                        className="softPrimary tree-continue-btn"
+                        style={{ 
+                          padding: '2px 4px', 
+                          fontSize: '11px', 
+                          borderRadius: '6px', 
+                          height: '24px', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          margin: 0,
+                          border: '1px solid #bfdbfe',
+                          backgroundColor: '#eff6ff',
+                          color: '#1d4ed8'
+                        }}
+                      >
+                        + Chương tiếp
+                      </button>
+
+                      {/* Hàng chờ (Opens Queue Manager) */}
+                      <button 
+                        onClick={() => setShowQueueModal(true)} 
+                        className="softPrimary tree-queue-btn"
+                        style={{ 
+                          padding: '2px 4px', 
+                          fontSize: '11px', 
+                          borderRadius: '6px', 
+                          height: '24px', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          margin: 0,
+                          border: '1px solid #cbd5e1',
+                          backgroundColor: '#f1f5f9',
+                          color: '#475569'
+                        }}
+                      >
+                        Hàng chờ
+                      </button>
+
+                      {/* Xóa */}
+                      <button 
+                        onClick={() => setShowBulkDeleteModal(true)} 
+                        disabled={filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0}
+                        className="dangerSoft"
+                        style={{ 
+                          padding: '2px 4px', 
+                          fontSize: '11px', 
+                          borderRadius: '6px', 
+                          height: '24px', 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          cursor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? 'not-allowed' : 'pointer',
+                          fontWeight: 'bold',
+                          margin: 0,
+                          border: '1px solid #fecaca',
+                          backgroundColor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#f1f5f9' : '#fef2f2',
+                          color: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#94a3b8' : '#b91c1c'
+                        }}
+                      >
+                        Xóa
+                      </button>
+
+                      {/* Checkbox (Subtle border wrapper, Tooltip: Chọn tất cả chương) */}
+                      <div 
+                        style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          flexShrink: 0, 
+                          border: '1px solid #cbd5e1', 
+                          borderRadius: '4px', 
+                          padding: '3px',
+                          backgroundColor: '#f8fafc', 
+                          boxSizing: 'border-box', 
+                          cursor: 'pointer'
                         }} 
-                      />
-                      <span style={{ fontSize: '11.5px', fontWeight: 'bold' }}>All</span>
-                    </label>
-                  </div>
+                        title="Chọn tất cả chương"
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={filteredChapters.length > 0 && filteredChapters.every(({ ch }) => ch.selectedForExport === true)} 
+                          onChange={() => {
+                            const allSelected = filteredChapters.every(({ ch }) => ch.selectedForExport === true);
+                            const filteredIndices = filteredChapters.map(({ originalIdx }) => originalIdx);
+                            setBooks(prev => prev.map((x, bookI) => {
+                              if (bookI === bIdx) {
+                                return {
+                                  ...x,
+                                  chapters: x.chapters.map((c, chI) => 
+                                    filteredIndices.includes(chI) ? { ...c, selectedForExport: !allSelected } : c
+                                  )
+                                };
+                              }
+                              return x;
+                            }));
+                          }} 
+                          style={{ margin: 0, width: '13px', height: '13px', cursor: 'pointer', display: 'block' }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="chapterList treeChapters" style={{ marginTop: '8px' }}>
+                <div className="chapterList treeChapters" style={{ marginTop: '0px' }}>
                   {chapterFilter !== 'all' && (
                     <div style={{
                       display: 'flex',
@@ -4103,81 +5933,11 @@ ${prompt.slice(-1500)}
                       </button>
                     </div>
                   )}
-
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', height: '24px', marginLeft: '-15px', width: 'calc(100% + 15px)' }}>
-                    <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
-                    <div className="tree-action-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap' }}>
-                      <button 
-                        onClick={addChapter} 
-                        className="softPrimary tree-continue-btn"
-                        style={{ 
-                          padding: '2px 8px', 
-                          fontSize: '11px', 
-                          borderRadius: '6px', 
-                          height: '22px', 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          cursor: 'pointer',
-                          fontWeight: 'bold',
-                          margin: 0,
-                          border: '1px solid #bfdbfe'
-                        }}
-                      >
-                        + Chương tiếp
-                      </button>
-                      <div className="tree-all-simple" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                        <input 
-                          type="checkbox" 
-                          checked={filteredChapters.length > 0 && filteredChapters.every(({ ch }) => ch.selectedForExport === true)} 
-                          onChange={() => {
-                            const allSelected = filteredChapters.every(({ ch }) => ch.selectedForExport === true);
-                            const filteredIndices = filteredChapters.map(({ originalIdx }) => originalIdx);
-                            setBooks(prev => prev.map((x, bookI) => {
-                              if (bookI === bIdx) {
-                                return {
-                                  ...x,
-                                  chapters: x.chapters.map((c, chI) => 
-                                    filteredIndices.includes(chI) ? { ...c, selectedForExport: !allSelected } : c
-                                  )
-                                };
-                              }
-                              return x;
-                            }));
-                          }} 
-                          style={{ margin: 0, width: '14px', height: '14px' }}
-                        />
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827' }}>All</span>
-                      </div>
-                      <button 
-                        onClick={() => setShowBulkDeleteModal(true)} 
-                        disabled={filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0}
-                        className="dangerSoft"
-                        style={{ 
-                          padding: '2px 8px', 
-                          fontSize: '11px', 
-                          borderRadius: '6px', 
-                          height: '22px', 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          cursor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? 'not-allowed' : 'pointer',
-                          fontWeight: 'bold',
-                          margin: 0,
-                          border: '1px solid #fecaca',
-                          backgroundColor: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#f1f5f9' : '#fef2f2',
-                          color: filteredChapters.filter(({ ch }) => ch.selectedForExport === true).length === 0 ? '#94a3b8' : '#b91c1c'
-                        }}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </div>
                   {filteredChapters.map(({ ch, originalIdx }) => {
                     const isActive = bIdx === bookIndex && originalIdx === selected;
                     const hasFactIssues = ch.aiFactIssues && ch.aiFactIssues.length > 0;
                     return (
-                      <div key={originalIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '36px', marginLeft: '-15px' }}>
+                      <div key={originalIdx} style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '36px', marginLeft: '-15px', width: 'calc(100% + 15px)' }}>
                         <div style={{ width: '25px', height: '2px', backgroundColor: '#dbeafe', flexShrink: 0 }} />
                         <button 
                           className={isActive ? 'chapter active' : 'chapter'} 
@@ -4185,6 +5945,15 @@ ${prompt.slice(-1500)}
                             selectBook(bIdx);
                             setSelected(originalIdx);
                           }} 
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            setContextMenu({
+                              x: e.clientX,
+                              y: e.clientY,
+                              bookIdx: bIdx,
+                              chapterIdx: originalIdx
+                            });
+                          }}
                           style={{ 
                             display: 'flex', 
                             alignItems: 'center', 
@@ -4199,6 +5968,7 @@ ${prompt.slice(-1500)}
                             minWidth: 0, 
                             overflow: 'hidden' 
                           }}
+                          title="Click chuột phải để hiện menu Hàng chờ AI"
                         >
                           <input 
                             type="checkbox" 
@@ -4212,7 +5982,7 @@ ${prompt.slice(-1500)}
                                     chapters: x.chapters.map((c, chI) => chI === originalIdx ? { ...c, selectedForExport: e.target.checked } : c)
                                   };
                                 }
-                                  return x;
+                                return x;
                               }));
                             }} 
                             style={{ width: '14px', height: '14px', margin: 0, flexShrink: 0, cursor: 'pointer' }} 
@@ -4244,7 +6014,7 @@ ${prompt.slice(-1500)}
             <button className={tab === 'editor' ? 'on' : ''} onClick={() => setTab('editor')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}>Biên tập</button>
             <button className={tab === 'filters' ? 'on' : ''} onClick={() => setTab('filters')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><ShieldCheck size={14} /> Bộ lọc từ</button>
             <button className={tab === 'ai' ? 'on' : ''} onClick={() => setTab('ai')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><Sparkles size={14} /> Gemini AI</button>
-            <button className={tab === 'report' ? 'on' : ''} onClick={() => setTab('report')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><FileText size={14} /> Báo cáo AI</button>
+            <button className={tab === 'report' ? 'on' : ''} onClick={() => setTab('report')} style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px' }}><FileText size={14} /> Report</button>
           </div>
           <div className="actions" style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: 0, flexWrap: 'nowrap', flexShrink: 0 }}>
             <input ref={projectInputRef} type="file" accept=".json" hidden onChange={e => importProject(e.target.files?.[0])} />
@@ -4277,10 +6047,10 @@ ${prompt.slice(-1500)}
                   <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '8px 14px', background: 'transparent', width: '100%', fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#334155' }} onClick={() => { setShowDocxDropdown(false); exportDocx(true); }}>
                     <span style={{ color: '#cbd5e1', fontWeight: 'normal' }}>├─</span> TTS
                   </button>
-                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '8px 14px', background: 'transparent', width: '100%', fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#334155' }} onClick={() => { setShowDocxDropdown(false); setExportIsTTS(false); setExportStartCh(1); setExportEndCh(Math.min(10, chapters.length)); updateDefaultFilename(1, Math.min(10, chapters.length)); setShowBatchExportModal(true); }}>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '8px 14px', background: 'transparent', width: '100%', fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#334155' }} onClick={() => handleOpenBatchExport(false)}>
                     <span style={{ color: '#cbd5e1', fontWeight: 'normal' }}>├─</span> Theo tập
                   </button>
-                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '8px 14px', background: 'transparent', width: '100%', fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#334155' }} onClick={() => { setShowDocxDropdown(false); setExportIsTTS(true); setExportStartCh(1); setExportEndCh(Math.min(10, chapters.length)); updateDefaultFilename(1, Math.min(10, chapters.length)); setShowBatchExportModal(true); }}>
+                  <button style={{ border: 0, borderRadius: 0, justifyContent: 'flex-start', padding: '8px 14px', background: 'transparent', width: '100%', fontSize: '12.5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#334155' }} onClick={() => handleOpenBatchExport(true)}>
                     <span style={{ color: '#cbd5e1', fontWeight: 'normal' }}>└─</span> Theo tập TTS
                   </button>
                 </div>
@@ -4323,7 +6093,9 @@ ${prompt.slice(-1500)}
             <div className="progressHeader" style={{ fontSize: '13px' }}>
               <b>{aiProgress.message}</b>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span>{aiProgress.done}/{aiProgress.total}</span>
+                <span>
+                  {queueRunning ? `Đang xử lý: ${aiProgress.done} / ${aiProgress.total}` : `${aiProgress.done} / ${aiProgress.total}`}
+                </span>
                 <button onClick={handleStop} className="dangerSoft stopBtn" style={{ padding: '4px 8px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fef2f2', borderColor: '#fecaca', borderRadius: '6px', cursor: 'pointer', height: 'auto', minHeight: '0', display: 'inline-flex', alignItems: 'center', fontWeight: 'bold' }} disabled={cancelRequested}>{cancelRequested ? 'Đang dừng...' : 'Dừng'}</button>
               </div>
             </div>
@@ -4368,9 +6140,10 @@ ${prompt.slice(-1500)}
               {/* AI chương đã chọn */}
               <button 
                 onClick={humanizeSelectedChapters} 
-                disabled={aiRunning || fetching} 
+                disabled={aiRunning || fetching || aiMode === 'selective'} 
                 className="softPrimary" 
-                style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1' }}
+                style={{ height: '34px', padding: '6px 10px', fontSize: '12.5px', borderRadius: '8px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '4px', border: '1px solid #cbd5e1', opacity: aiMode === 'selective' ? 0.5 : 1 }}
+                title={aiMode === 'selective' ? "Selective Mode chỉ hỗ trợ chạy từng chương đơn lẻ" : ""}
               >
                 {aiRunning ? <RefreshCcw className="spin" size={13} /> : <Sparkles size={13} />} AI chương đã chọn
               </button>
@@ -4378,9 +6151,10 @@ ${prompt.slice(-1500)}
               {/* AI hàng loạt */}
               <button 
                 onClick={openBatchAiModal}
-                disabled={aiRunning || fetching} 
+                disabled={aiRunning || fetching || aiMode === 'selective'} 
                 className="primary" 
-                style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}
+                style={{ height: '34px', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold', opacity: aiMode === 'selective' ? 0.5 : 1 }}
+                title={aiMode === 'selective' ? "Selective Mode chỉ hỗ trợ chạy từng chương đơn lẻ" : ""}
               >
                 {aiRunning ? <RefreshCcw className="spin" size={14} /> : <Sparkles size={14} />} 
                 AI hàng loạt
@@ -4509,6 +6283,24 @@ ${prompt.slice(-1500)}
                   </div>
                 </div>
 
+                {current.aiSelectiveStats && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '8px 14px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', color: '#065f46', fontSize: '13px', margin: '4px 0 8px 0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={16} style={{ color: '#10b981' }} />
+                      <span><b>Báo cáo AI Selective:</b></span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '4px' }}>
+                      <span>Tổng số câu: <b>{current.aiSelectiveStats.totalSentences !== undefined ? current.aiSelectiveStats.totalSentences : current.aiSelectiveStats.total}</b></span>
+                      <span>Nghi ngờ lỗi convert: <b>{current.aiSelectiveStats.flaggedSentences !== undefined ? current.aiSelectiveStats.flaggedSentences : current.aiSelectiveStats.flagged}</b></span>
+                      <span>Yêu cầu đã gửi: <b>{current.aiSelectiveStats.requestsSent !== undefined ? current.aiSelectiveStats.requestsSent : (current.aiSelectiveStats.flagged > 0 ? 1 : 0)}</b></span>
+                      <span>Phản hồi nhận được: <b>{current.aiSelectiveStats.responsesReceived !== undefined ? current.aiSelectiveStats.responsesReceived : (current.aiSelectiveStats.flagged > 0 ? 1 : 0)}</b></span>
+                      <span>Số câu AI sửa: <b>{current.aiSelectiveStats.editedSentences !== undefined ? current.aiSelectiveStats.editedSentences : current.aiSelectiveStats.edited}</b></span>
+                      <span>Đã vá (Patched): <b>{current.aiSelectiveStats.patchedSentences !== undefined ? current.aiSelectiveStats.patchedSentences : current.aiSelectiveStats.edited}</b></span>
+                      <span>Giữ nguyên (Preserved): <b>{current.aiSelectiveStats.preservedSentences !== undefined ? current.aiSelectiveStats.preservedSentences : current.aiSelectiveStats.preserved}</b></span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="compareGrid">
                   <label>Nội dung gốc<textarea ref={rawTextRef} value={current.raw} onScroll={() => handleCompareScroll('raw')} onChange={e => updateChapter(selected, { raw: e.target.value })} placeholder="Dán truyện convert / bản dịch thô / text lỗi vào đây..." style={{ height: 'calc(100vh - 350px)', minHeight: '260px', resize: 'none' }} /></label>
                   <label>
@@ -4550,69 +6342,62 @@ ${prompt.slice(-1500)}
               
               <div className="managerTabs" style={{ display: 'flex', gap: '6px', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', flexWrap: 'wrap' }}>
                 <button className={aiSubTab === 'settings' ? 'on' : ''} onClick={() => setAiSubTab('settings')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sliders size={16} /> Cài đặt AI</button>
-                <button className={aiSubTab === 'presets' ? 'on' : ''} onClick={() => setAiSubTab('presets')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sparkles size={16} /> Preset AI</button>
                 <button className={aiSubTab === 'prompts' ? 'on' : ''} onClick={() => setAiSubTab('prompts')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Sliders size={16} /> Prompt</button>
                 <button className={aiSubTab === 'pool' ? 'on' : ''} onClick={() => setAiSubTab('pool')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><ShieldCheck size={16} /> API/Gemini Pool</button>
                 <button className={aiSubTab === 'advanced' ? 'on' : ''} onClick={() => setAiSubTab('advanced')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Database size={16} /> Nâng cao</button>
               </div>
 
               {aiSubTab === 'settings' && (
-                <div className="apiConfigPanel" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
-                  <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b' }}>
-                    <Sliders size={16} /> <span>Cấu hình tham số API</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px 0' }}>
+                  {/* Section 1: Presets & Xưng hô */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+                    <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '14px' }}>
+                      <Sparkles size={16} /> <span>Preset AI & Context xưng hô</span>
+                    </div>
+                    <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                      <label>Mode xử lý
+                        <select value={aiMode} onChange={e => setAiMode(e.target.value)}>
+                          <option value="humanize">Natural VN Audio — Việt hóa để nghe</option>
+                          <option value="structure">Sửa bố cục + câu chữ</option>
+                          <option value="proofread">Check/sửa nhẹ text</option>
+                          <option value="selective">AI Biên tập chọn lọc</option>
+                        </select>
+                      </label>
+                      <label>Mức biên tập
+                        <select value={promptSettings.humanizeStrength} onChange={e => setPromptSettings({ ...promptSettings, humanizeStrength: e.target.value })}>
+                          <option value="cleanup">Cleanup — ít sửa nhất</option>
+                          <option value="naturalAudio">Natural VN Audio — khuyên dùng</option>
+                          <option value="light">Light — giữ gần văn gốc</option>
+                          <option value="balanced">Balanced — mượt vừa phải</option>
+                          <option value="strong">Strong — mượt hơn</option>
+                        </select>
+                      </label>
+                      <label>Xưng hô
+                        <select value={promptSettings.pronounStyle} onChange={e => setPromptSettings({ ...promptSettings, pronounStyle: e.target.value })}>
+                          <option value="preserve">Preserve — giữ ta/ngươi</option>
+                          <option value="balanced">Balanced — theo ngữ cảnh</option>
+                          <option value="modern">Modern VN — mềm hóa mạnh hơn</option>
+                        </select>
+                      </label>
+                    </div>
                   </div>
-                  <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                    <label>Model
-                      <select value={apiSettings.model} onChange={e => updateApi({ model: e.target.value })}>
-                        {modelOptions.map(m => <option key={m.name} value={m.name}>{m.displayName || m.name}</option>)}
-                      </select>
-                    </label>
-                    <label>Chunk Size<input type="number" value={apiSettings.chunkSize} onChange={e => updateApi({ chunkSize: Number(e.target.value) })} /></label>
-                    <label>Delay ms<input type="number" value={apiSettings.delayMs} onChange={e => updateApi({ delayMs: Number(e.target.value) })} /></label>
-                    <label>Cooldown ms<input type="number" value={apiSettings.cooldownMs} onChange={e => updateApi({ cooldownMs: Number(e.target.value) })} /></label>
-                    <label>Retry<input type="number" value={apiSettings.maxRetries} onChange={e => updateApi({ maxRetries: Number(e.target.value) })} /></label>
-                  </div>
-                </div>
-              )}
 
-              {aiSubTab === 'presets' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
-                  <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b' }}>
-                    <Sparkles size={16} /> <span>Preset AI / Context xưng hô</span>
-                  </div>
-                  <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                    <label>Mode xử lý
-                      <select value={aiMode} onChange={e => setAiMode(e.target.value)}>
-                        <option value="humanize">Natural VN Audio — Việt hóa để nghe</option>
-                        <option value="structure">Sửa bố cục + câu chữ</option>
-                        <option value="proofread">Check/sửa nhẹ text</option>
-                        <option value="selective">AI Biên tập chọn lọc</option>
-                      </select>
-                    </label>
-                    <label>Mức biên tập
-                      <select value={promptSettings.humanizeStrength} onChange={e => setPromptSettings({ ...promptSettings, humanizeStrength: e.target.value })}>
-                        <option value="cleanup">Cleanup — ít sửa nhất</option>
-                        <option value="naturalAudio">Natural VN Audio — khuyên dùng</option>
-                        <option value="light">Light — giữ gần văn gốc</option>
-                        <option value="balanced">Balanced — mượt vừa phải</option>
-                        <option value="strong">Strong — mượt hơn</option>
-                      </select>
-                    </label>
-                    <label>Xưng hô
-                      <select value={promptSettings.pronounStyle} onChange={e => setPromptSettings({ ...promptSettings, pronounStyle: e.target.value })}>
-                        <option value="preserve">Preserve — giữ ta/ngươi</option>
-                        <option value="balanced">Balanced — theo ngữ cảnh</option>
-                        <option value="modern">Modern VN — mềm hóa mạnh hơn</option>
-                      </select>
-                    </label>
-                  </div>
-                  <div className="memoryGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
-                    <label>Novel Memory <span className="hint">chỉ áp dụng cho bộ truyện hiện tại</span>
-                      <textarea value={promptSettings.novelMemory} onChange={e => setPromptSettings({ ...promptSettings, novelMemory: e.target.value })} style={{ minHeight: '80px' }} />
-                    </label>
-                    <label>Ghi chú thêm <span className="hint">không bắt buộc</span>
-                      <textarea value={promptSettings.additionalInstructions} onChange={e => setPromptSettings({ ...promptSettings, additionalInstructions: e.target.value })} placeholder="Ví dụ: Giữ nguyên xưng hô sư phụ/đệ tử. Không đổi Lâm Thiếu thành cậu Lâm..." style={{ minHeight: '80px' }} />
-                    </label>
+                  {/* Section 2: API Parameters */}
+                  <div className="apiConfigPanel" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '14px' }}>
+                      <Sliders size={16} /> <span>Cấu hình tham số API</span>
+                    </div>
+                    <div className="promptGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+                      <label>Model
+                        <select value={apiSettings.model} onChange={e => updateApi({ model: e.target.value })}>
+                          {modelOptions.map(m => <option key={m.name} value={m.name}>{m.displayName || m.name}</option>)}
+                        </select>
+                      </label>
+                      <label>Chunk Size<input type="number" value={apiSettings.chunkSize} onChange={e => updateApi({ chunkSize: Number(e.target.value) })} /></label>
+                      <label>Delay ms<input type="number" value={apiSettings.delayMs} onChange={e => updateApi({ delayMs: Number(e.target.value) })} /></label>
+                      <label>Cooldown ms<input type="number" value={apiSettings.cooldownMs} onChange={e => updateApi({ cooldownMs: Number(e.target.value) })} /></label>
+                      <label>Retry<input type="number" value={apiSettings.maxRetries} onChange={e => updateApi({ maxRetries: Number(e.target.value) })} /></label>
+                    </div>
                   </div>
                 </div>
               )}
@@ -4620,42 +6405,44 @@ ${prompt.slice(-1500)}
               {aiSubTab === 'prompts' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0 }}>Chọn Prompt:</label>
-                      <select 
-                        value={editingPromptKey} 
-                        onChange={e => {
-                          setEditingPromptKey(e.target.value);
-                          setEditingPromptText(promptTemplates[e.target.value] || '');
-                        }}
-                        style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
-                      >
-                        <option value="aiNaturalVn">AI Natural VN (Việt hóa chính)</option>
-                        <option value="storyCleaner">Story Cleaner (Xử lý convert)</option>
-                      </select>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'nowrap' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'nowrap' }}>
+                        <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0, whiteSpace: 'nowrap' }}>Chọn Prompt:</label>
+                        <select 
+                          value={editingPromptKey} 
+                          onChange={e => {
+                            setEditingPromptKey(e.target.value);
+                            setEditingPromptText(promptTemplates[e.target.value] || '');
+                          }}
+                          style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '130px' }}
+                        >
+                          <option value="aiNaturalVn">Natural VN</option>
+                          <option value="storyCleaner">Convert V1</option>
+                        </select>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'nowrap' }}>
+                        <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0, whiteSpace: 'nowrap' }}>Preset nhanh:</label>
+                        <select 
+                          value={selectedPresetKey}
+                          onChange={e => {
+                            setSelectedPresetKey(e.target.value);
+                            handleApplyPreset(e.target.value);
+                          }}
+                          style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '110px' }}
+                        >
+                          <option value="">-- Preset --</option>
+                          <option value="default">Default</option>
+                          <option value="naturalVn">Natural VN</option>
+                          <option value="strictOriginal">Strict Original</option>
+                        </select>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap' }}>
                       <input type="file" id="import-prompts-input" accept=".json" style={{ display: 'none' }} onChange={handleImportPrompts} />
                       <button className="softPrimary" onClick={() => document.getElementById('import-prompts-input').click()} style={{ height: '30px', padding: '2px 10px', fontSize: '12px' }}>Import Pack</button>
                       <button className="softPrimary" onClick={handleExportPrompts} style={{ height: '30px', padding: '2px 10px', fontSize: '12px' }}>Export Pack</button>
                     </div>
-                  </div>
-                  
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <label style={{ fontWeight: 'bold', fontSize: '13px', color: '#475569', margin: 0 }}>Preset nhanh:</label>
-                    <select 
-                      value={selectedPresetKey}
-                      onChange={e => {
-                        setSelectedPresetKey(e.target.value);
-                        handleApplyPreset(e.target.value);
-                      }}
-                      style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '6px' }}
-                    >
-                      <option value="">-- Chọn Preset --</option>
-                      <option value="default">Default (Nguyên bản)</option>
-                      <option value="naturalVn">Natural VN (Ưu tiên V2)</option>
-                      <option value="strictOriginal">Strict Original (Dịch sát gốc)</option>
-                    </select>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -4735,17 +6522,42 @@ ${prompt.slice(-1500)}
               {aiSubTab === 'pool' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 0' }}>
                   <div className="keyManagerLayout">
-                    <div className="keyImportPanel">
-                      <div className="panelTitle"><FileText size={16} /><b>Import Gemini Keys</b></div>
-                      <label>Nhập key <span className="hint">mỗi dòng một key, hoặc GEMINI_045=AIza...</span>
-                        <textarea className="keyBox" value={importKeyText} onChange={e => setImportKeyText(e.target.value)} placeholder={`GEMINI_001=AIza...\nGEMINI_002=AIza...\nAIza...`} />
-                      </label>
-                      <div className="miniActions left">
-                        <button className="softPrimary" onClick={importKeys}><Upload size={16} /> Import</button>
-                        <button onClick={testAllGeminiKeys} disabled={aiRunning}><Sparkles size={16} /> Test all</button>
-                        <button onClick={loadGeminiModels} disabled={aiRunning}><RefreshCcw size={16} /> Lấy model</button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
+                      <div className="keyImportPanel">
+                        <div className="panelTitle"><FileText size={16} /><b>Import Gemini Keys</b></div>
+                        <label>Nhập key <span className="hint">mỗi dòng một key, hoặc GEMINI_045=AIza...</span>
+                          <textarea className="keyBox" value={importKeyText} onChange={e => setImportKeyText(e.target.value)} placeholder={`GEMINI_001=AIza...\nGEMINI_002=AIza...\nAIza...`} />
+                        </label>
+                        <div className="miniActions left">
+                          <button className="softPrimary" onClick={importKeys}><Upload size={16} /> Import</button>
+                          <button onClick={testAllGeminiKeys} disabled={aiRunning}><Sparkles size={16} /> Test all</button>
+                          <button onClick={loadGeminiModels} disabled={aiRunning}><RefreshCcw size={16} /> Lấy model</button>
+                        </div>
+                      </div>
+
+                      {/* Xóa Cache Button */}
+                      <button className="softPrimary" onClick={clearCache} style={{ borderColor: '#fecdd3', color: '#be123c', background: '#fff1f2', width: '100%', height: '38px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', borderRadius: '10px', flexShrink: 0 }}><Trash2 size={16} /> Xóa auto-cache</button>
+                      
+                      {/* Session Log */}
+                      <div className="sessionLog" style={{ padding: '12px', background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '16px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: '220px' }}>
+                        <b>Session log (Key đã dùng trong phiên)</b>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px', flex: 1, overflowY: 'auto', fontSize: '12.5px', color: '#475569' }}>
+                          {apiPool.filter(k => k.lastUsedAt).length ? (
+                            apiPool
+                              .filter(k => k.lastUsedAt)
+                              .sort((a, b) => b.lastUsedAt - a.lastUsedAt)
+                              .map(k => (
+                                <div key={k.id} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                  • {formatKeyLabel(k.label)}: {k.lastStatus || 'unknown'} · {new Date(k.lastUsedAt).toLocaleTimeString()}
+                                </div>
+                              ))
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Chưa có key nào được dùng trong phiên này.</span>
+                          )}
+                        </div>
                       </div>
                     </div>
+
                     <div className="keyTablePanel">
                       <div className="tableToolbar" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <div className="searchBox" style={{ width: '130px', flex: 'none' }}>
@@ -4784,7 +6596,7 @@ ${prompt.slice(-1500)}
                           <div key={item.id || idx} className={`keyRow ${item.lastStatus || 'unknown'}`}>
                             <label className="check slim">
                               <input type="checkbox" checked={item.enabled !== false} onChange={e => setApiPool(prev => prev.map(k => k.id === item.id ? { ...k, enabled: e.target.checked } : k))} />
-                              <b>{item.label}</b>
+                              <b>{formatKeyLabel(item.label)}</b>
                             </label>
                             <code>{maskKey(item.key)}</code>
                             <span className={`badge ${item.lastStatus || 'unknown'}`}>{item.lastStatus || 'unknown'}</span>
@@ -4811,18 +6623,58 @@ ${prompt.slice(-1500)}
 
               {aiSubTab === 'advanced' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px 0' }}>
-                  <div className="promptPanel" style={{ border: 'none', padding: 0 }}>
-                    <div className="panelTitle" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: '#1e293b' }}>
-                      <Database size={16} /> <span>Tùy chọn nâng cao & Session</span>
+                  {/* Novel Memory & Context Manager */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '14px' }}>
+                        <Database size={16} /> <span>Ghi nhớ bộ truyện & Context nâng cao</span>
+                      </div>
+                      
+                      {/* Context Manager Button */}
+                      <button 
+                        onClick={() => setShowContextModal(true)} 
+                        className="primary"
+                        style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          padding: '6px 12px', 
+                          fontSize: '12.5px', 
+                          fontWeight: 'bold', 
+                          borderRadius: '8px', 
+                          height: '32px', 
+                          cursor: 'pointer',
+                          backgroundColor: '#2563eb',
+                          color: '#fff',
+                          border: 'none'
+                        }}
+                      >
+                        <Sparkles size={14} /> Quản lý Context truyện (Characters, Terms...)
+                      </button>
                     </div>
-                    <div className="aiControls" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                      <button className="softPrimary" onClick={clearCache} style={{ borderColor: '#fecdd3', color: '#be123c', background: '#fff1f2' }}><Trash2 size={17} /> Xóa auto-cache</button>
-                    </div>
-                  </div>
-                  <div className="sessionLog" style={{ padding: '12px', background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                    <b>Session log (Key đã dùng trong phiên)</b>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px', maxHeight: '120px', overflowY: 'auto', fontSize: '12.5px', color: '#475569' }}>
-                      {apiPool.filter(k => k.lastUsedAt).length ? apiPool.filter(k => k.lastUsedAt).slice(0, 8).map(k => <span key={k.id}>• {k.label}: {k.lastStatus || 'unknown'} · {new Date(k.lastUsedAt).toLocaleTimeString()}</span>) : <span>Chưa có key nào được dùng trong phiên này.</span>}
+
+                    <div className="memoryGrid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600', fontSize: '13px', color: '#334155', minHeight: '36px', marginBottom: '6px' }}>
+                          Novel Memory <span className="hint" style={{ fontSize: '11px', color: '#64748b', marginLeft: '4px' }}>(Chỉ dùng ghi chú nhanh; với các thực thể phức tạp hãy dùng Context Manager ở trên)</span>
+                        </span>
+                        <textarea 
+                          value={promptSettings.novelMemory} 
+                          onChange={e => setPromptSettings({ ...promptSettings, novelMemory: e.target.value })} 
+                          style={{ flex: 1, minHeight: '360px', height: 'calc(100vh - 380px)', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%', boxSizing: 'border-box', resize: 'vertical' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600', fontSize: '13px', color: '#334155', minHeight: '36px', marginBottom: '6px' }}>
+                          Ghi chú thêm <span className="hint" style={{ fontSize: '11px', color: '#64748b', marginLeft: '4px' }}>(Không bắt buộc)</span>
+                        </span>
+                        <textarea 
+                          value={promptSettings.additionalInstructions} 
+                          onChange={e => setPromptSettings({ ...promptSettings, additionalInstructions: e.target.value })} 
+                          placeholder="Ví dụ: Giữ nguyên xưng hô sư phụ/đệ tử. Không đổi Lâm Thiếu thành cậu Lâm..." 
+                          style={{ flex: 1, minHeight: '360px', height: 'calc(100vh - 380px)', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%', boxSizing: 'border-box', resize: 'vertical' }} 
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -4832,17 +6684,45 @@ ${prompt.slice(-1500)}
 
           {tab === 'report' && (
             <div className="tabContent" style={{ padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: '#1e293b', fontSize: '18px' }}>
-                  <FileText size={20} /> <span>Báo cáo & Kiểm tra chất lượng AI</span>
+                  <FileText size={20} /> <span>Report & Kiểm tra chất lượng AI</span>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label 
+                    className="report-all-toggle"
+                    style={{ 
+                      height: '34px', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      padding: '0 12px', 
+                      border: '1px solid #dbe3ef', 
+                      borderRadius: '8px', 
+                      whiteSpace: 'nowrap',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      backgroundColor: '#f8fafc',
+                      userSelect: 'none',
+                      color: '#475569',
+                      boxSizing: 'border-box',
+                      margin: 0
+                    }}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={reportAllBooks} 
+                      onChange={e => setReportAllBooks(e.target.checked)} 
+                      style={{ margin: 0, cursor: 'pointer' }}
+                    />
+                    <span>Report tất cả truyện</span>
+                  </label>
                   <button className="softPrimary" onClick={() => {
                     const text = getReportText('txt');
                     navigator.clipboard.writeText(text);
                     setCopyStatus('txt');
                     setTimeout(() => setCopyStatus(''), 1500);
-                  }} style={{ minWidth: '130px', justifyContent: 'center' }}>
+                  }} style={{ minWidth: '130px', justifyContent: 'center', height: '34px' }}>
                     <Copy size={16} /> {copyStatus === 'txt' ? 'Đã sao chép ✓' : 'Copy văn bản'}
                   </button>
                   <button className="softPrimary" onClick={() => {
@@ -4850,7 +6730,7 @@ ${prompt.slice(-1500)}
                     navigator.clipboard.writeText(text);
                     setCopyStatus('md');
                     setTimeout(() => setCopyStatus(''), 1500);
-                  }} style={{ minWidth: '140px', justifyContent: 'center' }}>
+                  }} style={{ minWidth: '140px', justifyContent: 'center', height: '34px' }}>
                     <Copy size={16} /> {copyStatus === 'md' ? 'Đã sao chép ✓' : 'Copy Markdown'}
                   </button>
                 </div>
@@ -4958,6 +6838,7 @@ ${prompt.slice(-1500)}
                   const list = 
                     activeReportTab === 'success' ? aiReportData.successList :
                     activeReportTab === 'error' ? aiReportData.errorList :
+                    activeReportTab === 'violations' ? aiReportData.violationsList :
                     activeReportTab === 'empty' ? aiReportData.emptyList :
                     activeReportTab === 'skipped' ? aiReportData.skippedList :
                     activeReportTab === 'pending' ? aiReportData.pendingList :
@@ -5287,6 +7168,176 @@ ${prompt.slice(-1500)}
         </div>
       )}
 
+      {showQueueModal && (() => {
+        const hasPending = aiQueue.some(q => q.status === 'pending' || q.status === 'retryable');
+        const hasErrors = aiQueue.some(q => q.status === 'error');
+
+        let mainBtnLabel = '';
+        let mainBtnDisabled = false;
+        let mainBtnOnClick = null;
+
+        if (queueRunning) {
+          mainBtnLabel = "Tạm dừng";
+          mainBtnOnClick = () => {
+            setQueuePaused(true);
+            queuePausedRef.current = true;
+            setStatus({ type: 'warn', message: 'Đang tạm dừng hàng chờ sau khi xong chương hiện tại...' });
+          };
+        } else if (queuePaused) {
+          mainBtnLabel = "Tiếp tục";
+          mainBtnOnClick = () => {
+            setQueuePaused(false);
+            queuePausedRef.current = false;
+            runAiQueue();
+          };
+        } else {
+          if (hasPending) {
+            mainBtnLabel = "AI truyện";
+            mainBtnOnClick = runAiQueue;
+          } else if (hasErrors) {
+            mainBtnLabel = "AI lại chương lỗi";
+            mainBtnOnClick = () => {
+              setAiQueue(prev => prev.map(item => item.status === 'error' ? { ...item, status: 'pending' } : item));
+              setQueuePaused(false);
+              queuePausedRef.current = false;
+              setTimeout(() => {
+                runAiQueue();
+              }, 100);
+            };
+          } else {
+            mainBtnLabel = "Đã hoàn thành";
+            mainBtnDisabled = true;
+          }
+        }
+
+        return (
+          <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowQueueModal(false); }}>
+            <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '640px', width: '90%' }}>
+              <div className="modalHeader">
+                <h3><List size={20} /> Hàng chờ AI đa truyện</h3>
+                <button className="closeBtn" onClick={() => setShowQueueModal(false)}>×</button>
+              </div>
+              <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                
+                {/* Summary Stats */}
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px', fontWeight: '500' }}>
+                  <span style={{ color: '#3b82f6' }}>Đang chờ: <strong>{aiQueue.filter(q => q.status === 'pending' || q.status === 'retryable').length}</strong></span>
+                  <span style={{ color: '#64748b' }}>•</span>
+                  <span style={{ color: '#eab308' }}>Đang chạy: <strong>{aiQueue.filter(q => q.status === 'running').length}</strong></span>
+                  <span style={{ color: '#64748b' }}>•</span>
+                  <span style={{ color: '#22c55e' }}>Hoàn thành: <strong>{aiQueue.filter(q => q.status === 'success').length}</strong></span>
+                  <span style={{ color: '#64748b' }}>•</span>
+                  <span style={{ color: '#ef4444' }}>Lỗi: <strong>{aiQueue.filter(q => q.status === 'error').length}</strong></span>
+                </div>
+
+                {/* Queue Items Table */}
+                <div style={{ maxHeight: '350px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
+                        <th style={{ padding: '8px 10px', fontWeight: '600' }}>Truyện</th>
+                        <th style={{ padding: '8px 10px', fontWeight: '600' }}>Chương</th>
+                        <th style={{ padding: '8px 10px', fontWeight: '600' }}>Chế độ</th>
+                        <th style={{ padding: '8px 10px', fontWeight: '600' }}>Trạng thái</th>
+                        <th style={{ padding: '8px 10px', fontWeight: '600', textAlign: 'center' }}>Hành động</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aiQueue.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontStyle: 'italic' }}>Hàng chờ trống. Vui lòng thêm chương từ ngoài danh sách.</td>
+                        </tr>
+                      ) : (
+                        aiQueue.map((item, idx) => {
+                          let statusColor = '#64748b';
+                          let statusBg = '#f1f5f9';
+                          let statusText = 'Đang chờ';
+                          if (item.status === 'running') {
+                            statusColor = '#ca8a04';
+                            statusBg = '#fef9c3';
+                            statusText = 'Đang chạy...';
+                          } else if (item.status === 'success') {
+                            statusColor = '#16a34a';
+                            statusBg = '#dcfce7';
+                            statusText = 'Xong';
+                          } else if (item.status === 'retryable') {
+                            statusColor = '#ea580c';
+                            statusBg = '#ffedd5';
+                            statusText = 'Quá tải (sẽ thử lại)';
+                          } else if (item.status === 'error') {
+                            statusColor = '#dc2626';
+                            statusBg = '#fee2e2';
+                            statusText = 'Lỗi';
+                          }
+
+                          return (
+                            <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: item.status === 'running' ? '#fffbeb' : '#fff' }}>
+                              <td style={{ padding: '8px 10px', fontWeight: '500', color: '#1e293b', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={item.bookTitle}>
+                                {item.bookTitle}
+                              </td>
+                              <td style={{ padding: '8px 10px', color: '#475569' }}>
+                                Chương {item.chapterNumber}: {item.chapterTitle}
+                              </td>
+                              <td style={{ padding: '8px 10px' }}>
+                                <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', fontWeight: '600', backgroundColor: item.mode === 'proofread' ? '#dbeafe' : '#f3e8ff', color: item.mode === 'proofread' ? '#1e40af' : '#6b21a8' }}>
+                                  {item.mode === 'proofread' ? 'Hiệu đính' : 'Biên dịch'}
+                                </span>
+                              </td>
+                              <td style={{ padding: '8px 10px' }}>
+                                <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', fontWeight: '600', color: statusColor, backgroundColor: statusBg }}>
+                                  {statusText}
+                                </span>
+                              </td>
+                              <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                                <button 
+                                  onClick={() => setAiQueue(prev => prev.filter((_, qIdx) => qIdx !== idx))} 
+                                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px 6px', fontSize: '11px', fontWeight: '500' }}
+                                  disabled={item.status === 'running'}
+                                >
+                                  Xóa
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="modalFooter" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <button 
+                  className="softPrimary" 
+                  onClick={() => { if (window.confirm('Bạn chắc chắn muốn xóa toàn bộ hàng chờ AI?')) { setAiQueue([]); setQueuePaused(false); queuePausedRef.current = false; } }} 
+                  disabled={queueRunning} 
+                  style={{ border: '1px solid #fecaca', color: '#dc2626', backgroundColor: '#fef2f2' }}
+                >
+                  Xóa hàng chờ
+                </button>
+
+                <div style={{ flexGrow: 1 }} />
+
+                <button className="softPrimary" onClick={() => setShowQueueModal(false)} style={{ border: '1px solid #cbd5e1' }}>Đóng</button>
+                
+                <button 
+                  className="primary" 
+                  onClick={mainBtnOnClick} 
+                  disabled={mainBtnDisabled}
+                  style={{ 
+                    fontWeight: 'bold', 
+                    backgroundColor: queueRunning ? '#d97706' : (queuePaused ? '#16a34a' : (mainBtnDisabled ? '#cbd5e1' : '#2563eb')), 
+                    borderColor: queueRunning ? '#d97706' : (queuePaused ? '#16a34a' : (mainBtnDisabled ? '#cbd5e1' : '#2563eb')),
+                    color: mainBtnDisabled ? '#94a3b8' : '#ffffff'
+                  }}
+                >
+                  {mainBtnLabel}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {showBatchAiModal && (
         <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchAiModal(false); }}>
           <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '360px' }}>
@@ -5359,41 +7410,49 @@ ${prompt.slice(-1500)}
           </div>
         </div>
       )}
-      {showBatchExportModal && (
-        <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchExportModal(false); }}>
-          <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '400px' }}>
-            <div className="modalHeader">
-              <h3><Download size={20} /> {exportIsTTS ? 'Xuất DOCX Theo Tập TTS' : 'Xuất DOCX Theo Tập'}</h3>
-              <button className="closeBtn" onClick={() => setShowBatchExportModal(false)}>×</button>
-            </div>
-            <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <label style={{ flex: 1, gap: '6px' }}>Từ chương
-                  <input type="number" min="1" max={chapters.length} value={exportStartCh} onChange={e => {
-                    const start = Math.max(1, parseInt(e.target.value) || 1);
-                    setExportStartCh(start);
-                    updateDefaultFilename(start, exportEndCh);
-                  }} />
-                </label>
-                <label style={{ flex: 1, gap: '6px' }}>Đến chương
-                  <input type="number" min="1" max={chapters.length} value={exportEndCh} onChange={e => {
-                    const end = Math.max(1, parseInt(e.target.value) || 1);
-                    setExportEndCh(end);
-                    updateDefaultFilename(exportStartCh, end);
-                  }} />
-                </label>
+      {showBatchExportModal && (() => {
+        try {
+          const totalChs = chapters?.length || 1;
+          return (
+            <div className="modalOverlay" onMouseDown={(e) => { overlayMouseDownTargetRef.current = e.target; }} onClick={(e) => { if (e.target === e.currentTarget && overlayMouseDownTargetRef.current === e.currentTarget) setShowBatchExportModal(false); }}>
+              <div className="modalContent" onClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onMouseUp={e => e.stopPropagation()} onKeyDown={e => { if (e.key !== 'Escape') e.stopPropagation(); }} style={{ maxWidth: '400px' }}>
+                <div className="modalHeader">
+                  <h3><Download size={20} /> {exportIsTTS ? 'Xuất DOCX Theo Tập TTS' : 'Xuất DOCX Theo Tập'}</h3>
+                  <button className="closeBtn" onClick={() => setShowBatchExportModal(false)}>×</button>
+                </div>
+                <div className="modalBody" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <label style={{ flex: 1, gap: '6px' }}>Từ chương
+                      <input type="number" min="1" max={totalChs} value={exportStartCh || 1} onChange={e => {
+                        const start = Math.max(1, parseInt(e.target.value) || 1);
+                        setExportStartCh(start);
+                        updateDefaultFilename(start, exportEndCh || 10);
+                      }} />
+                    </label>
+                    <label style={{ flex: 1, gap: '6px' }}>Đến chương
+                      <input type="number" min="1" max={totalChs} value={exportEndCh || 10} onChange={e => {
+                        const end = Math.max(1, parseInt(e.target.value) || 1);
+                        setExportEndCh(end);
+                        updateDefaultFilename(exportStartCh || 1, end);
+                      }} />
+                    </label>
+                  </div>
+                  <label style={{ gap: '6px' }}>Tên file mặc định
+                    <input type="text" value={exportFilename || ''} onChange={e => setExportFilename(e.target.value)} />
+                  </label>
+                </div>
+                <div className="modalFooter">
+                  <button className="softPrimary" onClick={() => setShowBatchExportModal(false)}>Hủy</button>
+                  <button className="primary" onClick={() => exportBatchDocx(exportStartCh || 1, exportEndCh || 10, exportFilename || '', exportIsTTS)}>Xuất file</button>
+                </div>
               </div>
-              <label style={{ gap: '6px' }}>Tên file mặc định
-                <input type="text" value={exportFilename} onChange={e => setExportFilename(e.target.value)} />
-              </label>
             </div>
-            <div className="modalFooter">
-              <button className="softPrimary" onClick={() => setShowBatchExportModal(false)}>Hủy</button>
-              <button className="primary" onClick={() => exportBatchDocx(exportStartCh, exportEndCh, exportFilename, exportIsTTS)}>Xuất file</button>
-            </div>
-          </div>
-        </div>
-      )}
+          );
+        } catch (err) {
+          console.error('[DOCX_VOLUME_DIALOG_OPEN_ERROR] Render error in batch export modal:', err);
+          return null;
+        }
+      })()}
     </div>
   );
 }

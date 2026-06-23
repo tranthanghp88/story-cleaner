@@ -35,3 +35,15 @@ Awkward Chinese sentence structures must be rewritten based on context and speak
   - Do not preserve the original Chinese sentence structure if it translates to awkward, confusing, or literal wording.
   - Read surrounding dialogue and actions to identify intent, then rewrite naturally (e.g., translate the dismissive `"Ngươi... bị bỏ."` to `"Ngươi... đi đi."` or `"Ngươi đi đi."` rather than the literal `"Ngươi... bị bỏ rồi."`).
   - Prioritize speaker meaning and natural readability over word-matching (`Meaning > Literal wording`), while keeping all plot facts, character identities, and core events intact.
+
+---
+
+## 4. Terminal & Command Execution Constraints
+To prevent disruptive approval popups and maintain workflow continuity, the AI Agent must minimize terminal usage.
+* **No Offline Script Execution**: Never create temporary Node.js scripts in `scratch/` or `scripts/` to run them via `node <script>`. Use file-reading (`view_file`), search tools (`grep_search`), and native LLM logic instead.
+* **Direct File Edits Only**: Do not use shell commands or node scripts to modify files. Use native code-edit tools (`replace_file_content`, `multi_replace_file_content`, `write_to_file`) exclusively.
+* **No Automated Git Commands**: Never automatically execute `git restore`, `git checkout`, `git reset`, or `git clean` unless explicitly requested by the user.
+* **No Automated Linters/Audits**: Do not run linters, syntax checkers, or compilers via terminal. Verify code syntax and logic mentally.
+* **Allowed Terminal Commands**: Only use `run_command` for:
+  - Starting the dev server (`npm run dev`) at the beginning of the session or upon direct request.
+  - Packaging the application (`npm run dist:*`) upon direct request.
