@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('storyAPI', {
   geminiGenerate: (payload) => ipcRenderer.invoke('story:gemini-generate', payload),
   geminiListModels: (payload) => ipcRenderer.invoke('story:gemini-list-models', payload),
   logError: (msg) => ipcRenderer.invoke('story:log-error', msg),
+  logGeminiDebug: (payload) => ipcRenderer.invoke('story:log-gemini-debug', payload),
   saveChapterContent: (payload) => ipcRenderer.invoke('story:save-chapter-content', payload),
   loadChapterContent: (payload) => ipcRenderer.invoke('story:load-chapter-content', payload),
   deleteBookChapters: (payload) => ipcRenderer.invoke('story:delete-book-chapters', payload),

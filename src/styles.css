@@ -564,24 +564,41 @@ button {
 
 /* Cache utility button inline with Auto Saved */
 .cache-btn {
-  height: auto;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
-  cursor: pointer;
-  font-weight: 500;
+  height: 26px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
   transition: all 0.2s;
 }
 
 .cache-btn:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-  border-color: #94a3b8;
+  background: #e2e8f0 !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+}
+
+.autosave {
+  height: 26px !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+/* Tree Menu Actions Row compact button overrides */
+.activeBookActionsRow button {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
 }
 

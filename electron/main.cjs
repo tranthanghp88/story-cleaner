@@ -1700,19 +1700,23 @@ ipcMain.handle('story:gemini-generate', async (_, payload = {}) => {
       validateStatus: () => true
     });
 
+    const statusText = res.statusText || (res.status === 200 ? 'OK' : 'Error');
     if (res.status < 200 || res.status >= 300) {
       const err = res.data?.error;
-      return { ok: false, status: res.status, error: err?.message || `Gemini HTTP ${res.status}`, details: res.data };
+      return { ok: false, status: res.status, statusText, error: err?.message || `Gemini HTTP ${res.status}`, details: res.data };
     }
 
     const text = extractGeminiText(res.data);
     if (!text) {
       const reason = res.data?.candidates?.[0]?.finishReason;
-      return { ok: false, status: 500, error: reason ? `Gemini không trả text. Finish reason: ${reason}` : 'Gemini không trả text.' };
+      return { ok: false, status: 500, statusText: 'No Text', error: reason ? `Gemini không trả text. Finish reason: ${reason}` : 'Gemini không trả text.', details: res.data };
     }
-    return { ok: true, text };
+    return { ok: true, text, status: res.status, statusText, details: res.data };
   } catch (err) {
-    return { ok: false, status: 500, error: err?.message || 'Không gọi được Gemini API.' };
+    const status = err.response?.status || 500;
+    const statusText = err.response?.statusText || 'Internal Server Error';
+    const details = err.response?.data || null;
+    return { ok: false, status, statusText, error: err?.message || 'Không gọi được Gemini API.', details };
   }
 });
 
@@ -1721,6 +1725,54 @@ ipcMain.handle('story:log-error', async (_, msg) => {
     fs.appendFileSync(path.join(__dirname, '..', 'runtime-error.txt'), msg);
   } catch {}
   return { ok: true };
+});
+
+ipcMain.handle('story:log-gemini-debug', async (_, payload = {}) => {
+  try {
+    const logDir = path.join(__dirname, '..', 'logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    const logFile = path.join(logDir, 'gemini-debug.log');
+
+    const timestamp = payload.timestamp || new Date().toISOString();
+    const keyLabel = payload.keyLabel || 'unknown';
+    const keyPrefix = payload.key ? (String(payload.key).slice(0, 8) + '...') : 'unknown';
+    const model = payload.model || 'unknown';
+    const endpoint = payload.endpoint || 'unknown';
+    const callSource = payload.callSource || 'unknown';
+    const inputLength = payload.inputLength || 0;
+
+    let logContent = `==================================================\n`;
+    logContent += `[GEMINI_REQUEST]\n`;
+    logContent += `timestamp: ${timestamp}\n`;
+    logContent += `keyLabel: ${keyLabel}\n`;
+    logContent += `keyPrefix: ${keyPrefix}\n`;
+    logContent += `model: ${model}\n`;
+    logContent += `endpoint: ${endpoint}\n`;
+    logContent += `callSource: ${callSource}\n`;
+    logContent += `inputLength: ${inputLength}\n\n`;
+
+    logContent += `[GEMINI_RESPONSE]\n`;
+    logContent += `status: ${payload.status || 'unknown'}\n`;
+    logContent += `statusText: ${payload.statusText || 'unknown'}\n`;
+    logContent += `responseBody: ${typeof payload.responseBody === 'object' ? JSON.stringify(payload.responseBody, null, 2) : (payload.responseBody || '{}')}\n`;
+
+    if (payload.isError) {
+      logContent += `\n[GEMINI_ERROR]\n`;
+      logContent += `errorType: ${payload.errorType || 'unknown'}\n`;
+      logContent += `rawMessage: ${payload.rawMessage || ''}\n`;
+      if (payload.stack) {
+        logContent += `stack: ${payload.stack}\n`;
+      }
+    }
+    logContent += `==================================================\n\n`;
+
+    fs.appendFileSync(logFile, logContent, 'utf8');
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
 });
 
 ipcMain.handle('story:save-chapter-content', async (_, payload = {}) => {
